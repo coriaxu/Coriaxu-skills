@@ -13,31 +13,50 @@
 
 其中一部分是原创，一部分是社区作者的杰出作品，我收录进来方便本地一键部署 + 致谢原作者。**所有第三方作者和原协议见 [CREDITS.md](CREDITS.md)**。
 
-## 快速开始
+## 🤖 最简单的方式：让你的 AI 助理帮你装
+
+完全不熟命令行？**把下面这段话复制粘贴给你的 Claude Code / Codex / Gemini Antigravity**，把 `<skill-name>` 换成你想装的那个：
+
+> 请打开以下链接阅读安装指引，并按指引帮我安装其中的 `<skill-name>`：
+> https://github.com/coriaxu/Coriaxu-skills/blob/main/docs/ai-install-guide.md
+
+可选 skill 列表：[skills/](skills/) 目录下每一个子文件夹就是一个。AI 助理会自动帮你 clone + 安装 + 提示重启。
+
+## 💻 命令行方式（推荐懂 shell 的朋友）
 
 ```bash
-# 1. 克隆仓库
+# 首次：克隆仓库
 git clone https://github.com/coriaxu/Coriaxu-skills.git ~/Code/Coriaxu-skills
 cd ~/Code/Coriaxu-skills
 
-# 2. 一键同步到三处 skill 目录
+# 装某一个 skill
+./install.sh yao-meta-skill
+
+# 装多个
+./install.sh yao-meta-skill nuwa-skill
+
+# 装全部
 ./install.sh
+
+# 预览不写盘
+./install.sh --dry-run yao-meta-skill
+
+# 看可选 skill
+./install.sh --list
 ```
 
-`install.sh` 默认同步到：
+`install.sh` 会自动把 skill 同步到本机实际存在的这几处（不存在的目录会跳过）：
 
 - `~/.claude/skills/`（Claude Code）
 - `~/.codex/skills/`（Codex）
 - `~/.gemini/antigravity/skills/`（Gemini Antigravity）
-
-只需要其中一两个目标，改 `install.sh` 里的 `TARGETS` 数组即可。
 
 ## 更新已有 skill
 
 ```bash
 cd ~/Code/Coriaxu-skills
 git pull
-./install.sh
+./install.sh <skill-name>   # 或跑过的所有
 ```
 
 ## 占位符约定
@@ -62,16 +81,17 @@ export SKILL_WORKSPACE="$HOME/Documents/my-workspace"
 
 ```
 Coriaxu-skills/
-├── README.md            # 你在看的这个
-├── LICENSE              # MIT
-├── CREDITS.md           # 第三方作者致谢（重要）
-├── install.sh           # 一键同步到三处本地目录
-├── skills/              # 所有 skill 的权威源
+├── README.md              # 你在看的这个
+├── LICENSE                # MIT
+├── CREDITS.md             # 第三方作者致谢（重要）
+├── install.sh             # 同步 skill 到本地（支持选装）
+├── skills/                # 所有 skill 的权威源
 │   ├── yao-meta-skill/
 │   ├── nuwa-skill/
 │   └── ...
 └── docs/
-    └── origin-audit.md  # 每个 skill 的归属溯源表
+    ├── ai-install-guide.md  # 给 AI 助理的安装 SOP
+    └── origin-audit.md      # 每个 skill 的归属溯源表
 ```
 
 ## 贡献 skill
