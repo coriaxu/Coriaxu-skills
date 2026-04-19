@@ -97,7 +97,7 @@ for target in "${TARGETS[@]}"; do
   mkdir -p "$target"
   echo "→ Target: $target"
   for skill in "${SKILL_LIST[@]}"; do
-    rsync -a --delete $DRY_RUN \
+    rsync -a --delete --exclude='.git' --exclude='.DS_Store' $DRY_RUN \
       "$SKILLS_SRC/$skill/" \
       "$target/$skill/"
     echo "  ✓ $skill"
