@@ -1,6 +1,6 @@
 # Coriaxu Skills
 
-徐浩（[@coriaxu](https://github.com/coriaxu)）的个人 Claude Code / Codex / Gemini Antigravity skill 库，**兼做三处本地 skill 目录的权威同步源**。
+我（[@coriaxu](https://github.com/coriaxu)）的个人 Claude Code / Codex / Gemini Antigravity skill 库，**兼做三处本地 skill 目录的权威同步源**。
 
 ## 这是什么
 
