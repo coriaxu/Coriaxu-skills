@@ -88,4 +88,4 @@ Coriaxu-skills/
 
 ---
 
-_maintained by 徐浩 [@coriaxu](https://github.com/coriaxu) · Surfin L&D · 2026_
+_maintained by 徐浩 [@coriaxu](https://github.com/coriaxu) · 2026_

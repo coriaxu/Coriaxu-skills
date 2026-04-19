@@ -14,12 +14,11 @@
 
 ## 详细明细
 
-### 🟢 徐老师原创（可直接开源，标注 `Author: 徐浩 / Surfin L&D`）
+### 🟢 徐老师原创（可直接开源，标注 `Author: 徐浩`）
 
 | skill | 证据 | 备注 |
 |-------|------|------|
 | 三级笔记 | 无外部归属 | 原创 |
-| luiz | 无外部归属 | 原创 |
 | ljg-card | 无外部归属 | 原创 |
 | ljg-roundtable | 无外部归属 | 原创 |
 | skill-creator | 无外部归属 | 原创 |
@@ -79,6 +78,7 @@
 | skill | 原因 |
 |-------|------|
 | sophia / vera / reading-companion / save-memory-claude / okr-review / grace skill / dbskill-knowledge | 重度个人化，按 plan 不开源 |
+| luiz | 徐老师决定不开源（2026-04-19） |
 
 ---
 
