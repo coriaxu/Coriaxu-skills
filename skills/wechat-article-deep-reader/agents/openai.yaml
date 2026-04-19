@@ -1,0 +1,4 @@
+interface:
+  display_name: "微信公众号深读"
+  short_description: "稳定抓取微信公众号正文并自动生成主旨论证细节三级阅读笔记"
+  default_prompt: "请处理这篇微信公众号文章：先抓取并归一化正文，再按主旨-论证-细节输出三级阅读笔记。"

@@ -107,7 +107,7 @@ Coriaxu-skills/
 
 ## 致谢
 
-感谢以下开源作者的 skill，没有他们就没有这个仓库的完整形态：花叔（nuwa-skill、darwin-skill）、小能熊老师（三级笔记）、姚金刚（yao-meta-skill）、op7418、MrGeDiao、一泽 Eze、RKiding。
+感谢以下开源作者的 skill，没有他们就没有这个仓库的完整形态：花叔（nuwa-skill、darwin-skill）、小能熊老师（三级笔记）、姚金刚（yao-meta-skill）、李继刚（ljg-card、ljg-roundtable）、dontbesilent（dbs 系列）、Obsidian（obsidian-markdown、obsidian-bases）、乔木（qiaomu-epub-book-generator）、空格的键盘（career-skill-planner）、akira82-ai（agent-review）、一泽 Eze（web-access）、MrGeDiao（shuorenhua）。
 
 ---
 
