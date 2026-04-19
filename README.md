@@ -13,6 +13,8 @@
 
 其中一部分是原创，一部分是社区作者的杰出作品，我收录进来方便本地一键部署 + 致谢原作者。**所有第三方作者和原协议见 [CREDITS.md](CREDITS.md)**。
 
+👉 **看完整技能清单（触发词 + 一句话介绍）**：[docs/skill-catalog.md](docs/skill-catalog.md)
+
 ## 🤖 最简单的方式：让你的 AI 助理帮你装
 
 完全不熟命令行？**把下面这段话复制粘贴给你的 Claude Code / Codex / Gemini Antigravity**，把 `<skill-name>` 换成你想装的那个：
@@ -90,6 +92,7 @@ Coriaxu-skills/
 │   ├── nuwa-skill/
 │   └── ...
 └── docs/
+    ├── skill-catalog.md     # 完整技能清单（触发词 + 介绍）
     ├── ai-install-guide.md  # 给 AI 助理的安装 SOP
     └── origin-audit.md      # 每个 skill 的归属溯源表
 ```
@@ -104,7 +107,7 @@ Coriaxu-skills/
 
 ## 致谢
 
-感谢以下开源作者的 skill，没有他们就没有这个仓库的完整形态：花叔（nuwa-skill、darwin-skill）、op7418、MrGeDiao、一泽 Eze、姚金刚（yao-meta-skill）、RKiding。
+感谢以下开源作者的 skill，没有他们就没有这个仓库的完整形态：花叔（nuwa-skill、darwin-skill）、小能熊老师（三级笔记）、姚金刚（yao-meta-skill）、op7418、MrGeDiao、一泽 Eze、RKiding。
 
 ---
 

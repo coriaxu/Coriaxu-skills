@@ -20,6 +20,13 @@
 - 功能：达尔文 — 借鉴 Karpathy autoresearch 的自主实验循环，自动评估并优化 skill
 - 原仓：_待补充_
 
+### 小能熊老师 — `三级笔记`
+
+- 目录：`skills/三级笔记/`
+- 协议：_待确认（仓内无 LICENSE）_
+- 功能：深度阅读三级大纲笔记器 — 把长文章、演讲稿、论文拆成三级结构化大纲
+- 原仓：_待补充_
+
 ### MrGeDiao — `shuorenhua`
 
 - 目录：`skills/shuorenhua/`

@@ -6,12 +6,12 @@
 
 ## 溯源结果总览
 
-- **徐老师原创**：约 26 个
+- **徐老师原创**：约 25 个
 - **徐老师 AI 团队（小萌/若谷）署名**：2 个（flomo-processor、daily-review）
-- **第三方原创（明确作者）**：6 个（yao-meta-skill = 姚金刚、nuwa-skill = 花叔、darwin-skill = 花叔、shuorenhua、web-access、claude-to-im）
+- **第三方原创（明确作者）**：7 个（yao-meta-skill = 姚金刚、nuwa-skill = 花叔、darwin-skill = 花叔、三级笔记 = 小能熊老师、shuorenhua、web-access、claude-to-im）
 - **第三方包装/致敬**：1 个（awesome-finance-skills 基于 RKiding）
 - **所有第三方协议均为 MIT 或未声明**，徐老师仓库可安全采用 MIT
-- **订正记录（2026-04-19）**：徐老师 confirm yao-meta-skill 作者是姚金刚（原 frontmatter 写 Yao Team），darwin-skill 作者是花叔（之前误判为徐浩原创）
+- **订正记录（2026-04-19）**：徐老师 confirm yao-meta-skill 作者是姚金刚（原 frontmatter 写 Yao Team），darwin-skill 作者是花叔，三级笔记作者是小能熊老师（之前三条都误判为徐浩原创）
 
 ## 详细明细
 
@@ -19,7 +19,6 @@
 
 | skill | 证据 | 备注 |
 |-------|------|------|
-| 三级笔记 | 无外部归属 | 原创 |
 | ljg-card | 无外部归属 | 原创 |
 | ljg-roundtable | 无外部归属 | 原创 |
 | skill-creator | 无外部归属 | 原创 |
@@ -68,6 +67,7 @@
 | yao-meta-skill | 姚金刚 Yao Jingang（Yao Team） | MIT | `LICENSE:2 Copyright (c) 2026 Yao Team`（徐老师确认作者是姚金刚） | 待徐老师补链接 |
 | nuwa-skill | 花叔 Huashu | MIT | `LICENSE:2 Copyright (c) 2026 Huashu (花叔)` | 待徐老师补链接 |
 | darwin-skill | 花叔 Huashu | 待确认（仓内无 LICENSE） | 徐老师确认作者是花叔，扫描时误判为徐浩原创 | 待徐老师补链接 |
+| 三级笔记 | 小能熊老师 | 待确认（仓内无 LICENSE） | 徐老师确认作者是小能熊老师，扫描时误判为徐浩原创 | 待徐老师补链接 |
 | shuorenhua | MrGeDiao | MIT | `LICENSE:2 Copyright (c) 2026 MrGeDiao` | 待徐老师补链接 |
 | web-access | 一泽 Eze | MIT | `SKILL.md:560 author: 一泽Eze` | 待徐老师补链接 |
 | claude-to-im | op7418 | MIT | `LICENSE:3 Copyright (c) 2024-2025 op7418` | 独立 GitHub 仓（有 `.git` 目录） |
