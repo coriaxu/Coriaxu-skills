@@ -84,7 +84,7 @@ Coriaxu-skills/
 
 ## 致谢
 
-感谢以下开源作者的 skill，没有他们就没有这个仓库的完整形态：花叔、op7418、MrGeDiao、一泽 Eze、Yao Team、RKiding，以及启发了 darwin-skill 的 [Andrej Karpathy autoresearch](https://github.com/karpathy)。
+感谢以下开源作者的 skill，没有他们就没有这个仓库的完整形态：花叔（nuwa-skill、darwin-skill）、op7418、MrGeDiao、一泽 Eze、姚金刚（yao-meta-skill）、RKiding。
 
 ---
 

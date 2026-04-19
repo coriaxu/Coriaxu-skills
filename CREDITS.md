@@ -6,11 +6,18 @@
 
 ## 🙏 第三方 skill 原作者（按字母序）
 
-### Huashu 花叔 — `nuwa-skill`
+### Huashu 花叔 — `nuwa-skill`, `darwin-skill`
 
+**nuwa-skill**
 - 目录：`skills/nuwa-skill/`
 - 协议：MIT (Copyright © 2026 Huashu 花叔)
 - 功能：女娲造人术 — 输入任意人名自动派多 agent 调研并生成「人物视角 skill」
+- 原仓：_待补充_
+
+**darwin-skill**
+- 目录：`skills/darwin-skill/`
+- 协议：_待补充_（仓库内无 LICENSE 文件，按 MIT 处理，待联系花叔确认）
+- 功能：达尔文 — 借鉴 Karpathy autoresearch 的自主实验循环，自动评估并优化 skill
 - 原仓：_待补充_
 
 ### MrGeDiao — `shuorenhua`
@@ -27,10 +34,10 @@
 - 功能：把 Claude Code / Codex 会话桥接到 Telegram / Discord / 飞书 / QQ / 微信
 - 原仓：_待补充_
 
-### Yao Team — `yao-meta-skill`
+### 姚金刚 Yao Jingang — `yao-meta-skill`
 
 - 目录：`skills/yao-meta-skill/`
-- 协议：MIT (Copyright © 2026 Yao Team)
+- 协议：MIT (Copyright © 2026 Yao Team，作者：姚金刚)
 - 功能：元技能创造器 — 把 SOP、对话记录、工作笔记沉淀为可复用的 skill
 - 原仓：_待补充_
 
@@ -42,12 +49,6 @@
 - 原仓：_待补充_
 
 ## 💡 受启发 / 包装致敬
-
-下面这些 skill 在我手里做了二次开发或原创框架，但灵感或基础来自他人，在此致敬：
-
-### `darwin-skill` — 致敬 Andrej Karpathy
-
-受 Karpathy autoresearch 启发设计的 skill 自动优化器（基于 8 维评分 + 爬山算法 + git 版本控制）。方法论由徐浩整合实现。
 
 ### `awesome-finance-skills` — 基于 RKiding/Awesome-finance-skills
 

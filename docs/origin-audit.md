@@ -6,11 +6,12 @@
 
 ## 溯源结果总览
 
-- **徐老师原创**：约 27 个
+- **徐老师原创**：约 26 个
 - **徐老师 AI 团队（小萌/若谷）署名**：2 个（flomo-processor、daily-review）
-- **第三方原创（明确作者+MIT 协议）**：5 个（yao-meta-skill、nuwa-skill、shuorenhua、web-access、claude-to-im）
-- **第三方包装/致敬**：2 个（awesome-finance-skills 基于 RKiding、darwin-skill 致敬 Karpathy）
+- **第三方原创（明确作者）**：6 个（yao-meta-skill = 姚金刚、nuwa-skill = 花叔、darwin-skill = 花叔、shuorenhua、web-access、claude-to-im）
+- **第三方包装/致敬**：1 个（awesome-finance-skills 基于 RKiding）
 - **所有第三方协议均为 MIT 或未声明**，徐老师仓库可安全采用 MIT
+- **订正记录（2026-04-19）**：徐老师 confirm yao-meta-skill 作者是姚金刚（原 frontmatter 写 Yao Team），darwin-skill 作者是花叔（之前误判为徐浩原创）
 
 ## 详细明细
 
@@ -47,7 +48,6 @@
 
 | skill | 原创人 | 启发/致敬对象 | 处理方式 |
 |-------|--------|---------------|---------|
-| darwin-skill | 徐老师 | Karpathy's autoresearch | SKILL.md 里已提 "Inspired by Karpathy's autoresearch"，开源时在 README 明确致敬 |
 | awesome-finance-skills | 徐老师 | RKiding/Awesome-finance-skills | SKILL.md 已写 "基于 RKiding/Awesome-finance-skills 封装"，README 补原仓链接 |
 
 ### 🔵 徐老师 AI 团队（小萌 ChatGPT + 若谷 Gemini）署名
@@ -65,8 +65,9 @@
 
 | skill | 原作者 | 协议 | 证据 | 原仓/联系方式 |
 |-------|--------|------|------|---------------|
-| yao-meta-skill | Yao Team | MIT | `LICENSE:2 Copyright (c) 2026 Yao Team` | 待徐老师补链接 |
+| yao-meta-skill | 姚金刚 Yao Jingang（Yao Team） | MIT | `LICENSE:2 Copyright (c) 2026 Yao Team`（徐老师确认作者是姚金刚） | 待徐老师补链接 |
 | nuwa-skill | 花叔 Huashu | MIT | `LICENSE:2 Copyright (c) 2026 Huashu (花叔)` | 待徐老师补链接 |
+| darwin-skill | 花叔 Huashu | 待确认（仓内无 LICENSE） | 徐老师确认作者是花叔，扫描时误判为徐浩原创 | 待徐老师补链接 |
 | shuorenhua | MrGeDiao | MIT | `LICENSE:2 Copyright (c) 2026 MrGeDiao` | 待徐老师补链接 |
 | web-access | 一泽 Eze | MIT | `SKILL.md:560 author: 一泽Eze` | 待徐老师补链接 |
 | claude-to-im | op7418 | MIT | `LICENSE:3 Copyright (c) 2024-2025 op7418` | 独立 GitHub 仓（有 `.git` 目录） |
