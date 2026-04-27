@@ -45,6 +45,7 @@
 | [**qiaomu-epub-book-generator**](../skills/qiaomu-epub-book-generator/) | 生成 EPUB、制作电子书、Markdown 转 EPUB、博客文章做成电子书 | EPUB 电子书生成器：博客文章、Markdown 文档、AI 搜索资料转 EPUB，支持图片下载 + 代码块渲染 + 专业封面，兼容微信读书和 Apple Books。 | 乔木原创 |
 | [**shuorenhua**](../skills/shuorenhua/) | 说人话、去 AI 味、自然一点、别像模板、别太像 ChatGPT | 清理中英文文本里的 AI 套路：保留事实和术语，按 chat / status / docs / public-writing 四种场景控制改写力度。 | MrGeDiao 原创（MIT） |
 | [**reading-notes-splitter**](../skills/reading-notes-splitter/) | 读书笔记、flomo、HTML 转 MD、拆分卡片、笔记整理 | 把 flomo 等 HTML 格式的读书笔记转换为结构化 Markdown 卡片：自动拆分每条笔记，区分标题、个人想法和原书摘要。 | 徐浩原创 |
+| [**【Coriaxu】pending-zone**](../skills/coriaxu-pending-zone/) | 悬置、先放一放、回头再说、看一下悬置区、归档 | 个人悬置区：把“重要但还没想清楚”的议题保存成桌面 Markdown 卡片，默认使用 `~/Desktop/个人悬置区/`。 | 徐浩原创 |
 | [**wechat-article-deep-reader**](../skills/wechat-article-deep-reader/) | 微信文章链接（mp.weixin.qq.com）+ 提炼大纲 / 整理笔记 / 三级笔记 | 稳定抓取微信公众号文章并输出"主旨 - 论证 - 细节"三级阅读笔记，适合微信长文的深度结构化阅读。 | 徐浩原创 |
 | [**html-screenshot**](../skills/html-screenshot/) | 截图、网页截图、HTML 转图片、截成图片 | 本地 HTML 文件截图为竖版 PNG 图片，支持单文件和批量，用 Chrome 无头模式 2x 视网膜清晰度。 | 徐浩原创 |
 | [**brand-design-md**](../skills/brand-design-md/) | XX 风格、做成 XX 的感觉、参考 XX 设计 | 根据品牌名称从 `getdesign.md` 自动获取设计规范并生成匹配风格的 UI 代码，支持 62 个顶级品牌（Apple、Notion、Claude、Stripe 等）。 | 徐浩原创 |

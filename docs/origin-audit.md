@@ -36,6 +36,7 @@
 | obsidian-markdown | 原创手册 | 原创 |
 | obsidian-bases | 原创手册 | 原创 |
 | pending-zone | 徐老师个人工作流 | 原创 |
+| coriaxu-pending-zone | pending-zone 通用公开版 | 原创 |
 | init-project-claude | 原创 | 原创 |
 | init-memory-claude | 原创 | 原创 |
 | agent-review | 原创 | 原创 |
