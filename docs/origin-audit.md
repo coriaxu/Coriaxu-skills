@@ -72,6 +72,7 @@
 | shuorenhua | MrGeDiao | MIT | `LICENSE:2 Copyright (c) 2026 MrGeDiao` | 待徐老师补链接 |
 | web-access | 一泽 Eze | MIT | `SKILL.md:560 author: 一泽Eze` | 待徐老师补链接 |
 | claude-to-im | op7418 | MIT | `LICENSE:3 Copyright (c) 2024-2025 op7418` | 独立 GitHub 仓（有 `.git` 目录） |
+| aihot | 卡兹克 | MIT | 原始 skill 页面 https://aihot.virxact.com/aihot-skill/ | https://aihot.virxact.com/aihot-skill/ |
 
 **特别处理**：`claude-to-im` 本身是独立开源项目，带 `.git` 目录。**不建议直接塞进 monorepo**（会形成 git 嵌套或丢失原 git 历史）。建议在 README 做「第三方 skill 推荐」章节，贴原仓链接引导用户自己 clone。
 

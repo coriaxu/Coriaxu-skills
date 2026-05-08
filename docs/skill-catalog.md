@@ -65,6 +65,7 @@
 | [**obsidian-markdown**](../skills/obsidian-markdown/) | 处理 Obsidian 笔记、wikilinks、callouts、frontmatter | 创建和编辑 Obsidian 风格的 Markdown：wikilinks、embeds、callouts、properties/frontmatter、tags 等 Obsidian 特有语法。 | Obsidian 原创 |
 | [**obsidian-bases**](../skills/obsidian-bases/) | 创建数据库视图、表格视图、卡片视图、`.base` 文件 | 创建和编辑 Obsidian Bases（`.base` 文件）：视图、过滤器、公式、汇总等数据库式笔记组织能力。 | Obsidian 原创 |
 | [**web-access**](../skills/web-access/) | 搜索信息、查看网页、抓取社交媒体、读取动态渲染页面 | 联网操作总控：自动选择 WebSearch / WebFetch / curl / Jina / CDP 浏览器，支持登录态操作、动态页面、视频采帧、并行子 Agent 分治调研。 | 一泽 Eze 原创（MIT） |
+| [**aihot**](../skills/aihot/) | 今天 AI 圈有什么、AI 日报、AI 热点、最近 AI 发布、aihot | AI HOT 中文 AI 资讯查询：查询 aihot.virxact.com 公开 REST API，无需 API Key，实时返回中文 AI 新闻日报和精选动态流，支持关键词搜索和分类筛选。 | 卡兹克原创（MIT） |
 
 ---
 
@@ -91,4 +92,4 @@ cd ~/Code/Coriaxu-skills
 
 ---
 
-_最后更新：2026-04-19 · 本清单随仓库内容同步更新_
+_最后更新：2026-05-08 · 本清单随仓库内容同步更新_
