@@ -85,6 +85,13 @@
 - 功能：深度阅读三级大纲笔记器 — 把长文章、演讲稿、论文拆成三级结构化大纲
 - 原仓：_待补充_
 
+### 卡兹克 — `aihot`
+
+- 目录：`skills/aihot/`
+- 协议：MIT
+- 功能：AI HOT 中文 AI 资讯查询 — 查询 aihot.virxact.com 公开 REST API，实时返回中文 AI 新闻日报和动态流
+- 原仓：https://aihot.virxact.com/aihot-skill/
+
 ### 空格的键盘 — `career-skill-planner`
 
 - 目录：`skills/career-skill-planner/`
@@ -104,4 +111,4 @@ GitHub: [@coriaxu](https://github.com/coriaxu)
 
 ---
 
-_最后更新：2026-04-19_
+_最后更新：2026-05-08_
