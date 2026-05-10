@@ -1,0 +1,24 @@
+interface:
+  display_name: "Init Memory Student"
+  short_description: "给已有业务项目补上 AI 记忆"
+  default_prompt: "当我在一个已有项目文件夹里，希望 AI 先根据文件夹名和文件名理解项目，再把准备写入 AI_专属 的内容展示给我确认后再创建记忆文件时，使用 $init-memory-student。"
+compatibility:
+  canonical_format: "agent-skills"
+  adapter_targets:
+    - "openai"
+    - "claude"
+    - "generic"
+  activation:
+    mode: "manual"
+    paths: []
+  execution:
+    context: "inline"
+    shell: "bash"
+  trust:
+    source_tier: "local"
+    remote_inline_execution: "forbid"
+    remote_metadata_policy: "allow-metadata-only"
+  degradation:
+    openai: "metadata-adapter"
+    claude: "neutral-source-plus-adapter"
+    generic: "neutral-source"

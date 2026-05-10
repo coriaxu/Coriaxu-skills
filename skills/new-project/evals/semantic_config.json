@@ -1,0 +1,107 @@
+{
+  "fallback_positive_concepts": [
+    "new_project_command",
+    "business_project",
+    "interview_first",
+    "project_scaffold"
+  ],
+  "positive_concepts": {
+    "new_project_command": {
+      "weight": 0.3,
+      "phrases": [
+        "/new-project",
+        "new project",
+        "start a new project",
+        "create a new project",
+        "project scaffold"
+      ]
+    },
+    "business_project": {
+      "weight": 0.22,
+      "phrases": [
+        "training project",
+        "business project",
+        "operations project",
+        "learning project",
+        "workshop project",
+        "non technical project"
+      ]
+    },
+    "interview_first": {
+      "weight": 0.2,
+      "phrases": [
+        "interview me first",
+        "ask me a few setup questions",
+        "ask questions first",
+        "understand the project first",
+        "before creating files"
+      ]
+    },
+    "project_scaffold": {
+      "weight": 0.18,
+      "phrases": [
+        "create the project folder",
+        "project folder",
+        "readme",
+        "memory files",
+        "task plan",
+        "findings",
+        "scratchpad",
+        "decisions"
+      ]
+    },
+    "filled_docs": {
+      "weight": 0.1,
+      "phrases": [
+        "filled project files",
+        "not blank templates",
+        "pre filled",
+        "write the answers into the files"
+      ]
+    }
+  },
+  "negative_concepts": {
+    "coding_project": {
+      "weight": 0.4,
+      "exclusive": true,
+      "phrases": [
+        "coding project",
+        "code project",
+        "python tool",
+        "script repo",
+        "software repo",
+        "developer project",
+        "engineering project"
+      ]
+    },
+    "summary_only": {
+      "weight": 0.32,
+      "exclusive": true,
+      "phrases": [
+        "summarize",
+        "summary only",
+        "just explain",
+        "review this document"
+      ]
+    },
+    "brainstorm_only": {
+      "weight": 0.25,
+      "exclusive": true,
+      "phrases": [
+        "brainstorm",
+        "ideas only",
+        "name ideas"
+      ]
+    },
+    "existing_project": {
+      "weight": 0.28,
+      "exclusive": true,
+      "phrases": [
+        "existing project",
+        "current project folder",
+        "review this folder",
+        "reorganize this project"
+      ]
+    }
+  }
+}

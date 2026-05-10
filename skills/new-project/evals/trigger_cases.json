@@ -1,0 +1,16 @@
+{
+  "recommended_threshold": 0.33,
+  "should_trigger": [
+    "Use /new-project to ask me a few setup questions and then create a new training project folder with README and memory files.",
+    "I want to start a new business project. Interview me first, then create the project structure and fill the files with my answers.",
+    "Help me create a non-technical project scaffold for an operations workshop."
+  ],
+  "should_not_trigger": [
+    "Initialize a coding repo for a Python automation tool.",
+    "Summarize this project brief without creating any folders."
+  ],
+  "near_neighbor": [
+    "Brainstorm some names for a new workshop project.",
+    "Review the structure of this existing project folder and tell me what is missing."
+  ]
+}

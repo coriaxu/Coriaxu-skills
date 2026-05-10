@@ -1,0 +1,18 @@
+{
+  "recommended_threshold": 0.48,
+  "should_trigger": [
+    "Initialize AI memory for this existing project folder. Do not create a new project. Show your understanding first and only write after I confirm.",
+    "This folder is full of PPT, Excel, Word, and PDF files. Help the AI remember the project without touching the original files.",
+    "Use /init-memory to add an AI_专属 memory area to this business project after showing the draft content to me."
+  ],
+  "should_not_trigger": [
+    "Create a brand new training project folder from scratch.",
+    "Only help me restore the current project progress. Do not create any files.",
+    "Save the useful points from our last conversation into project memory."
+  ],
+  "near_neighbor": [
+    "Review this folder structure and tell me what looks missing, but do not create AI_专属 yet.",
+    "Summarize what materials exist in this directory without creating any memory files.",
+    "I need save-memory, not initialization."
+  ]
+}

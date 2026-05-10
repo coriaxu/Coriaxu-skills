@@ -1,0 +1,24 @@
+interface:
+  display_name: "New Project"
+  short_description: "Interview first, then create a filled business project scaffold"
+  default_prompt: "Use $new-project to interview me first and then create a new business project folder with README and AI memory files."
+compatibility:
+  canonical_format: "agent-skills"
+  adapter_targets:
+    - "openai"
+    - "claude"
+    - "generic"
+  activation:
+    mode: "manual"
+    paths: []
+  execution:
+    context: "inline"
+    shell: "bash"
+  trust:
+    source_tier: "local"
+    remote_inline_execution: "forbid"
+    remote_metadata_policy: "allow-metadata-only"
+  degradation:
+    openai: "metadata-adapter"
+    claude: "neutral-source-plus-adapter"
+    generic: "neutral-source"

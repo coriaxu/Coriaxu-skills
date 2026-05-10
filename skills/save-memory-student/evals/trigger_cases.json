@@ -1,0 +1,18 @@
+{
+  "recommended_threshold": 0.48,
+  "should_trigger": [
+    "Save this round of work into today's AI daily work log and update project memory if AI_专属 exists.",
+    "Use /save-memory to remember what we completed today, what we discovered, and what comes next.",
+    "Archive today's work summary after showing me the planned content first."
+  ],
+  "should_not_trigger": [
+    "Initialize AI memory for this project folder.",
+    "Restore the last known project status without writing anything.",
+    "Write a finished weekly report from these notes."
+  ],
+  "near_neighbor": [
+    "Summarize this folder structure but do not save anything.",
+    "Let's reflect on what happened, but don't write files yet.",
+    "Create a new AI_专属 template for this project."
+  ]
+}

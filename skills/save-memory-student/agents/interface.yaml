@@ -1,0 +1,24 @@
+interface:
+  display_name: "Save Memory Student"
+  short_description: "把今天的工作存进 AI 工作日报，并按需更新项目记忆"
+  default_prompt: "当我希望把当前这一轮工作的进展、发现和下一步先展示给我确认，再写入桌面的 AI 工作日报，并在 AI_专属 存在时同步更新项目记忆时，使用 $save-memory-student。"
+compatibility:
+  canonical_format: "agent-skills"
+  adapter_targets:
+    - "openai"
+    - "claude"
+    - "generic"
+  activation:
+    mode: "manual"
+    paths: []
+  execution:
+    context: "inline"
+    shell: "bash"
+  trust:
+    source_tier: "local"
+    remote_inline_execution: "forbid"
+    remote_metadata_policy: "allow-metadata-only"
+  degradation:
+    openai: "metadata-adapter"
+    claude: "neutral-source-plus-adapter"
+    generic: "neutral-source"
