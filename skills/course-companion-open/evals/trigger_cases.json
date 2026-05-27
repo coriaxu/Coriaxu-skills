@@ -1,0 +1,69 @@
+{
+  "recommended_threshold": 0.28,
+  "should_trigger": [
+    {
+      "text": "用 course-companion-open 陪我学这堂课，我贴课程原文给你。",
+      "family": "cn_explicit_skill"
+    },
+    {
+      "text": "我们来共学这节在线课，先做课程笔记，再一起聊聊。",
+      "family": "cn_co_learning"
+    },
+    {
+      "text": "我刚听完一堂课，想把它消化成深度研读笔记。",
+      "family": "cn_course_digest"
+    },
+    {
+      "text": "Study this lecture transcript with me and help connect it to my notes.",
+      "family": "en_lecture_study"
+    },
+    {
+      "text": "Use course companion to help me digest this class and create lesson notes.",
+      "family": "en_course_companion"
+    },
+    {
+      "text": "这是我的 Obsidian vault，只扫课程笔记和读书笔记，帮我学这堂课。",
+      "family": "cn_obsidian_mode"
+    },
+    {
+      "text": "Scan this notes folder while we discuss this lesson transcript.",
+      "family": "en_folder_mode"
+    }
+  ],
+  "should_not_trigger": [
+    {
+      "text": "把这篇文章总结成三条要点就行，不用对话。",
+      "family": "cn_summary_only"
+    },
+    {
+      "text": "帮我设计一门面向管理者的 AI 课程。",
+      "family": "cn_course_design"
+    },
+    {
+      "text": "陪我精读这本书，从第一章开始。",
+      "family": "cn_book_reading"
+    },
+    {
+      "text": "Clean these messy meeting notes and extract action items.",
+      "family": "en_note_cleanup"
+    },
+    {
+      "text": "Translate this lesson transcript into English only.",
+      "family": "en_translation_only"
+    }
+  ],
+  "near_neighbor": [
+    {
+      "text": "帮我提炼这篇长文的三级笔记，不需要共学。",
+      "family": "cn_three_level_only"
+    },
+    {
+      "text": "我想做一个课程大纲，给学员上课用。",
+      "family": "cn_instructional_design"
+    },
+    {
+      "text": "Summarize this podcast transcript in one page, no discussion needed.",
+      "family": "en_summary_no_dialogue"
+    }
+  ]
+}

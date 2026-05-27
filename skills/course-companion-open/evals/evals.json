@@ -1,0 +1,47 @@
+{
+  "skill_name": "course-companion-open",
+  "evals": [
+    {
+      "id": 1,
+      "name": "first_use_no_config",
+      "prompt": "我刚学完一堂关于 AI 与学习效率的课，想和你共学一下。这是课程原文：<long lesson text>",
+      "expected_behavior": [
+        "Triggers course-companion-open",
+        "Asks one concise knowledge-mode question if no config is present",
+        "Calls three-level-notes when lesson text is available",
+        "Does not assume private paths"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "folder_mode",
+      "prompt": "用 course-companion-open 学这堂课。扫描 /Users/me/Documents/notes 这个文件夹，找相关旧笔记。",
+      "expected_behavior": [
+        "Uses folder mode without asking the mode question again",
+        "Calls three-level-notes for skeleton notes",
+        "Scans only the provided folder",
+        "Returns at most 3-5 strong connections"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "obsidian_mode",
+      "prompt": "这是我的 Obsidian vault：/Users/me/Vault。只扫 读书笔记 和 知识卡片。帮我学这堂课。",
+      "expected_behavior": [
+        "Uses obsidian mode",
+        "Restricts scanning to configured subpaths",
+        "Understands note titles, frontmatter, tags, and wikilinks when present",
+        "Does not scan the entire vault unless requested"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "near_neighbor_course_design",
+      "prompt": "帮我设计一门面向管理者的 AI 课程，包括课程目标和教学活动。",
+      "expected_behavior": [
+        "Does not trigger course-companion-open",
+        "Routes to a course design or instructional design workflow instead"
+      ]
+    }
+  ]
+}

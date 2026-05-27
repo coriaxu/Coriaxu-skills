@@ -1,0 +1,28 @@
+{
+  "name": "course-companion-open",
+  "display_name": "课程共学搭档",
+  "version": "0.1.0",
+  "owner": "Coria Xu",
+  "updated_at": "2026-05-27",
+  "status": "draft",
+  "maturity_tier": "production-candidate",
+  "lifecycle_stage": "public-draft",
+  "target_platforms": [
+    "openai",
+    "claude",
+    "generic",
+    "agent-skills-compatible"
+  ],
+  "required_skills": [
+    "three-level-notes"
+  ],
+  "package_components": [
+    "SKILL.md",
+    "README.md",
+    "agents/interface.yaml",
+    "references",
+    "examples",
+    "evals",
+    "reports"
+  ]
+}

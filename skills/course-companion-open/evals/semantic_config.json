@@ -1,0 +1,145 @@
+{
+  "fallback_positive_concepts": [
+    "course_material",
+    "co_learning",
+    "deep_digest"
+  ],
+  "positive_concepts": {
+    "course_material": {
+      "weight": 0.3,
+      "phrases": [
+        "course",
+        "class",
+        "lesson",
+        "lecture",
+        "transcript",
+        "online class",
+        "课程",
+        "这堂课",
+        "这节课",
+        "一堂课",
+        "听完一堂课",
+        "在线课",
+        "讲稿",
+        "课程原文"
+      ]
+    },
+    "co_learning": {
+      "weight": 0.24,
+      "phrases": [
+        "co-learn",
+        "study with me",
+        "with me",
+        "course companion",
+        "discuss this lesson",
+        "共学",
+        "一起聊",
+        "陪我学",
+        "一起学",
+        "课程共学"
+      ]
+    },
+    "deep_digest": {
+      "weight": 0.22,
+      "phrases": [
+        "deeply study",
+        "digest",
+        "lesson notes",
+        "study note",
+        "研读笔记",
+        "深度研读",
+        "深度研读笔记",
+        "消化",
+        "课程笔记",
+        "学这堂课"
+      ]
+    },
+    "knowledge_connection": {
+      "weight": 0.16,
+      "phrases": [
+        "connect it to my notes",
+        "scan this notes folder",
+        "obsidian",
+        "vault",
+        "notes folder",
+        "接入笔记",
+        "扫描",
+        "旧笔记",
+        "知识库",
+        "笔记文件夹"
+      ]
+    },
+    "final_artifact": {
+      "weight": 0.08,
+      "phrases": [
+        "create lesson notes",
+        "final study note",
+        "knowledge card",
+        "生成笔记",
+        "写成笔记",
+        "知识卡片"
+      ]
+    }
+  },
+  "negative_concepts": {
+    "summary_only": {
+      "weight": 0.35,
+      "exclusive": true,
+      "phrases": [
+        "summary only",
+        "summarize only",
+        "one page",
+        "no discussion needed",
+        "总结就行",
+        "不用对话",
+        "不需要共学",
+        "三条要点"
+      ]
+    },
+    "course_design": {
+      "weight": 0.35,
+      "exclusive": true,
+      "phrases": [
+        "design a course",
+        "curriculum",
+        "lesson plan",
+        "instructional design",
+        "设计一门",
+        "课程大纲",
+        "给学员上课",
+        "教学活动"
+      ]
+    },
+    "book_reading": {
+      "weight": 0.3,
+      "exclusive": true,
+      "phrases": [
+        "book",
+        "chapter",
+        "精读这本书",
+        "第一章",
+        "读书陪读"
+      ]
+    },
+    "note_cleanup": {
+      "weight": 0.3,
+      "exclusive": true,
+      "phrases": [
+        "meeting notes",
+        "action items",
+        "clean notes",
+        "会议纪要",
+        "行动项"
+      ]
+    },
+    "translation_only": {
+      "weight": 0.3,
+      "exclusive": true,
+      "phrases": [
+        "translate",
+        "translation",
+        "翻译"
+      ]
+    }
+  }
+}

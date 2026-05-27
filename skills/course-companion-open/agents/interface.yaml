@@ -1,0 +1,24 @@
+interface:
+  display_name: "课程共学搭档"
+  short_description: "Study one lesson through skeleton notes, note connections, dialogue, and final artifacts"
+  default_prompt: "Use $course-companion-open to study this lesson with me. First resolve whether to connect my notes, then call three-level-notes for the lesson skeleton."
+compatibility:
+  canonical_format: "agent-skills"
+  adapter_targets:
+    - "openai"
+    - "claude"
+    - "generic"
+  activation:
+    mode: "manual"
+    paths: []
+  execution:
+    context: "inline"
+    shell: "bash"
+  trust:
+    source_tier: "local"
+    remote_inline_execution: "forbid"
+    remote_metadata_policy: "allow-metadata-only"
+  degradation:
+    openai: "requires-three-level-notes-or-approved-fallback"
+    claude: "requires-three-level-notes-or-approved-fallback"
+    generic: "requires-three-level-notes-or-approved-fallback"
