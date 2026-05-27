@@ -1,5 +1,10 @@
 # Claude Code 安装
 
+## lite / full 怎么选
+
+- `lite`：只加载 `SKILL.md`。适合临时改写和轻量审稿。
+- `full`：加载 `SKILL.md` + `references/`。适合项目级安装、公开文本、技术文档和需要误杀防护的场景。
+
 ## 方式 1：项目级（推荐）
 
 ```bash
@@ -7,6 +12,8 @@ mkdir -p .claude/skills/shuorenhua
 cp SKILL.md .claude/skills/shuorenhua/
 cp -r references .claude/skills/shuorenhua/
 ```
+
+这是 full 用法，也是项目级安装的默认建议。
 
 在项目的 `CLAUDE.md` 中写清楚触发条件：
 
@@ -26,7 +33,7 @@ cp SKILL.md ~/.claude/skills/shuorenhua/
 cp -r references ~/.claude/skills/shuorenhua/
 ```
 
-即使放到全局目录，也建议在各项目的 `CLAUDE.md` 里补一条触发说明，否则 Claude Code 不会主动读取。
+这是 full 用法。只复制 `SKILL.md` 也能作为 lite 用法临时使用，但长期项目建议带上 `references/`。即使放到全局目录，也建议在各项目的 `CLAUDE.md` 里补一条触发说明，否则 Claude Code 不会主动读取。
 
 ## 使用
 

@@ -1,6 +1,6 @@
 ---
 name: shuorenhua
-description: 检查和清理中英文文本里的 AI 套路，适用于”去 AI 味””说人话””自然一点””别像模板”这类改写需求；按场景控制力度，同时保留事实、术语和语域。
+description: 检查和清理中英文文本里的 AI 套路，适用于“去 AI 味”“说人话”“自然一点”“别像模板”“先标问题”这类改写和审稿需求；按场景控制力度，同时保留事实、术语、语域和责任主体。
 ---
 
 # 说人话
@@ -28,7 +28,7 @@ description: 检查和清理中英文文本里的 AI 套路，适用于”去 AI
 - 去 AI 味，主要处理的是模板感、收束腔、虚假主语、语域混搭和表演性技术腔。
 - 保留技术性。专业词、系统主语、事故复盘用语、PRD/发布说明中的术语默认可保留。
 - 优先保信息，再谈风格。任何改写都不能新增事实、删核心事实或改变责任主体。
-- 不用机械同义词替换表。优先删句、并句、降调、换主语、去总结式收尾。
+- 不用机械同义词替换表。默认可以删句、并句、降调、换主语、去总结式收尾；如果进入 `in-place` scope，就只做句内改写。
 - 短语表默认只列代表项，不追求穷举所有变体。遇到新口癖，先按现有模式归类，再决定要不要补词。
 
 ## Execution order
@@ -39,11 +39,12 @@ description: 检查和清理中英文文本里的 AI 套路，适用于”去 AI
 2. 查禁改项：先划 `protected spans`，看有没有必须保留的术语、系统主语、引用原文、命令或正式语体
 3. 判 Tier：`Tier 1 / Tier 2 / Tier 3`，按问题命中强度判断，不要把 Tier 当作改写力度
 4. 再判档位：`minimal / standard / aggressive`
-5. 先执行本文件里的最小规则；只要环境里能读 `references/`，默认继续按问题类型补看 [Protected Spans](./references/protected-spans.md)、[Positive Style Contract](./references/positive-style.md)、[微操作手册](./references/operation-manual.md)、[结构反模式](./references/structures.md) 和相关短语表
-6. 回读拆成两步：先做保真回读，再按需做残留味回读
-7. 输出：默认只给单一推荐版本；用户明确要求“先标问题，不改写”时切到 `annotation mode`
+5. 判 scope：`structural / in-place`，判断这次能不能动句子和段落结构
+6. 先执行本文件里的最小规则；只要环境里能读 `references/`，默认继续按问题类型补看 [Protected Spans](./references/protected-spans.md)、[Positive Style Contract](./references/positive-style.md)、[微操作手册](./references/operation-manual.md)、[结构反模式](./references/structures.md) 和相关短语表；如果目标是“改完能直接发”，或文本明显属于 README、release note、论坛帖、issue 回复，再补看 [Scene Packs](./references/scene-packs.md)、[真实样本评测](./evals/real-samples.md) 和 [改写示例](./references/examples.md)
+7. 回读拆成两步：先做保真回读，再按需做残留味回读
+8. 输出：默认只给单一推荐版本；用户明确要求“先标问题，不改写”时切到 `annotation mode`
 
-执行第 5 步时，先按“模式”处理，再按“词条”兜底：
+执行第 6 步时，先按“模式”处理，再按“词条”兜底：
 
 - 同一类调试腔、暴力动作腔、主动出击腔、总结提示腔，默认按同一模式处理，不要求逐词命中
 - 只有当新说法改变了误杀边界，或明显不属于现有模式时，才把它当作新增词条处理
@@ -74,7 +75,7 @@ description: 检查和清理中英文文本里的 AI 套路，适用于”去 AI
 
 信号：
 
-- 操作文档、技术说明、接口说明、FAQ、事故复盘、发布说明
+- 操作文档、技术说明、接口说明、FAQ、事故复盘
 - 重点是可检索、可复现、术语稳定
 
 默认档位：`minimal`
@@ -90,6 +91,17 @@ description: 检查和清理中英文文本里的 AI 套路，适用于”去 AI
 
 更细的下限限制见 [场景禁改表](./references/scene-guardrails.md)。
 
+### Scene Packs
+
+如果文本本身命中下面任一子场景，不依赖用户是否明说，也不受主场景初判限制，都要补看 Scene Packs：
+
+- `README`：出现项目介绍、快速开始、安装方式、功能列表、README intro 等信号时，第一屏要说清“这是什么、给谁用、解决什么问题”
+- `release-note`：出现版本标题、`Release Highlights`、`Added / Changed / Fixed / Tested`、changelog 列表等信号时，列清本版变更、验证和限制，不写发布宣言
+- `forum-post`：出现 Linux.do / V2EX / 社区帖 / 发帖复盘等信号时，保留维护者的真实观察和社区语气，不改成公告
+- `issue-reply`：出现 issue / PR 回复、bad case、复现、下一版补 benchmark 等信号时，先确认问题和下一步，不做客服式安抚
+
+子场景只负责发布目的和语气收束，不覆盖 protected spans、Tier、档位和回读规则。完整策略见 [Scene Packs](./references/scene-packs.md)。
+
 ## 2. Single-file fallback rules
 
 只加载 `SKILL.md` 时，也必须能完成基础改写。下面这些规则默认直接生效：
@@ -99,6 +111,7 @@ description: 检查和清理中英文文本里的 AI 套路，适用于”去 AI
 - 处理二元对比骨架：`不是 X，而是 Y`、`与其 X，不如 Y` 多数删前半句，直接说 `Y`
 - 处理无源引用：`研究表明`、`数据显示`、`studies show`、`experts say` 默认按场景选择 `rewrite-safe` 或 `audit-only`；只有用户明确要保留原论证骨架时才用 `rewrite-with-placeholder`；不要补虚构来源
 - 把商业黑话和表演性技术腔改回普通动作：例如 `赋能`、`抓手`、`闭环`、`收窄`、`兜住`、`落盘`、`leverage`
+- 遇到过度接住、替用户做心理判断或身份认证式夸奖：例如 `你不是敏感`、`你只是太久没被稳稳接住了`、`你问到了问题的核心`、`顶刊作者的素养`，默认删姿态层，改回低承诺回应或具体判断；不要硬演“我懂了”
 - 发现翻译腔时，优先缩短主语和动作，少用长定语链、被动堆砌、`基于……`、`通过……来……`
 - 误杀防护优先：引用原文、命令、接口名、字段名、日志、报错、系统主语、技术报告术语默认保留
 - 中英混排句中的英文词按当前句子的实际语义判断，不机械套英文词表
@@ -133,8 +146,8 @@ description: 检查和清理中英文文本里的 AI 套路，适用于”去 AI
 默认动作：
 
 - 删掉空总结
-- 收窄过度抬高的语气
-- 把“像在解释自己会写作”的句子压回事实句
+- 把过度抬高的语气压回常规
+- 把"像在解释自己会写作"的句子压回事实句
 
 ### `standard`
 
@@ -156,6 +169,48 @@ description: 检查和清理中英文文本里的 AI 套路，适用于”去 AI
 - 先保护事实和术语，再做重写
 - `docs` 默认不要升到 `aggressive`
 
+## 3.5 Edit scope
+
+Scope 表示这次能不能改动句子和段落结构，和 `minimal / standard / aggressive` 是两条轴。
+
+### `structural`
+
+默认 scope。适用于短文本、明确要求重写的文本、AI 味密度很高且不需要保留原节奏的文本。
+
+允许动作：
+
+- 删整句空总结
+- 合并相邻事实句
+- 轻量调整句序或段落落点
+- 按场景重写局部结构
+
+### `in-place`
+
+适用于长 `public-writing`、观点文、复盘文、评论文，以及用户明确说“保长度 / 别缩水 / 字数 / 节奏 / 别删 / 尽量原样”的情况。
+
+默认触发条件：
+
+- 主场景是 `public-writing`，且中文原文约 1000 字以上
+- 用户 prompt 明确要求保留长度、句数、段落节奏或原文结构
+
+禁止动作：
+
+- 不删整句
+- 不合并相邻句
+- 不重排段落
+- 不把多段压成一段
+
+允许动作：
+
+- 句内替换词或短语
+- 删除句内提示层、空泛修饰和语气垫片
+- 把句内拔高语气降回普通判断
+- 在单句内部拆短过满结构，但不改变段落顺序
+
+删短语前先做语义独立性检查：删掉短语后，剩余部分必须仍是完整、可读、没有悬空指代的陈述句。否则改用句内替换，不要硬删。
+
+`aggressive + in-place` 可以存在，但默认先提醒用户：长文 `aggressive` 很容易明显缩水；如果用户真正要保长度，优先改成 `standard + in-place`。用户明确坚持时，再执行 `aggressive + in-place`，但仍遵守不删整句、不并句、不重排的边界。
+
 ## 4. Tier severity
 
 Tier 表示问题命中强度，与 [严重度分级](./references/severity.md) 保持一致，不表示改写力度。
@@ -166,6 +221,7 @@ Tier 表示问题命中强度，与 [严重度分级](./references/severity.md) 
 
 - 开场套话、总结式收尾、谄媚句
 - 明显商业黑话、自媒体流水线用语、表演性工程师腔
+- 过度接住式共情、替用户做心理判断、郑重预告和身份认证式夸奖
 - 英文里的 sycophantic openers、significance inflation、business jargon
 
 默认处理：局部命中用 `minimal` 或 `standard`，密集命中时可升到 `aggressive`
@@ -211,8 +267,10 @@ Tier 表示问题命中强度，与 [严重度分级](./references/severity.md) 
 - 有具体信息，不靠空洞总括撑气势
 - 有主语和动作，不靠虚假主体兜底
 - 有统一语域，不在技术腔、商业腔、自媒体腔之间跳
+- 以“可直接发”为终点，不为了更像人继续抛光到失真
 - 有节奏，但节奏来自删冗余和保留重点，不来自硬造金句
 - 有立场，但立场来自判断或事实，不来自“故作洞见”
+- 有边界，没把握就直说，不替对方做心理判断，也不硬演“我懂了”
 
 更完整的正向目标、分场景校准和“cleaner vs more human”对照见 [Positive Style Contract](./references/positive-style.md)。
 
@@ -272,6 +330,12 @@ Tier 表示问题命中强度，与 [严重度分级](./references/severity.md) 
 
 如果删掉一句后段落突然没了落点，就补一条事实句，不要补口号句。
 
+`in-place` scope 下额外检查：
+
+- 输出字数低于原文字数 85% 时，回退检查是否误删整句、并句或压段落
+- 句数变化超过约 10% 时，回退检查是否偷偷做了 structural 改写
+- 关键事实句、转场句和承担节奏的重复句，不能因为“看起来像模板”就默认删除
+
 ### Pass 2 | Residual Audit
 
 只有在第一遍已经保住事实、但读起来还有轻微 AI 味时，才做第二遍。第二遍固定只查这 5 件事：
@@ -311,6 +375,8 @@ Tier 表示问题命中强度，与 [严重度分级](./references/severity.md) 
 - 遇到具体病灶怎么动手：看 [微操作手册](./references/operation-manual.md)
 - 想确认某个场景什么不能乱动：看 [场景禁改表](./references/scene-guardrails.md)
 - 想校准误杀边界或做静态回归：看 [边界案例集](./references/boundary-cases.md)
+- 想看真实样本评测：看 [真实样本评测](./evals/real-samples.md)
+- 想看默认改写和 `annotation mode` 的对照：看 [改写示例](./references/examples.md)
 - 想处理没收录进词表的同类变体：先看 [微操作手册](./references/operation-manual.md) 里的“变体归并”规则，再决定要不要补词
 
 默认做法是：先用本文件完成“场景、Tier、档位、输出合同”的主判断，再按问题类型补读 `references/`；只有在单文件安装场景里，才停留在本文件的兜底规则。

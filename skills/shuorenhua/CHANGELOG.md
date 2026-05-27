@@ -1,5 +1,197 @@
 # Changelog
 
+## [1.8.5] - 2026-05-27 — In-place Scope / 长文保长度
+
+针对 [#4](https://github.com/MrGeDiao/shuorenhua/issues/4) 反馈"长文被改完明显缩水"（约 1800 字 → minimal 约 1500 字 → aggressive 约 1000 字）。本版结论：问题不在三档力度，而在长文默认走 structural 动作时，删句、并句、重排段落会叠加。
+
+### Added
+- 新增 `in-place` edit scope，和 `minimal / standard / aggressive` 三档力度**正交**。`in-place` 下只做句内替换、删短语和降调，不默认删整句、并句或重排段落。它不是第四档力度，而是改写动作的边界。
+- `evals/benchmark.md` 新增 4 条用例（66 → 70 条，38 SF + 28 SNF → 40 SF + 30 SNF）：
+  - `SF-39`：长 `public-writing` 在 `in-place` 下应去掉拔高骨架，但保留字数、句数和关键转场
+  - `SF-40`：多类骨架叠加时，`in-place` 应做句内替代，而不是删段落
+  - `SNF-29`：重复短语承担长文节奏时，不应被当作水分误删
+  - `SNF-30`：正常承接句挂在事实上下文里，不应被误杀为总结式收尾
+- `evals/real-samples.md` 新增 `RS-19` 高拟真合成长文样本（不直接转录 issue #4 原文），并为 long-form 场景增加 `长度节奏` 评分维度。
+- 新增 `evals/results-v1.8.5.md`，归档本轮静态复核。
+
+### Changed
+- `SKILL.md` 在执行顺序里加入 scope 判断，定义 `structural` / `in-place` 两种改写边界。默认走 `structural`；中文 `public-writing` 长文（约 1000 字以上）或用户明确要求保长度、保句数、保段落节奏时切到 `in-place`。
+- `references/operation-manual.md` 给二元对比、总结式收尾、narrator 腔、价值拔高骨架四类骨架补 `in-place` 替代动作，保留原有 structural 默认动作不变。
+- `references/positive-style.md` 和 `references/scene-guardrails.md` 加长文节奏边界：重复和转场不一定是水分，删之前先看它是不是在承担段落呼吸。
+- `evals/run-eval.md` 同步 scope 判断和 70 条 benchmark 的评测范围。
+- `README.md` 同步版本、计数和 In-place Scope 能力说明。
+
+### Tested
+- 静态复核 `SF-39` / `SF-40` / `SNF-29` / `SNF-30`：4 条新增 benchmark 都能被 `SKILL.md` + `references/operation-manual.md` 当前的 scope 规则解释。
+- 静态复核 `RS-19`：推荐改法保留五段结构、三处时间锚点和关键转场，不把长文压成摘要。
+- 没有跑模型实测。本版的"通过率"是静态走查口径，不是任何具体模型在线跑出来的结果——模型实跑留给后续轮次。
+
+### Notes
+- 本版不动 `minimal / standard / aggressive` 三档力度本身，也不新增第四档；调整集中在"动作边界"这一条新的正交轴上。
+- `in-place` 不是凑字数。字数留存率（目标 ≥ 0.90，硬下限 0.85）是回读指标，真正约束的是不删整句、不并句、不重排段落。
+- "约 1000 字"是这一轮反馈得到的工程默认值，不是稳定结论；后续需要更多真实长文 bad case 校准。
+
+## [1.8.4] - 2026-05-17 — Maintenance Surface / 维护入口对齐
+
+### Added
+- 新增 `.github/ISSUE_TEMPLATE/bad-case.md`，给“改完还是像 AI”的反馈留一个结构化入口，固定收集原文、使用方式、场景、问题点、不可改坏内容和期望方向。
+- `CONTRIBUTING.md` 新增 bad case 提交说明，明确脱敏和授权边界。
+
+### Changed
+- `README.md` 最新版本说明更新到 `v1.8.4`，并把 lite / full 的安装口径写清楚：lite 是只加载 `SKILL.md`，full 是 `SKILL.md` + `references/`。
+- `install/` 下各平台安装文档统一 lite / full 表述，避免不同入口对“只放 `SKILL.md` 还是带 `references/`”给出相互矛盾的建议。
+
+### Notes
+- 本版不改 `SKILL.md`、`references/`、`evals/benchmark.md` 或评测口径；它是维护入口和分发准备版本，不是规则能力扩张。
+- 本地 `tasks/current/roadmap-v1.8-v2.0.md` 已同步到当前维护状态；`tasks/` 仍保持 local-only，不进入公开发布面。
+
+## [1.8.3] - 2026-05-09 — Community Intake Round 1 / 首次实战
+
+### Added
+- `evals/benchmark.md` 新增 4 条用例（62 → 66 条，35 SF + 27 SNF → 38 SF + 28 SNF）：
+  - `SF-36`：路径正确性认证（`已经走在正确的路上了 / 走得很稳`），身份认证式夸奖在"对你的进度"维度上的延伸
+  - `SF-37`：对人本身发证书（`说明你已经超越绝大部分人了 / 你已经具备做这件事的实力了`），SF-31 同族新变体
+  - `SF-38`：庸医问诊腔变体（`掰扯清楚 / 彻底掰开说清楚`），归并到 `references/phrases-zh.md` 「庸医问诊腔」族
+  - `SNF-28`：技术语境里的"落盘"放行（宾语是 `重构方案 / 三份文档` 这类具体技术对象），规则同 v1.7.3 的 `接住` 按宾语判断
+
+### Changed
+- `references/operation-manual.md` 4 处补充（按"模式优先、词条兜底"原则，主要规则更新落在 manual 边界，不新增 phrases-zh 词条）：
+  - 5.2 节「过度接住 / 心理判断腔」补 `你现在的 X 很正常` 心理判断变体
+  - 5.2 节补 `抱住 / 紧紧抱住 / 拥抱 / 实实在在的抱住你这种想法` 同类抚慰动词归并提示
+  - 第 3 节「工程师腔」补 `落 X / 把 X 落下去 / 落到` 万能动词边界（按宾语区分姿态层 vs 技术对象）
+  - 第 7 节「价值拔高骨架」补 `你看完会彻底开悟 / 看完就懂了 / 看完会震惊 / 看完不再 X` 承诺式收尾
+- `evals/run-eval.md` 同步评测口径：SF 范围 → `01–38`，SNF 范围 → `01–28`，总数 → `66`
+- `README.md` 同步状态徽章、状态表、评测表、项目结构里的 benchmark 数量（62 → 66），版本号 → `v1.8.3`
+- `evals/real-samples.md` 同步 benchmark 计数（62 → 66）：元数据对比表（"benchmark vs real-samples 分工"）+ RS-10 推荐改法演示文本，样本本身和数量（18 条）不变
+- `references/phrases-zh.md` 工程师腔族升级 `落盘 / 已经落下去` 两条已有词条为按宾语判断（沿用 v1.7.3 `接住` 的处理方式），让 SNF-28 在单加载词表的评测路径上也能正确放行；不新增词条
+
+### Tested
+- 2026-05-09 用 v1.8.2 引入的 intake automation 跑了首次真实 community intake：10 条样本批次 → 报告归类 `已覆盖 3 / 变体归并 13 / 候选新模式 2`，落到 `tasks/current/intake/reports/2026-05-09-intake.md`（local-only）
+- intake 报告自身守住"已覆盖 → 无动作"边界：3 条已覆盖样本（包括接住体长版样板、元讨论保护、`You're absolutely right!`）全部按现有规则放行，没有被推到候选新模式
+- 新增 4 条 benchmark 静态复核：在更新后的 `operation-manual.md` 下，SF-36/37/38 命中身份认证 / 庸医问诊腔规则；SNF-28 在工程师腔的"落 X 按宾语判断"新边界下应放行
+
+### Notes
+- 本版坚持 v1.8.2 intake 协议的"模式优先、词条兜底"：**不新增** `references/phrases-zh.md` 词条；只升级已有 `落盘 / 已经落下去` 两条的判断口径（同 v1.7.3 `接住`），其余规则更新落在 `operation-manual.md` 的边界说明上
+- 2 个候选新模式（末尾二选一追问 / narrator 自夸式自我演绎）按 `automation/README.md:62-64` 协议，先记录在 intake 报告里观察 2-3 轮，确认是否反复出现再考虑入库；本版不立即落库
+- 本轮 intake 也是 v1.8.2 工具链首次脱离 dryrun 跑真实社区样本，验证了"先 intake 报告 → 人工确认 → 才动文件"的工作流可走通
+- 不动 `references/structures.md`、`SKILL.md`；`evals/real-samples.md` 仅做计数同步，样本本体和数量（18 条）不变；`references/phrases-zh.md` 仅升级 `落盘 / 已经落下去` 两条已有词条的判断口径，不新增词条
+
+## [1.8.2] - 2026-05-01 — Intake Automation / 维护者侧反馈闭环
+
+### Added
+- 顶层新增 `automation/` 目录，作为维护者工具入口（committed）：
+  - `automation/intake.md` — 协议规范
+  - `automation/intake-prompt.md` — Codex prompt 本体
+  - `automation/README.md` — 运行入口，含可复制粘贴的 `codex exec -C . -s read-only --ephemeral -o ...` 命令、文件命名约定、强约束说明
+- 运行实例继续放在 `tasks/current/intake/inbox/` 和 `reports/`（`.gitignore` 内，本地工作目录），第一次用前 `mkdir -p` 即可
+- dryrun 验证集（本地）：6 条合成样本覆盖三档结论 + 两类陷阱（被讨论词、技术语境放行），expected baseline 钉在 inbox 同目录下
+- 真实样本 smoke（本地）：用 `evals/real-samples.md` 的 RS-14 接住体跑了一次，验证工具守住"已覆盖 → 无动作"边界
+
+### Changed
+- `CONTRIBUTING.md`「维护者：Community Observation Intake」末尾新增"自动化运行（v1.8.2 起）"小节，明确自动化只覆盖原 5 步里的第 2-3 步（抽象姿态链、判宾语 / 判场景），第 1、4、5 步仍需人工
+- 公开路线图把原 v1.8.2「Feedback Loop / 反馈闭环」拆成两半：维护者侧 intake automation（本版）+ 外部 issue 模板 / pinned issue / bad-case 公开征集（顺延到 v2.0，理由和 v1.7.3 retro 一致）
+
+### Tested
+- 2026-05-01 跑了两轮 codex exec：第一轮 dryrun 6/6 命中 expected（已覆盖 3、变体归并 2、候选新模式 1），无误判被讨论词或技术语境放行；第二轮真实样本 smoke 1/1 标"已覆盖 → 无动作"
+- 报告格式两轮都符合 spec 的 6 段：本轮样本数 / 已覆盖 / 变体归并 / 候选新模式 / 建议动作 / 一句总判断
+- prompt 一轮通过，没有进入预设的"最多 2 轮微调"分支
+
+### Notes
+- 本版只动 intake 工具链 + 维护者文档，**没有改** `SKILL.md`、`references/*`、`evals/benchmark.md`、`evals/real-samples.md`、`README.md`，benchmark 总数仍为 62 条（35 SF + 27 SNF）
+- 强约束遵循 spec 已固定的口径：报告默认不建议加词条、不自动改仓库；`-s read-only` 沙箱在 codex 层再保一道
+- 不做 Codex Automation 调度（每周自动跑、自动开 issue）和外部 bad-case 征集入口，等 v2.0 配合分发一起做
+
+## [1.8.1] - 2026-04-27 — Knowledge Architecture / 项目知识架构对齐
+
+### Changed
+- `README.md` 更新项目状态和快速开始入口，把公开信息架构对齐到当前已发布能力
+- `install/codex.md` 和 `evals/run-eval.md` 切换到当前 Codex CLI 的 `codex exec` 用法，避免旧命令继续作为主入口传播
+- `install/chatgpt.md` 去掉易漂移的 reference 文件数量，改为按目录上传完整知识文件
+
+### Framing
+- 本版定位为项目知识架构对齐：让新用户能从 README 进入使用路径，让评测和安装入口保持同一套事实基线
+- 不改变 `SKILL.md`、`references/`、benchmark 判分口径或 Scene Packs 行为；`v1.8.1` 是采用路径和维护表面的升级，不是规则能力扩张
+
+## [1.8.0] - 2026-04-24 — Scene Packs / 可直接发场景包
+
+### Added
+- 新增 `references/scene-packs.md`，把 `public-writing` 细分为 `README`、`release-note`、`forum-post`、`issue-reply` 四个可发布场景
+- `evals/benchmark.md` 新增 8 条 scene pack 回归用例：`SF-32` ~ `SF-35` 覆盖该改场景，`SNF-24` ~ `SNF-27` 覆盖误杀防护
+- `evals/real-samples.md` 新增 `RS-15` ~ `RS-18` 四条整段样本，分别覆盖 README intro、release note、forum post 和 issue reply
+- 新增 `evals/results-v1.8.0.md`，归档本轮 TDD 静态复核结果
+
+### Changed
+- `SKILL.md` 在大场景判定后增加 Scene Packs 入口：先判 `public-writing`，再按发布目的细分
+- `references/scene-guardrails.md` 明确分工：大场景边界仍由 guardrails 控制，scene packs 只做更细的落地策略
+- benchmark 总数从 54 条（31 SF + 23 SNF）扩到 62 条（35 SF + 27 SNF）
+- `README.md` 重构为正式项目首页：新增状态徽章、快速导航、v1.8.0 场景能力入口和 Star History
+- 新增 `assets/icon-hd.png` 和 `assets/readme-logo.png`，在保留原 icon 元素的基础上补齐 README 横向品牌图
+
+### Tested
+- 2026-04-24 按 TDD 做静态复核：先补 `SF-32` ~ `SF-35` / `SNF-24` ~ `SNF-27`，再写最小 Scene Packs 和接入点
+- 静态复核结果：SF 通过率 `35/35 (100%)`，SNF 误杀率 `0/27 (0%)`，Scene Packs `8/8 (100%)`
+- 复核方式、用例详情和 real samples 评分口径见 `evals/results-v1.8.0.md`
+
+### Notes
+- v1.8.0 不做 Voice Calibration / Voice Hints，不模仿名人、品牌或公众人物
+- 公开 bad-case 征集入口继续留到 v2.0，等项目有更多外部流量后再和分发一起做
+
+## [1.7.4] - 2026-04-20 — Guardrails & Retro
+
+### Added
+- `evals/benchmark.md` 新增 `SNF-22`（code-context：技术语境里的接住突发请求）和 `SNF-23`（docs：限流网关稳稳接住上游峰值请求），作为 v1.7.3"接住"语境判断的**回归护栏**——防止未来改规则时把"接住请求 / 接住流量 / 稳稳接住上游峰值请求"一起误杀
+- `evals/results-v1.7.4.md` 新增评测归档：追溯覆盖 v1.7.1 → v1.7.4 的 benchmark 增量（`SF-31`、`SNF-22`、`SNF-23`），补上 v1.7.2 / v1.7.3 当时没做的结果归档
+- `CONTRIBUTING.md` 新增"维护者：Community Observation Intake"小节，把 v1.7.3 用过的"公开讨论 → 姿态链抽象 → 判宾语 / 判场景 → 双向补样本 → 升级规则"五步流程沉淀为可复用协议
+
+### Changed
+- benchmark 总数从 52 条（31 SF + 21 SNF）扩到 54 条（31 SF + 23 SNF）
+- `README.md` 的评测口径（54 条）、最新归档链接（`results-v1.7.4.md`）、文件树里的 benchmark 条数（54）同步对齐
+- `evals/real-samples.md` 顶部版本标记从"v1.7.2 新增"升级为"v1.7.2 新增（首批 12 条），v1.7.3 扩到 14 条"；内部 benchmark 对比表条数同步为 54
+
+### Tested
+- 2026-04-20 对 `SNF-22` / `SNF-23` 做静态复核：在 v1.7.3 现有规则下（`phrases-zh.md:88-90, 240-243`、`operation-manual.md:201, 213, 219`）两条 SNF 都按预期放行，**不需要修改规则文件**——这正是"先写回归测试再看规则"的 TDD 收尾
+- 复核方式、通过率和用例详情见 `evals/results-v1.7.4.md`
+
+### Notes
+- v1.7.4 是 v1.7.x 的收尾版本，主旨是 **Guardrails（回归护栏）** + **Retro（追溯归档和方法论沉淀）**，不引入新能力也不扩词表
+- 原 v1.7.3 roadmap 规划的"入口打通 + bad-case 收集"整体推迟到 v2.0，等项目有曝光后再配合分发一起做
+- 后续路线已调整：v1.8.0 先做 Scene Packs / 可直接发场景包，Voice Hints Lite 推迟到 v1.9 评估
+
+## [1.7.3] - 2026-04-17 — Community Intake / 接住体
+
+### Added
+- `evals/real-samples.md` 新增“社区观察：为什么‘接住体’一眼像 AI”区块，提炼 Linux.do / V2EX 公开讨论里的高频方法信号，并附公开链接作观察来源
+- `references/boundary-cases.md` 新增案例 10：技术语境里的“接住请求”，明确 `接住` 不能按字面一刀切
+- `evals/real-samples.md` 新增 `RS-14`（社区标题 / 宣言腔），覆盖 `稳稳地接住所有人` 这类标题式承接承诺
+
+### Changed
+- `references/phrases-zh.md`、`references/operation-manual.md` 把“接住”从单词命中升级为按宾语和场景判断：人/情绪/关系默认更可疑，请求/流量/峰值先回技术语境判断
+- `SKILL.md` 的 Lite 模式兜底同步覆盖“过度接住 / 心理判断 / 身份认证式夸奖”，避免单文件模式和 Full 模式行为分裂
+- `README.md` 同步补“姿态链优先”的解释，明确这类问题按模式处理，不按社区热词逐条追打
+- 按最近公开讨论里的分布，这版也开始覆盖 Claude Opus 4.7 新冒出来的那批口癖；它在“我就在这里 / 稳稳接住 / 你不是……你只是……”这组姿态链上，已经越来越接近 GPT-5.4
+- `evals/real-samples.md` 数量从 12 条更新为 14 条，`README.md` 评测口径同步对齐
+
+### Tested
+- 2026-04-17 做一轮“接住体”静态 smoke test：私聊安抚、社区标题、推销式结尾应命中；技术语境里的“接住峰值请求 / 流量”应放行
+- `git diff --check` 通过
+
+## [1.7.2] - 2026-04-17 — Real Sample Eval Pack
+
+### Added
+- 新增 `evals/real-samples.md`，首批 12 条整段样本，覆盖 README 简介、release note、X 短帖、Linux.do 长帖、GitHub issue 回复、commit message、Python docstring、开发进度同步、技术博客开头、微信对话、知乎长回答、混合场景
+- 每条样本按统一模板记录：原文、场景、为什么像 AI、不该改坏什么、推荐改法、原文 3 维评分
+- 新增 3 维评分体系：`自然 / 保真 / 可直接发`（5 分制），以"可直接发"为最终指标，`保真` 掉到 < 4 分即算退步
+- 新增"高频 AI 句式分布"区块：汇总 2026-04 中文用户被吐槽最多的 AI 味句式（`要不要我顺手帮你`、`掰开揉碎`、`先说结论`、`直接封神`、`核心逻辑是` 等），用来指导样本构造
+- `README.md` 示例 2 换成 `RS-11`（微信工程师腔溢出），还原"程序员一开口像在写工程报告"的尴尬瞬间
+
+### Changed
+- `README.md` 评测区补充 `real-samples.md` 12 条整段样本的说明，和 51 条 benchmark 并列
+- `tasks/roadmap-v1.7-v2.0.md` v1.7.2 条目全部打勾
+
+### Notes
+- 首批为"观察归纳 + 合成"样本，不指向任何真人或真项目。之所以不直接引用真实帖子到公开仓库：未授权转录有归属和合规问题
+- 真实样本收集机制留给后续版本，届时会补单独的提交流程和授权模板，再追加到本文件（目标 20+ 条）
+
 ## [1.7.1] - 2026-04-14 — Residual Audit / Two-pass
 
 ### Added
@@ -14,7 +206,7 @@
 - `README.md` 同步工作流和 benchmark 数量到 `51` 条
 
 ### Fixed
-- `SKILL.md` frontmatter 去掉远端同步带来的 `metadata` 字段，收口成当前本地 skill 规范可稳定使用的形式
+- `SKILL.md` frontmatter 去掉远端同步带来的 `metadata` 字段，调整为当前本地 skill 规范可稳定使用的形式
 
 ### Tested
 - 2026-04-14 用 GPT-5.4 Codex 静态复核 `benchmark.md`（51 条）：SF 通过率 `30/30 (100%)`，SNF 误杀率 `0/21 (0%)`

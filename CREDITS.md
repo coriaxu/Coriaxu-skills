@@ -16,9 +16,9 @@
 ### dontbesilent — `dbs`, `dbs-content`, `dbs-diagnosis`, `dbskill-knowledge`
 
 - 目录：`skills/dbs/`、`skills/dbs-content/`、`skills/dbs-diagnosis/`、`skills/dbskill-knowledge/`
-- 协议：_待确认_
+- 协议：CC BY-NC 4.0（见目录内 LICENSE；`dbskill-knowledge` 为本仓库整理的知识包）
 - 功能：商业工具箱系列 skill — 商业模式诊断、内容创作诊断、商业问诊入口，附共享知识包
-- 原仓：_待补充_
+- 原仓：https://github.com/dontbesilent2025/dbskill
 
 ### Huashu 花叔 — `nuwa-skill`, `darwin-skill`
 
@@ -26,48 +26,48 @@
 - 目录：`skills/nuwa-skill/`
 - 协议：MIT (Copyright © 2026 Huashu 花叔)
 - 功能：女娲造人术 — 输入任意人名自动派多 agent 调研并生成「人物视角 skill」
-- 原仓：_待补充_
+- 原仓：https://github.com/alchaincyf/nuwa-skill
 
 **darwin-skill**
 - 目录：`skills/darwin-skill/`
 - 协议：_待确认（仓内无 LICENSE 文件，按 MIT 处理）_
 - 功能：达尔文 — 借鉴 Karpathy autoresearch 的自主实验循环，自动评估并优化 skill
-- 原仓：_待补充_
+- 原仓：https://github.com/alchaincyf/darwin-skill
 
 ### MrGeDiao — `shuorenhua`
 
 - 目录：`skills/shuorenhua/`
 - 协议：MIT (Copyright © 2026 MrGeDiao)
 - 功能：去 AI 味 — 检查和清理中英文文本里的 AI 套路
-- 原仓：_待补充_
+- 原仓：https://github.com/MrGeDiao/shuorenhua
 
 ### Obsidian — `obsidian-markdown`, `obsidian-bases`
 
 - 目录：`skills/obsidian-markdown/`、`skills/obsidian-bases/`
-- 协议：_待确认_
+- 协议：MIT（见目录内 LICENSE）
 - 功能：Obsidian 笔记相关的 skill — Markdown 语法（wikilinks/callouts/frontmatter）与 Bases 数据库文件操作
-- 原仓：_待补充_
+- 原仓：https://github.com/kepano/obsidian-skills
 
 ### Yao Jingang 姚金刚 — `yao-meta-skill`
 
 - 目录：`skills/yao-meta-skill/`
 - 协议：MIT (Copyright © 2026 Yao Team，作者：姚金刚)
 - 功能：元技能创造器 — 把 SOP、对话记录、工作笔记沉淀为可复用的 skill
-- 原仓：_待补充_
+- 原仓：https://github.com/yaojingang/yao-meta-skill
 
 ### 一泽 Eze — `web-access`
 
 - 目录：`skills/web-access/`
 - 协议：MIT (author: 一泽Eze)
 - 功能：联网操作总控 — 自动选择 WebSearch/WebFetch/curl/Jina/CDP 浏览器
-- 原仓：_待补充_
+- 原仓：https://github.com/eze-is/web-access
 
 ### 乔木 — `qiaomu-epub-book-generator`
 
 - 目录：`skills/qiaomu-epub-book-generator/`
 - 协议：_待确认_
 - 功能：EPUB 电子书生成器 — 博客文章、Markdown 文档、AI 搜索资料转 EPUB，支持图片下载 + 代码块渲染 + 专业封面，兼容微信读书和 Apple Books
-- 原仓：_待补充_
+- 原仓：https://github.com/joeseesun/qiaomu-epub-book-generator
 
 ### 李继刚 Li Jigang — `ljg-card`, `ljg-roundtable`
 
@@ -103,7 +103,7 @@
 
 - 本仓库整体采用 **MIT 协议**（见 [LICENSE](LICENSE)）覆盖我自己编写的代码（`install.sh`、文档、工具脚本等）
 - `skills/` 下每个第三方 skill 目录**保留原作者的 LICENSE 文件**，按其原始协议分发
-- 所有已知第三方协议均为 MIT 或未声明，无 GPL / AGPL 等强传染性协议
+- 已知第三方协议包含 MIT、CC BY-NC 4.0 或未声明；未发现 GPL / AGPL 等强传染性协议
 
 ## 📬 联系方式
 
@@ -111,4 +111,4 @@ GitHub: [@coriaxu](https://github.com/coriaxu)
 
 ---
 
-_最后更新：2026-05-08_
+_最后更新：2026-05-27_

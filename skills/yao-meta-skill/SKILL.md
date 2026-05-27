@@ -8,49 +8,56 @@ metadata:
 
 # Yao Meta Skill
 
-Build reusable skill packages, not long prompts.
-
 ## Router Rules
 
-- Route by frontmatter `description` first.
-- Keep `SKILL.md` to routing plus the minimal execution skeleton.
-- Push long guidance to `references/`, deterministic logic to `scripts/`, and evidence to `reports/`.
-- Use the lightest process that still makes the skill reliable.
+- Route by frontmatter `description`.
+- Keep `SKILL.md` lean; put guidance in `references/`, logic in `scripts/`, and evidence in `reports/`.
+- Use the lightest reliable process.
 
 ## Modes
 
 - `Scaffold`: exploratory or personal.
-- `Production`: team reuse with focused gates.
-- `Library`: shared infrastructure or meta skill.
+- `Production`: team reuse.
+- `Library`: shared infrastructure.
 
-Mode rules: [Operating Modes](references/operating-modes.md), [QA Ladder](references/qa-ladder.md), [Resource Boundary Spec](references/resource-boundaries.md), [Skill Engineering Method](references/skill-engineering-method.md).
+Mode rules: [Method](references/skill-engineering-method.md), [Operating Modes](references/operating-modes.md), [Resource Boundaries](references/resource-boundaries.md).
 
 ## Compact Workflow
 
-1. Decide whether the request should become a skill, then choose the lightest archetype.
-2. Capture the recurring job, outputs, trigger phrases, and exclusions.
-3. Write the `description` early, then test route quality before expanding the package.
-4. Add only the folders and gates that earn their keep: `trigger_eval.py`, `optimize_description.py`, `judge_blind_eval.py`, `resource_boundary_check.py`, `governance_check.py`, `cross_packager.py`.
+1. Decide whether the request should become a skill and choose the lightest fit.
+2. Capture job, output, exclusions, constraints, and standards.
+3. Run reference scan: external benchmarks first, user references second, local fit third; surface only uncertainty or conflict.
+4. Write the `description` early and test route quality before expanding the package.
+5. Add output-risk, artifact-design, prompt-quality, and system-model reports only when they matter.
+6. Add only folders and gates that earn their keep.
+7. Surface the top three next iteration directions.
 
-Playbooks: [Skill Engineering Method](references/skill-engineering-method.md), [Skill Archetypes](references/skill-archetypes.md), [Gate Selection](references/gate-selection.md), [Non-Skill Decision Tree](references/non-skill-decision-tree.md), [Operating Modes](references/operating-modes.md), [Trigger And Eval Playbook](references/eval-playbook.md).
+Core playbooks: [Method](references/skill-engineering-method.md), [Intent Dialogue](references/intent-dialogue.md), [Reference Scan](references/reference-scan.md), [Artifact Design](references/artifact-design-doctrine.md), [Prompt Engineering](references/prompt-engineering-doctrine.md), [Systems Thinking](references/systems-thinking-doctrine.md).
+
+## First-Turn Style
+
+When the skill first activates:
+
+- open warmly, like a thoughtful teacher or design partner
+- start from the user's work and desired outcome before asking for structure
+- ask only `2-3` key questions unless the user already gave enough detail
+- let the user answer naturally first; offer a tiny scaffold only as a shortcut
+- avoid cold field lists; turn benchmark work into one recommendation unless uncertainty or conflict needs a visible call
+
+Chinese conversations should sound soft and companion-like rather than procedural.
+
+Opening patterns: [Intent Dialogue](references/intent-dialogue.md).
 
 ## Output Contract
 
 Unless the user asks otherwise, produce:
 
 1. a working skill directory
-2. a trigger-aware `SKILL.md`
+2. a `SKILL.md`
 3. aligned `agents/interface.yaml`
-4. optional `references/`, `scripts/`, `evals/`, `reports/`, and `manifest.json` only when justified
+4. optional `references/`, `scripts/`, `evals/`, `reports/`, and `manifest.json` when justified
 5. a short summary of boundary, exclusions, gates, and next steps
 
 ## Reference Map
 
-- [Skill Engineering Method](references/skill-engineering-method.md)
-- [Skill Archetypes](references/skill-archetypes.md)
-- [Gate Selection](references/gate-selection.md)
-- [Non-Skill Decision Tree](references/non-skill-decision-tree.md)
-- [Operating Modes](references/operating-modes.md)
-- [Governance Model](references/governance.md)
-- [Resource Boundary Spec](references/resource-boundaries.md)
-- [Trigger And Eval Playbook](references/eval-playbook.md)
+Primary references: [Method](references/skill-engineering-method.md), [Reference Scan](references/reference-scan.md), [Artifact Design](references/artifact-design-doctrine.md), [Prompt Engineering](references/prompt-engineering-doctrine.md), [Systems Thinking](references/systems-thinking-doctrine.md), [Governance](references/governance.md).

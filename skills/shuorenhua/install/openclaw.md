@@ -1,5 +1,10 @@
 # OpenClaw 安装
 
+## lite / full 怎么选
+
+- `lite`：只放 `SKILL.md`。适合 token 紧张或只做基础改写。
+- `full`：放 `SKILL.md` + `references/`。适合长期 workspace、对外文本、技术文档和需要误杀防护的场景。
+
 ## 1. 把 skill 放进 workspace
 
 ```bash
@@ -8,7 +13,7 @@ cp SKILL.md workspace/skills/shuorenhua/
 cp -r references workspace/skills/shuorenhua/
 ```
 
-token 紧张时只放 `SKILL.md` 也能完成基础改写；`references/` 能让场景判断和误杀防护更稳。
+上面是 full 用法。token 紧张时只放 `SKILL.md` 也能完成基础改写；`references/` 能让场景判断和误杀防护更稳。
 
 ## 2. 触发方式选一个
 

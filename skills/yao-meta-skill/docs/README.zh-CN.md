@@ -9,35 +9,94 @@
 - 清晰的触发面
 - 精简的 `SKILL.md`
 - 可选的 references、scripts 和 evals
+- 深度起草前先做一轮更有人味的意图对话，并通过 intent confidence gate 判断理解是否足够清楚；如果不够清楚，会继续补 1 到 2 个高杠杆问题
+- 深度起草前会静默执行 GitHub benchmark scan 和 reference synthesis，优先学习高质量公开项目与世界级模式；只有遇到真实冲突或不确定性时才显式抬给用户
+- 会主动询问用户是否有希望借鉴的参考对象，只学习其中的模式抽象、结构和标准，不复制原文或私密内容
+- 新建 skill 时自动生成一份极简白底 HTML 可视化说明
+- 提供 prompt quality profile，把需求模型、RTF 映射、复杂度和提示词质量检查沉淀成 reviewer 可见证据，而不是塞进 `SKILL.md`
+- 首次建包后会自动给出 3 个最有价值的下一步迭代方向
+- 提供一个紧凑的 HTML review viewer，方便第一次人工理解和评审
+- 提供一个轻量 feedback log，不必每次都走完整 promotion 流程
+- 提供一个 with-skill vs baseline 的对比报告，便于快速看增量收益
+- 提供一个更像对话发现流程的 archetype-aware quickstart，引导新 skill 落到 scaffold、production、library 或 governed 的合适形态
 - 中性的源元数据以及面向不同客户端的适配层
 - 内建的治理、晋升和 portability 检查
 
-## Quick Start
+## 架构图
+
+Hero 版可以压缩成一条主线：把零散输入变成一个可治理、可复用的 skill 包。
+
+```mermaid
+flowchart LR
+    A["输入<br/>workflow / prompt / transcript / docs / notes"] --> B["路由<br/>SKILL.md"]
+    B --> C["设计<br/>方法 + 质量门"]
+    C --> D["执行<br/>create / validate / eval / promote"]
+    D --> E["产出<br/>skill 包 + 报告 + 适配层"]
+```
+
+10 秒理解这张图：
+
+- **输入**：从零散的 workflow、prompt、文档和笔记出发。
+- **路由**：先用精简的 `SKILL.md` 定义边界和触发。
+- **设计**：选择合适的 archetype、gates 和资源拆分方式。
+- **执行**：通过统一 CLI 完成创建、校验、优化和晋升。
+- **产出**：最终得到 skill 包，以及评测、治理和 portability 证据。
+
+## 加权质量评测
+
+下面是当前项目采用的工程质量评测模型。每个维度按 `0-10` 评分，再按权重折算到 `100` 分。GitHub stars 不计入总分，因为它反映生态热度，不直接代表元 skill 工程质量。
+
+加权总分公式：`sum(单项评分 / 10 * 权重)`。
+
+| 元 Skill | 方法论深度 15 | 上下文纪律 10 | 工具链 15 | Eval/测试 20 | 治理 15 | 可移植 10 | 上手/评审 5 | 本地可靠性 10 | 加权总分 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| Yao Meta Skill | 9.5 | 8.0 | 9.5 | 9.5 | 9.5 | 9.0 | 6.5 | 9.5 | 91.5 |
+| Anthropic Skill Creator | 9.0 | 6.5 | 8.5 | 7.5 | 4.0 | 5.0 | 7.5 | 5.0 | 67.5 |
+| OpenAI Skill Creator | 8.5 | 9.5 | 5.0 | 2.0 | 3.0 | 4.0 | 8.5 | 4.0 | 50.5 |
+
+| 排名 | 元 Skill | 总分 | 核心定位 |
+| ---: | --- | ---: | --- |
+| 1 | Yao Meta Skill | 91.5 | 工程化、评测化、治理化、可移植的完整元 skill 系统。 |
+| 2 | Anthropic Skill Creator | 67.5 | 方法论和迭代闭环强，但本地执行可靠性和治理覆盖较弱。 |
+| 3 | OpenAI Skill Creator | 50.5 | 更适合作为精简 skill 写作方法论教材，而不是完整工程系统。 |
+
+## 适用场景
+
+- 如果你要的是**团队复用、显式边界、质量门、治理、可移植性和长期维护**，更适合 `Yao Meta Skill`。
+- 如果你要的是**对话优先的创作循环和人工引导式迭代**，更适合 `Anthropic Skill Creator`。
+- 如果你要的是**精简的 skill 写作参考和上下文纪律示范**，更适合 `OpenAI Skill Creator`。
+- 一个很实用的组合方式是：先用更对话式的系统做第一版，再用 `yao-meta-skill` 把它加固成团队可复用的正式资产。
+
+## 快速开始
 
 1. 先描述你想沉淀成 skill 的 workflow、prompt 集合或重复任务。
-2. 使用 `yao-meta-skill` 以 scaffold、production 或 library 模式生成或改进 skill 包。
-3. 按需要运行 `context_sizer.py`、`trigger_eval.py` 和 `cross_packager.py` 来检查并导出结果。
+2. 先做一轮简短但更有人味的意图对话，把真实任务、输出物、边界、约束和你在意的质量标准说清楚。
+3. 先让 `quickstart` 澄清意图，再静默跑 benchmark scan 和 reference synthesis；只有当意图还不清楚，或者设计路线真的冲突时，才会显式继续追问或让你拍板。
+4. 使用 archetype-aware 的 `quickstart` 或完整作者流，在 scaffold、production、library 或 governed 模式下生成或改进 skill 包。
+5. 新建 skill 后，会默认附带 `reports/intent-dialogue.md`、`reports/intent-confidence.md`、`reports/reference-synthesis.md`、`reports/artifact-design-profile.md`、`reports/prompt-quality-profile.md`、`reports/skill-overview.html`、`reports/review-viewer.html` 和 `reports/iteration-directions.md`；后续还可以通过 feedback log 和 baseline compare 快速收集意见、查看增量收益，而不必每次都走完整 promotion 流程。
 
-## Results
+## 当前结果
 
 - 当前 `make test` 可通过
 - 当前回归集下 trigger eval 为 `0` 误触发、`0` 漏触发
 - train / dev / holdout 三层评测均通过
+- 中文真实表达已经纳入触发评测，覆盖“做一个 skill”“沉淀成可复用能力”“优化已有 skill”“补 trigger 评测”等常见说法
 - `openai`、`claude`、`generic` 三个目标的 packaging contract 校验通过
 
 ## 当前优势
 
-根据最近一轮加权评测，Yao 当前最强的优势主要集中在真正决定 meta-skill 质量的几个维度：
+最新加权评测中，Yao 的总分是 `91.5/100`。最强的部分集中在团队级 skill 资产真正需要的能力上：
 
-- **方法论完整性 `9.8`**：已经形成正式的 skill engineering doctrine，覆盖 gate selection、non-skill decision、governance 和 resource boundary。
-- **工程化工具链 `9.8`**：初始化、校验、优化、报告、晋升检查、打包和 CI 已经串成一条完整工具链。
-- **治理 / 维护 / 安全 `9.8`**：重要 skill 可以声明生命周期、review cadence、maturity score、trust boundary 和 promotion evidence。
-- **评测闭环 `9.7`**：触发评测已经覆盖 train/dev/holdout、blind holdout、adversarial holdout、judge-backed blind eval、drift history 和 promotion gate。
-- **跨环境复用 / 打包 `9.6`**：源码保持中性，adapter、degradation rule 和 packaging contract 负责保留跨环境可移植语义。
-- **触发与边界设计 `9.5`**：route confusion、anti-pattern regression 和 promotion policy 把 trigger 质量变成可审计的路由问题。
-- **上下文效率 `9.4`**：入口文件保持紧凑，context budget 分层治理，quality density 也被量化跟踪。
+- **方法论深度 `9.5`**：已经形成正式的 skill engineering doctrine，覆盖 archetype、gate selection、non-skill decision、governance 和 resource boundary。
+- **工具链完整度 `9.5`**：初始化、校验、benchmark scan、description optimization、报告、晋升检查、打包、CI 和 portability checks 已经串成一条完整工具链。
+- **Eval / 测试严谨度 `9.5`**：触发评测覆盖 train/dev/holdout、blind holdout、adversarial holdout、judge-backed blind eval、route confusion、drift history 和 promotion gate。
+- **治理 / 生命周期 `9.5`**：重要 skill 可以声明 owner、生命周期、review cadence、maturity score、trust boundary、promotion decision 和 regression history。
+- **本地可执行可靠性 `9.5`**：可以通过 `make test`、`make ci-test` 和统一 CLI 在本地复验。
+- **可移植 / 分发能力 `9.0`**：源码保持中性，adapter、degradation rule、packaging contract 和 portability score 负责保留跨环境可复用语义。
+- **上下文纪律 / 精简度 `8.0`**：入口仍保持在预算内，但因为系统承载了更多报告、案例、benchmark 和证据资产，这一项被持续作为约束跟踪。
+- **上手 / 评审体验 `6.5`**：quickstart、HTML overview、side-by-side review viewer 和 feedback log 已经改善首次体验，但仍是下一阶段最值得优化的 UX 维度。
 
-整体方向很明确：入口尽量轻，评测尽量硬，治理成为 skill 质量的一部分。
+整体方向很明确：入口尽量轻，评测尽量硬，治理显性化，同时继续降低首次创建和人工评审的摩擦。
 
 ## 为什么是 Yao
 

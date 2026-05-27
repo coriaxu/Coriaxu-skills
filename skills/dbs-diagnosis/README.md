@@ -5,8 +5,8 @@
 ## 来源
 
 - **原作者**：dontbesilent
-- **原仓链接**：_待补充_
-- **协议**：_待确认_。若作者要求调整或移除，请联系 [@coriaxu](https://github.com/coriaxu)。
+- **原仓链接**：https://github.com/dontbesilent2025/dbskill
+- **协议**：CC BY-NC 4.0（见本目录 LICENSE）。若作者要求调整或移除，请联系 [@coriaxu](https://github.com/coriaxu)。
 
 ## 功能
 

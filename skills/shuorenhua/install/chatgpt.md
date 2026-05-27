@@ -1,6 +1,11 @@
 # ChatGPT / 通用 LLM 安装
 
-默认只放 `SKILL.md`，不要一上来就把整个 `references/` 全塞进去。`SKILL.md` 已经负责主判断（场景、Tier、档位、禁改边界），`references/` 是按需补细节用的，不需要每次常驻。
+## lite / full 怎么选
+
+- `lite`：只加载 `SKILL.md`。适合直接贴对话、API system prompt、上下文紧张或偶尔改写。
+- `full`：加载 `SKILL.md` + `references/`。适合 Custom GPT、Project、公开文本、技术文档和需要误杀防护的场景。
+
+ChatGPT / 通用 LLM 场景默认从 lite 开始；如果要长期使用、处理 README / release note / issue 回复，或担心术语和事实被误杀，再升级到 full。
 
 ## ChatGPT
 
@@ -15,7 +20,7 @@
 1. 打开 [ChatGPT GPT Editor](https://chatgpt.com/gpts/editor)，新建一个 GPT
 2. 名称填"说人话"，描述填"去 AI 味的中英文改写助手"
 3. 将 [`install/chatgpt-gpt-instructions.md`](chatgpt-gpt-instructions.md) 中分隔线以下的内容粘贴到 Instructions
-4. 上传 Knowledge Files：`SKILL.md` + `references/` 目录下所有 `.md` 文件（共 9 个文件）
+4. 上传 Knowledge Files：`SKILL.md` + `references/` 目录下所有 `.md` 文件（full 用法）
 5. 保存，发布为 "Only me" 或 "Anyone with a link"
 
 用的时候直接打开这个 GPT 对话就行。
@@ -25,7 +30,7 @@
 如果你有 ChatGPT Plus / Pro，也可以用 Projects：
 
 1. 新建一个 Project
-2. 把 `SKILL.md` 和需要的 `references/` 文件上传到 Project Files
+2. 把 `SKILL.md` 和需要的 `references/` 文件上传到 Project Files；长期使用建议走 full，临时项目可以先只放 `SKILL.md`
 3. Project Instructions 里写一句：`按照项目文件中 SKILL.md 的规则改写用户提供的文本。`
 
 Projects 的文件没有严格字符限制，效果和 Custom GPT 类似。
@@ -33,6 +38,8 @@ Projects 的文件没有严格字符限制，效果和 Custom GPT 类似。
 ### 方案三：直接贴对话（轻量用法）
 
 不想建 GPT 也不想建 Project，直接在对话开头贴 `SKILL.md` 内容也能用。适合偶尔用一次的场景。
+
+这是 lite 用法。
 
 > **注意：** Custom Instructions（Settings > Personalization）有 1,500 字符上限，放不下完整的 `SKILL.md`。不建议用这个方式。
 

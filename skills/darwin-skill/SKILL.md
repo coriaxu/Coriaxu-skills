@@ -1,12 +1,13 @@
 ---
 name: darwin-skill
-description: Autonomous skill optimizer inspired by Karpathy's autoresearch. Evaluates SKILL.md files using an 8-dimension rubric (structure + effectiveness), runs hill-climbing with git version control, and validates improvements through test prompts. Use when user mentions "优化skill", "skill评分", "自动优化", "auto optimize skills", "skill质量检查", "这个skill写得不好", "帮我改改skill", "skill怎么样", "提升skill质量", "skill review", "skill打分".
+description: "Darwin Skill (达尔文.skill): autonomous skill optimizer inspired by Karpathy's autoresearch. Evaluates SKILL.md files using an 8-dimension rubric (structure + effectiveness), runs hill-climbing with git version control, validates improvements through test prompts, and generates visual result cards. Use when user mentions \"优化skill\", \"skill评分\", \"自动优化\", \"auto optimize\", \"skill质量检查\", \"达尔文\", \"darwin\", \"帮我改改skill\", \"skill怎么样\", \"提升skill质量\", \"skill review\", \"skill打分\"."
 ---
 
-# 达尔文.skill
+# Darwin Skill
 
 > 借鉴 Karpathy autoresearch 的自主实验循环，对 skills 进行持续优化。
-> 核心理念：**评估 → 改进 → 实测验证 → 人类确认 → 保留或回滚**
+> 核心理念：**评估 → 改进 → 实测验证 → 人类确认 → 保留或回滚 → 生成成果卡片**
+> GitHub: https://github.com/alchaincyf/darwin-skill
 
 ---
 
@@ -61,6 +62,59 @@ autoresearch 的精髓：
    - 有没有skill引入的负面影响（过度冗余、跑偏、格式奇怪）？
 
 如果无法跑子agent（时间/资源限制），可以退化为「干跑验证」：读完skill后模拟一个典型prompt的执行思路，判断流程是否合理。但要在results.tsv中标注 `dry_run`。
+
+---
+
+## Runtime 适配性审查（gate 项，独立于 8 维度评分）
+
+**背景**：花叔的 skills 基于 Anthropic 开放的 [Agent Skills](https://agentskills.io) 协议，应当能在 Claude Code、Codex、Cursor、OpenClaw、Hermes Agent、CodeBuddy、Workbuddy、Gemini CLI、OpenCode 等 50+ skills-compatible runtime 上通用。这是 skill 分发力的根本——一个被误判为「单一 runtime 绑定」的 skill，会被其他 agent 直接拒绝安装（实例：nuwa-skill 因 README 写「在 Claude Code 里使用」被 Marvis agent 拒绝）。
+
+**适用范围**：除非 skill 名字明确声明绑定单一 runtime（如 `huashu-slides-codex`、`xxx-for-claude-code`），所有 skill 都必须通过本审查。
+
+### 红灯信号（出现即扣分，且必须在优化循环里修复）
+
+| 红灯类型 | 典型表现 | 危害 |
+|---|---|---|
+| Badge 钉死 | `[![Claude Code Skill]]`、`[![Cursor Only]]` 之类的单一 runtime badge | 视觉上首屏定调，其他 runtime 用户直接退出 |
+| 措辞钉死 | 「在 Claude Code 里」「Cursor 用户可以」「Codex 中使用」「Claude Code skill」 | 让 agent 解析时误判为"不是给我用的" |
+| 安装命令钉死 | 只给 `~/.claude/skills/` 路径、只给 `/plugin install`、只给某 runtime 私有 CLI | 不知道这是 Claude Code 命令的 agent 会拒绝 |
+| 工具调用钉死 | 工作流里硬编码 `mcp__claude-in-chrome__*`、`PostToolUse hook` 等单 runtime 能力，且不给替代方案 | 其他 runtime 没这些工具 → 流程跑不通 |
+| 路径硬编码 | `~/.claude/skills/xxx/`、`.claude/agents/yyy` 作为唯一路径 | 其他 runtime 用 `~/.cursor/skills/` `~/.codex/skills/` |
+
+### 绿灯措辞（推荐改写）
+
+| 红灯 | 绿灯 |
+|---|---|
+| "在 Claude Code 里" | "在你的 agent 里" / "在任何 skills-compatible runtime 中" |
+| "Claude Code skill" | "Agent Skill" |
+| "Claude Code 用户" | "skills-aware agent 用户" |
+| 单一 badge 钉死 | `Agent Skills Standard` + `skills.sh Compatible` + `Multi-Runtime` 三个中立 badge |
+| 只给 `npx skills add ...` 一行 | 三层结构：① 自动检测的一行命令 ② 折叠展开的各 runtime 手动路径 ③ 「作为参考资料 cat 进 context」fallback |
+| 工具名硬编码 | "用一个 browser automation 工具（例如 Claude 的 chrome MCP、Playwright 等）" |
+
+### 例外清单（允许的「Claude Code 痕迹」）
+
+不是所有 Claude-Code 相关字符都要清除。下面这些是**正当出现**的，不算红灯：
+
+1. **Frontmatter `description` 里的中英文触发词**——这是 skill 入口，其他 runtime 解析 frontmatter 时同样能匹配
+2. **花叔生态内部联动的 skill 名引用**——如「调用 huashu-design」「跟 darwin-skill 配套」
+3. **明确标注的 runtime-specific 章节**——如「### 仅 Claude Code 优化（可选）」+ 解释清楚是 nice-to-have
+4. **commit message、changelog、内部脚本**——不属于用户读到的 skill 内容
+
+### 审查时机
+
+- **Phase 1 基线评估时**：每个 skill 跑一次红灯扫描，命中项以 `runtime_warn=N` 形式写入 results.tsv 的 `note` 列（不新增列、保持向后兼容）
+- **Phase 2 优化循环时**：红灯命中数 ≥ 1 的 skill，强制把第一轮优化方向定为 P0「runtime drift 修复」（详见 P0 章节），优先于其他维度
+- **Phase 3 汇总报告时**：单独一栏「runtime 中立度」展示修复进度（命中数从 X → 0）
+
+### 红灯扫描快速命令
+
+```bash
+# 在 skill 目录跑这个 grep，输出即红灯命中
+grep -nE "(在 Claude Code|Claude Code skill|Claude Code 用户|Cursor only|Codex 中|^\[!\[Claude Code|~/\.claude/skills/[a-z]|/plugin install\b)" SKILL.md README.md 2>/dev/null
+```
+
+输出非空 = 该 skill 未通过 gate，必须在优化循环里修复。
 
 ---
 
@@ -236,13 +290,20 @@ timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
 ```
 
 新增 `eval_mode` 列：`full_test`（跑了子agent测试）或 `dry_run`（模拟推演）。
-文件位置：`.claude/skills/auto-optimize-results.tsv`
+文件位置：`.claude/skills/darwin-skill/results.tsv`
 
 ---
 
 ## 优化策略库
 
 按优先级排序，每轮只做最高优先级的一个：
+
+### P0: Runtime 适配性问题（gate 项命中 → 必须先修）
+- README/SKILL.md 出现红灯措辞（如「在 Claude Code 里」「Claude Code skill」）→ 替换为 runtime-neutral 措辞
+- Badge 钉死单一 runtime → 改为 `Agent Skills Standard` + `skills.sh` + `Multi-Runtime` 三个中立 badge
+- 安装章节只给一种 runtime 的路径 → 改为「一行命令（auto-detect）+ 手动路径表 + 作为参考资料」三层结构
+- 工作流硬编码 runtime-specific 工具且无 fallback → 给出通用替代方案或标注「仅在某 runtime 可用」
+- 例外：skill 名明确标注单 runtime（如 `xxx-codex`）的，可跳过本项
 
 ### P0: 效果问题（实测发现的）
 - 测试输出偏离用户意图 → 检查skill是否有误导性指令
@@ -266,6 +327,27 @@ timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
 
 ---
 
+## 异常与边界条件
+
+流程假设环境理想，但实操常遇异常。以下预定义 fallback，保证优化过程不会「一跑就卡住」。
+
+| 场景 | 触发条件 | 处理动作 |
+|---|---|---|
+| 不在 git 仓库 | `git rev-parse` 失败 | 提示用户「建议 git init」；若拒绝，用 `cp SKILL.md SKILL.md.bak.YYYYMMDD-HHMM` 文件备份代替 revert |
+| results.tsv 缺失 | 文件不存在 | 新建并写表头行（9列：含 eval_mode） |
+| results.tsv 损坏 | 列数不匹配 / 非TSV | 备份为 `.bak.YYYYMMDD-HHMM` 后重建，告知用户 |
+| 分支已存在 | `git checkout -b` 失败 | 分支名末尾加 `-2` / `-3`；第3次失败则切回现有分支并询问继续还是新起 |
+| `git revert` 失败 | 冲突 / 工作树脏 | 先 `git stash`，重试；仍失败则从上一个 commit 的 SKILL.md 读出覆盖当前文件手动恢复 |
+| MAX_ROUNDS 触顶（默认3） | 已跑3轮仍有短板 | 不强制 break，展示当前最弱维度问用户「继续加1轮 / 进入Phase 2.5 / 收工」 |
+| 优化后超 150% 体积 | 新文件 > 原 × 1.5 | 拒绝提交，回到改进步骤精简（删冗余/合并重复），再评 |
+| test-prompts.json 已存在 | 文件已在 skill 目录 | 默认复用并展示，问用户「复用 / 重写 / 追加」三选一 |
+| SKILL.md 找不到 | 目录存在但无 SKILL.md | 该 skill 终止，results.tsv 记 `status=error`，继续下一个 |
+| 分数计算规则 | 浮点精度漂移 | 总分保留 1 位小数，改进需严格 > 旧分（不靠四舍五入） |
+
+**原则**：异常先告知用户，再按规则处理；绝不静默跳过或静默失败。
+
+---
+
 ## 约束规则
 
 1. **不改变skill的核心功能和用途** — 只优化"怎么写"和"怎么执行"，不改"做什么"
@@ -275,6 +357,7 @@ timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
 5. **尊重花叔风格** — 中文为主、简洁为上
 6. **可回滚** — 所有改动在git分支上，用git revert而非reset --hard
 7. **评分独立性** — 效果维度必须用子agent或至少干跑验证，不能在同一上下文里「改完直接评」
+8. **Runtime 中立性** — skill 必须能在 Claude Code、Codex、Cursor、OpenClaw、Hermes 等任何 skills-compatible runtime 中正常运行。除非 skill 名明确绑定单一 runtime（如 `xxx-codex`、`huashu-slides-codex`），任何「在 Claude Code 里」「Claude Code skill」「单一 badge 钉死」「安装命令只给 `.claude/skills/` 一种路径」都视为 gate 不通过，须在 P0 优先修复（详见「Runtime 适配性审查」章节）
 
 ---
 
@@ -320,3 +403,61 @@ timestamp	commit	skill	old_score	new_score	status	dimension	note	eval_mode
 - **test set** → 每个skill的test-prompts.json
 
 区别：增加了人在回路（autoresearch是全自主的，skill优化需要人的判断力），以及双重评估机制（结构+效果），因为skill的「好坏」比loss数值更微妙。
+
+---
+
+## 成果卡片生成（Result Card）
+
+每个skill优化完成后（或全量汇总后），自动生成视觉成果卡片，截图保存为PNG。
+
+### 卡片模板
+
+模板位置：`templates/result-card.html`
+
+3种风格，每次随机选择一种：
+
+| 风格 | CSS类 | URL hash | 视觉特点 |
+|------|--------|----------|---------|
+| Warm Swiss | `.theme-swiss` | `#swiss` | 暖白底+赤陶橙，Inter字体，干净网格 |
+| Dark Terminal | `.theme-terminal` | `#terminal` | 近黑底+荧光绿，等宽字体，扫描线 |
+| Newspaper | `.theme-newspaper` | `#newspaper` | 暖白纸+深红，衬线字体，双栏编辑风 |
+
+### 生成流程
+
+```
+1. 复制 templates/result-card.html 到临时工作文件
+2. 用 sed/编辑工具 替换占位数据：
+   - data-field="skill-name" → 实际skill名
+   - data-field="score-before/after/delta" → 实际分数
+   - 8个维度的 dim-bar-before/after width → 实际百分比
+   - data-field="improvement-1/2/3" → 实际改进摘要
+   - data-field="date" → 当前日期
+3. 随机选择风格：hash 设为 swiss/terminal/newspaper 之一
+4. 用 scripts/screenshot.mjs 截图（2x 高清，只截 .card 元素，自动 open 图片）：
+   node .claude/skills/darwin-skill/scripts/screenshot.mjs \
+     /abs/path/to/card.html /abs/path/to/output.png
+   # 回退方案（脚本失败时）：
+   npx playwright screenshot "file:///path/to/card.html#[theme]" \
+     output.png --viewport-size=960,1280 --wait-for-timeout=2000
+5. 提示用户查看成果卡片 PNG
+
+### 资源文件速查
+
+| 路径 | 用途 |
+|---|---|
+| `templates/result-card.html` | 3风格主模板（swiss/terminal/newspaper，hash切换） |
+| `templates/result-card-dark.html` / `-white.html` | 单一风格替代模板（需要锁定风格时用） |
+| `scripts/screenshot.mjs` | 2x 高清截图，只截 .card，自动 open |
+| `results.tsv` | 历次优化日志（9列含 eval_mode） |
+| `{skill目录}/test-prompts.json` | 每个 skill 的测试 prompt 集（用于维度8实测） |
+```
+
+### 何时生成
+
+- **单skill卡片**：每个skill优化完成后，展示该skill的分数变化
+- **总览卡片**：全部优化完成后（Phase 3），展示全局战绩
+
+### 品牌元素
+
+- 顶部：Darwin.skill 品牌标识 + 日期
+- 底部：「Train your Skills like you train your models」+ github.com/alchaincyf/darwin-skill
