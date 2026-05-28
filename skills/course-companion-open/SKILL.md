@@ -153,11 +153,11 @@ During the dialogue:
 - ask one strong follow-up question at a time
 - add at most 1-2 new note connections per round, only when they genuinely help
 - distinguish the course author's view, the user's view, and the assistant's view
-- keep the conversation alive until the user says to finish, save, write the note, or create a card
+- keep the conversation alive until the user says to finish, save, archive, 存档, 归档, write the note, or create a card
 
 ### Phase 3: Final Artifacts
 
-When the user asks to finish, save, write, archive, or create final notes, use `references/output-formats.md`.
+When the user asks to finish, save, write, archive, 存档, 归档, or create final notes, use `references/output-formats.md`.
 
 Default outputs:
 

@@ -81,6 +81,21 @@ Use $course-companion-open to study this lesson with me.
 
 更稳定的做法是在课程目录放一个 `course-companion.config.md`，模板见 `references/config-template.md`。
 
+## 存档会写到哪里
+
+用户说“存档”“归档”“保存”“写成笔记”时，会进入最终文件写入流程。
+
+- 配了 `output.study_note_output_path`：深度研读笔记写到这个位置
+- 配了 `output.knowledge_card_output_path`：知识卡片写到这个位置
+- 没配输出路径，但课程材料来自本地文件：默认写到课程源文件所在目录
+- 直接在聊天里粘贴课程材料，又没配输出路径：先询问保存位置
+
+默认研读笔记文件名：
+
+```text
+YYYY-MM-DD-[课程名]-深度研读笔记.md
+```
+
 ## 公开版边界
 
 这个版本不包含任何私人路径、私人称呼、固定知识库结构或个人案例。用户需要自己配置笔记路径和输出位置。

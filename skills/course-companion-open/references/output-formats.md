@@ -1,6 +1,6 @@
 # Output Formats
 
-Phase 3 在用户说“结束”“保存”“写成笔记”“出卡片”“finish”“save”等表达时触发。
+Phase 3 在用户说“结束”“保存”“存档”“归档”“写成笔记”“出卡片”“finish”“save”“archive”等表达时触发。
 
 ## Final Study Note
 
@@ -127,6 +127,9 @@ tags:
 ## File Writing Rule
 
 - 用户只说“给我看看”：只输出草稿。
-- 用户说“保存”“写入”“生成文件”：按配置路径写文件。
-- 没有输出路径时，先询问保存位置。
+- 用户说“保存”“存档”“归档”“写入”“生成文件”：进入文件写入流程。
+- 最终研读笔记优先写入 `course-companion.config.md` 里的 `output.study_note_output_path`。
+- 知识卡片优先写入 `course-companion.config.md` 里的 `output.knowledge_card_output_path`。
+- 没有配置输出路径时，如果课程材料来自本地文件，默认写到该课程源文件所在目录。
+- 如果课程材料是直接粘贴在聊天里，且没有配置输出路径，先询问保存位置，不要写到随机工作目录。
 - 已有同名文件时，先询问覆盖、改名，或追加。
