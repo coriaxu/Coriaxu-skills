@@ -16,13 +16,19 @@
 - 有个人笔记库，希望把新课接入旧知识的人
 - 没有笔记库，但希望 AI 陪自己把课聊透的人
 
-## 依赖
+## 内置依赖
 
-必须安装或同时提供：
+`course-companion-open` 会在 Phase 1 调用 `three-level-notes` 生成课程骨架笔记。
 
-- `three-level-notes`
+这个依赖不需要用户去别处找。本仓库已经自带 `三级笔记` skill，它的注册名就是 `three-level-notes`。
 
-`course-companion-open` 会在 Phase 1 调用它生成骨架笔记。没有这个依赖时，默认不手写替代。
+如果安装整个仓库，它会一起安装。若只安装这一项，建议一起装：
+
+```bash
+./install.sh course-companion-open 三级笔记
+```
+
+如果运行环境里确实没有 `three-level-notes`，`course-companion-open` 会提醒补装本仓库里的 `三级笔记`，不会手写一个简化版替代。
 
 ## 三种知识库模式
 
@@ -81,6 +87,6 @@ Use $course-companion-open to study this lesson with me.
 
 ## 建议迭代
 
-- 增加安装脚本，把 `course-companion-open` 和 `three-level-notes` 一起复制到用户 skill 目录
+- 让安装脚本自动读取 `manifest.json` 的依赖并连带安装 `三级笔记`
 - 增加文件扫描脚本，减少不同 Agent 对目录检索的表现差异
 - 增加更多真实课程样例，用于测试 Phase 2 的对话质量

@@ -33,8 +33,8 @@ Skill(skill="three-level-notes", args="<完整课程材料>")
 
 如果当前环境无法调用 `three-level-notes`：
 
-1. 先说明缺少依赖。
-2. 告诉用户本 skill 的高质量版本需要该依赖。
+1. 先说明缺少本仓库自带的 `三级笔记` skill；它的注册名是 `three-level-notes`。
+2. 告诉用户如果是从 `Coriaxu-skills` 安装，不需要去外部下载，只需要同时安装 `course-companion-open` 和 `三级笔记`。
 3. 只有用户明确同意临时继续，才生成 fallback 骨架。
 4. fallback 输出必须标明：`当前为 fallback 骨架，未调用 three-level-notes`。
 
