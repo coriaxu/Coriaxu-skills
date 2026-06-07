@@ -267,7 +267,9 @@ curl -sH "User-Agent: $UA" "https://aihot.virxact.com/api/public/items?mode=sele
       "source": "OpenAI Blog",
       "publishedAt": "2026-05-07T15:30:00.000Z",
       "summary": "中文摘要（LLM 生成）",
-      "category": "ai-models"
+      "category": "ai-models",
+      "score": 88,
+      "selected": true
     }
   ]
 }
@@ -275,8 +277,10 @@ curl -sH "User-Agent: $UA" "https://aihot.virxact.com/api/public/items?mode=sele
 
 字段不变量：
 
-- 必有：`id` / `title` / `url` / `source`
-- 可空：`title_en` / `summary` / `publishedAt` / `category`
+- 必有：`id` / `title` / `url` / `source` / `selected`
+- 可空：`title_en` / `summary` / `publishedAt` / `category` / `score`
+- `score`：内容总分 0-100（= 网页卡片右上角分数，越高越值得读）。**不是排序字段**（结果按 `publishedAt` 倒序），可自行按 score 给用户挑"最重要的几条"；极端竞态未评分时可能 `null`
+- `selected`：是否精选（boolean）。`mode=selected` 恒 `true`，`mode=all` 区分精选主菜单（true）/ 全池次要条目（false）
 - `category` 取值集：`ai-models` / `ai-products` / `industry` / `paper` / `tip` / `null`
 - `publishedAt`：ISO 8601 UTC（带 `Z`）
 - `id`：cuid 字符串（25 字符），**不要假设是数字**

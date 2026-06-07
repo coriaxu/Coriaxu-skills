@@ -1,5 +1,30 @@
 # Changelog
 
+## [1.8.6] - 2026-06-03 — Bounded Scope / 长文去味与保长度的中间态
+
+针对 [#4](https://github.com/MrGeDiao/shuorenhua/issues/4) 复测反馈:v1.8.5 的 `in-place` 把长度接住了(实测 95–96%),但去 AI 味效果明显弱于 `structural`——长文里整句级的空话(无源引用、价值拔高收尾)在 `in-place` 下规则上删不掉,只会被软化保留。本版在 `structural` 和 `in-place` 之间补一个 `bounded` scope。
+
+### Added
+- `SKILL.md` 新增 `bounded` edit scope:`public-writing` 长文默认 scope。允许删"整句都是空话"的句子,但不直接删,而是进「建议删除(待确认)」清单交用户拍板;句内洗实句照常,不并句、不重排、不删承担节奏的重复。
+- `evals/benchmark.md` 新增 2 条用例(70 → 72,40 SF + 30 SNF → 41 SF + 31 SNF):
+  - `SF-41`:`bounded` 下整句空话(谄媚开场 / 无源引用 / 价值拔高收尾)进删除清单,带数字的实句和排比节奏句原样保留
+  - `SNF-31`:`bounded` 删除清单不该混进实句或节奏句——带句首引导词(`说到底`)但实质是立场判断的句子,只能句内删引导词,整句不进清单
+- `references/operation-manual.md` 顶部新增「Scope 与删除清单」一节,统一三档 scope 下"整句空话 vs 句首引导词"的处理,不在各类问题里重复。
+
+### Changed
+- 长 `public-writing` 默认 scope 从 `in-place` 改为 `bounded`(行为变化);`in-place` 退为用户明确要求"完全原样 / 一句都别删 / 严格保句数",或反馈 `bounded` 仍删多了时才用。
+- `SKILL.md` 执行顺序第 5 步 scope 判断扩成三档;第 8 节回读把"字数留存"从硬指标降为参考,新增"信息留存"为硬指标——`bounded` 删整句空话会降字数,约束应落在"信息点可追溯"和"删除清单只含纯空句"上,不是字数。
+- `README.md`、`evals/run-eval.md` 同步版本、计数(72)、scope 三档和默认值变化。
+
+### Tested
+- 2026-06-03 首次**模型实跑**(此前各版为静态复核):同一篇 1498 字合成长文,用现有 `SKILL.md`+`references/` 跑 `aggressive` 力度的 `structural` 和 `in-place`,Codex(gpt-5 家族)与 Claude(opus 家族)双交叉。
+- 结果支撑本版动机:`in-place` 两个模型都把无源引用、价值拔高收尾**整句残留**(只软化铺垫),留存 95–96%;`structural` 都删掉这些整句空话,留存 80–83%。`bounded` 规则刚落地,实跑留待下一轮。
+- 一处修正:`structural` 在两个强模型上并未腰斩(实测 -18%,非 issue #4 报告的 -39%),说明长文 `structural` 缩水程度依模型而定、不可控——这也是 `bounded` 把"删多少"交还用户的理由。
+
+### Notes
+- `bounded` 不是第四个力度档位,而是 scope 轴上介于 `structural` 和 `in-place` 之间的中间态;`minimal / standard / aggressive` 三档力度不变。
+- 实跑成稿和对照存档在本地 `tasks/current/runs/`(local-only)。
+
 ## [1.8.5] - 2026-05-27 — In-place Scope / 长文保长度
 
 针对 [#4](https://github.com/MrGeDiao/shuorenhua/issues/4) 反馈"长文被改完明显缩水"（约 1800 字 → minimal 约 1500 字 → aggressive 约 1000 字）。本版结论：问题不在三档力度，而在长文默认走 structural 动作时，删句、并句、重排段落会叠加。

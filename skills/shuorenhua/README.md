@@ -15,9 +15,9 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/MrGeDiao/shuorenhua/stargazers"><img src="https://img.shields.io/github/stars/MrGeDiao/shuorenhua?style=for-the-badge" alt="GitHub stars"></a>
+  <a href="https://github.com/MrGeDiao/shuorenhua/stargazers"><img src="https://img.shields.io/github/stars/MrGeDiao/shuorenhua?style=for-the-badge&amp;label=stars" alt="GitHub stars"></a>
   <a href="https://github.com/MrGeDiao/shuorenhua/releases"><img src="https://img.shields.io/github/v/release/MrGeDiao/shuorenhua?style=for-the-badge&amp;label=release" alt="GitHub release"></a>
-  <a href="evals/benchmark.md"><img src="https://img.shields.io/badge/benchmark-70%20cases-2563eb?style=for-the-badge" alt="Benchmark: 70 cases"></a>
+  <a href="evals/benchmark.md"><img src="https://img.shields.io/badge/benchmark-72%20cases-2563eb?style=for-the-badge" alt="Benchmark: 72 cases"></a>
   <a href="evals/real-samples.md"><img src="https://img.shields.io/badge/real%20samples-19-16a34a?style=for-the-badge" alt="Real samples: 19"></a>
   <a href="LICENSE"><img src="https://img.shields.io/github/license/MrGeDiao/shuorenhua?style=for-the-badge" alt="License"></a>
 </p>
@@ -47,9 +47,9 @@
 
 | 项 | 当前状态 |
 |----|----------|
-| 最新版本 | `v1.8.5`：新增 `in-place` edit scope，处理长文改完明显缩水的问题（见 [#4](https://github.com/MrGeDiao/shuorenhua/issues/4)） |
+| 最新版本 | `v1.8.6`：新增 `bounded` edit scope（长文默认），把整句空话进删除清单交用户确认，补 v1.8.5 `in-place` 去味偏弱的问题（见 [#4](https://github.com/MrGeDiao/shuorenhua/issues/4)） |
 | 规则覆盖 | 210+ 中文短语、96 条英文短语、19 类结构反模式 |
-| 评测集 | 70 条 benchmark：40 条该改，30 条不该误杀 |
+| 评测集 | 72 条 benchmark：41 条该改，31 条不该误杀 |
 | 真实样本 | 19 条整段样本，按自然 / 保真 / 可直接发评分，长文加 `长度节奏` 维度 |
 | 许可证 | [MIT](LICENSE) |
 
@@ -100,18 +100,19 @@ v1.8.0 把可发布文本再拆成 4 个子场景。它们不是简单换语气�
 | `docs` | 中 | 技术表达优先，二次回读更保守 |
 | `public-writing` | 重 | 全规则扫描，并按需要触发 Scene Packs |
 
-### v1.8.5：In-place Scope
+### v1.8.5 / v1.8.6：长文的三档 scope
 
-长文按默认 structural 动作改写时，删句、并句、重排段落容易叠加。一篇 1800 字的稿子有时会被改成 1500 字，再调一档变成 1000 字（见 [#4](https://github.com/MrGeDiao/shuorenhua/issues/4)）。
+长文按默认 structural 动作改写时，删句、并句、重排段落容易叠加，一篇 1800 字的稿子可能被压到 1000 字（见 [#4](https://github.com/MrGeDiao/shuorenhua/issues/4)）。但反过来只做句内改写（`in-place`），整句级的空话（无源引用、价值拔高收尾）又删不掉、去味偏弱——v1.8.6 用真实模型实跑验证了这一点：两个模型在 `in-place` 下都把无源引用和拔高收尾整句留了下来。
 
-v1.8.5 加了一条和力度正交的 `in-place` scope：只做句内替换、删短语和降调，不默认删整句、并句或重排段落。它不是"更轻一档"，而是改写动作的边界。
+所以长文的 scope 分三档（和 `minimal / standard / aggressive` 力度正交）：
 
-触发条件：
+| scope | 删整句 | 适用 |
+|-------|--------|------|
+| `structural` | 自由删并重排 | 短文、明确要重写 |
+| `bounded`（v1.8.6，长文默认） | 只把"整句空话"进删除清单，交用户确认 | `public-writing` 长文 |
+| `in-place`（v1.8.5） | 一句都不删，只句内降调 | 用户明确要"完全原样" |
 
-- 中文 `public-writing` 长文（约 1000 字以上）默认优先 `in-place`；
-- 用户明确说"保长度""别缩水""别删""保留节奏""尽量原样"时，无论长度都切到 `in-place`。
-
-字数留存目标 ≥ 0.90，但这只是回读指标，不是让模型凑字数。"约 1000 字"是这一轮反馈得到的工程默认值，后续会用更多真实长文 bad case 校准。
+`bounded` 的取舍：句内洗实句直接改、承担节奏的重复不动；整句都是空话的（剥掉引导词就什么都不剩）进「建议删除（待确认）」清单，删多少由用户拍板。这样既不像 `structural` 那样不可控地缩水，也不像 `in-place` 那样把整句空话留在文里。
 
 ## 效果
 
@@ -190,19 +191,20 @@ v1.8.5 加了一条和力度正交的 `in-place` scope：只做句内替换、�
 
 ## 评测
 
-当前评测集共 70 条：
+当前评测集共 72 条：
 
 | 类型 | 数量 | 目标 |
 |------|------|------|
-| SF | 40 | 应该改的文本必须命中并改掉主要问题 |
-| SNF | 30 | 不该误杀的文本必须放行或轻提示 |
+| SF | 41 | 应该改的文本必须命中并改掉主要问题 |
+| SNF | 31 | 不该误杀的文本必须放行或轻提示 |
 | Real Samples | 19 | 整段样本按自然、保真、可直接发三项评分，长文加 `长度节奏` |
 | Scene Packs | 8 | README / release note / forum post / issue reply 的正反样本 |
 | Long-form In-place | 4 | 长文保长度场景，检查字数留存、句数对齐和关键转场 |
+| Bounded | 2 | 长文整句空话进删除清单，但不误删实句和节奏句 |
 
 覆盖范围包括：套话清理、工程师腔、小红书 AI 腔、无源引用、事实保真、保护片段、代码上下文保护、Residual Audit / 二次审稿、Scene Packs、Long-form In-place，以及真实技术文本误杀防护。
 
-当前用例集见 [evals/benchmark.md](evals/benchmark.md)。最近一次公开归档结果见 [evals/results-v1.8.5.md](evals/results-v1.8.5.md)——本轮是**静态复核**口径（按当前规则逐条走查 70 条 benchmark），不是模型实跑结果。模型实跑留给后续轮次。历史归档可参考 [evals/results-v1.8.3.md](evals/results-v1.8.3.md)、[evals/results-v1.8.0.md](evals/results-v1.8.0.md)、[evals/results-v1.7.4.md](evals/results-v1.7.4.md) 和 [evals/results-v1.7.1.md](evals/results-v1.7.1.md)。
+当前用例集见 [evals/benchmark.md](evals/benchmark.md)（72 条）。v1.8.6 首次做了**模型实跑**（Codex + Claude 双模型跑 `structural` / `in-place` 两版，见 [evals/results-v1.8.6.md](evals/results-v1.8.6.md)），此前各版 `results-*.md` 是**静态复核**口径（按规则逐条走查）。历史归档可参考 [evals/results-v1.8.5.md](evals/results-v1.8.5.md)、[evals/results-v1.8.3.md](evals/results-v1.8.3.md)、[evals/results-v1.8.0.md](evals/results-v1.8.0.md)、[evals/results-v1.7.4.md](evals/results-v1.7.4.md) 和 [evals/results-v1.7.1.md](evals/results-v1.7.1.md)。
 
 ## 安装
 
@@ -235,7 +237,7 @@ shuorenhua/
 ├── CHANGELOG.md
 ├── CONTRIBUTING.md
 ├── evals/
-│   ├── benchmark.md          # 评测集（70 条）
+│   ├── benchmark.md          # 评测集（72 条）
 │   ├── real-samples.md       # 19 条整段真实样本
 │   ├── run-eval.md           # 评测指令
 │   └── results-*.md          # 历次版本归档
