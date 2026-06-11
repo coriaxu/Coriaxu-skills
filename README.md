@@ -10,7 +10,7 @@
 
 - **通用工具类**：笔记处理、内容制作、截图、EPUB 生成等
 - **思维教练类**：人物视角（Elon Musk / Peter Senge）、商业诊断（dbs 系列）、圆桌讨论
-- **元技能类**：skill 创作器、skill 优化器（darwin）、skill 规划器
+- **元技能类**：skill 创作器、skill 优化器（darwin）、skill 打磨工坊（luban）、skill 规划器
 - **集成工具类**：Obsidian、Google Workspace、web-access、claude-to-im 桥接
 
 其中一部分是原创，一部分是社区作者的杰出作品，我收录进来方便本地一键部署 + 致谢原作者。**所有第三方作者和原协议见 [CREDITS.md](CREDITS.md)**。
@@ -109,7 +109,7 @@ Coriaxu-skills/
 
 ## 致谢
 
-感谢以下开源作者的 skill，没有他们就没有这个仓库的完整形态：花叔（nuwa-skill、darwin-skill）、小能熊老师（三级笔记）、姚金刚（yao-meta-skill）、李继刚（ljg-card、ljg-roundtable）、dontbesilent（dbs 系列）、Obsidian（obsidian-markdown、obsidian-bases）、乔木（qiaomu-epub-book-generator）、空格的键盘（career-skill-planner）、akira82-ai（agent-review）、一泽 Eze（web-access）、MrGeDiao（shuorenhua）、卡兹克（aihot）。
+感谢以下开源作者的 skill，没有他们就没有这个仓库的完整形态：花叔（nuwa-skill、darwin-skill）、LearnPrompt（luban-skill）、小能熊老师（三级笔记）、姚金刚（yao-meta-skill）、李继刚（ljg-card、ljg-roundtable）、dontbesilent（dbs 系列）、Obsidian（obsidian-markdown、obsidian-bases）、乔木（qiaomu-epub-book-generator）、空格的键盘（career-skill-planner）、akira82-ai（agent-review）、一泽 Eze（web-access）、MrGeDiao（shuorenhua）、卡兹克（aihot）。
 
 ---
 

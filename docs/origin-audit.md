@@ -3,13 +3,13 @@
 **扫描时间**：2026-04-18
 **扫描范围**：`/Users/surfin/.claude/skills/` 下候选开源的 ~40 个 skill
 **扫描方式**：SKILL.md frontmatter + LICENSE 文件 + README.md 归属关键词
-**更新记录**：2026-05-27 依据已确认上游仓库补全来源链接与许可信息。
+**更新记录**：2026-05-27 依据已确认上游仓库补全来源链接与许可信息；2026-06-11 新增 LearnPrompt 的 `luban-skill`。
 
 ## 溯源结果总览
 
 - **徐老师原创**：约 20 个（2026-05-27 已将部分原误判条目改入第三方来源）
 - **徐老师 AI 团队（小萌/若谷）署名**：2 个（flomo-processor、daily-review）
-- **第三方原创（明确作者）**：yao-meta-skill = 姚金刚、nuwa-skill / darwin-skill = 花叔、三级笔记 = 小能熊老师、shuorenhua、web-access、claude-to-im、dbskill、obsidian-skills 等
+- **第三方原创（明确作者）**：yao-meta-skill = 姚金刚、nuwa-skill / darwin-skill = 花叔、luban-skill = LearnPrompt、三级笔记 = 小能熊老师、shuorenhua、web-access、claude-to-im、dbskill、obsidian-skills 等
 - **第三方包装/致敬**：1 个（awesome-finance-skills 基于 RKiding）
 - **已知第三方协议包含 MIT、CC BY-NC 4.0 或未声明**；徐老师原创内容仍可采用 MIT，但第三方目录需遵守各自 LICENSE
 - **订正记录（2026-04-19）**：徐老师 confirm yao-meta-skill 作者是姚金刚（原 frontmatter 写 Yao Team），darwin-skill 作者是花叔，三级笔记作者是小能熊老师（之前三条都误判为徐浩原创）
@@ -61,6 +61,7 @@
 | yao-meta-skill | 姚金刚 Yao Jingang（Yao Team） | MIT | `LICENSE:2 Copyright (c) 2026 Yao Team`（徐老师确认作者是姚金刚） | https://github.com/yaojingang/yao-meta-skill |
 | nuwa-skill | 花叔 Huashu | MIT | `LICENSE:3 Copyright (c) 2026 Huashu (花叔)` | https://github.com/alchaincyf/nuwa-skill |
 | darwin-skill | 花叔 Huashu | 待确认（仓内无 LICENSE，README 标 MIT） | 徐老师确认作者是花叔，扫描时误判为徐浩原创 | https://github.com/alchaincyf/darwin-skill |
+| luban-skill | LearnPrompt | MIT | `LICENSE:3 Copyright (c) 2026 LearnPrompt` | https://github.com/LearnPrompt/luban-skill |
 | 三级笔记 | 小能熊老师 | 待确认（仓内无 LICENSE） | 徐老师确认作者是小能熊老师，扫描时误判为徐浩原创 | 待徐老师补链接 |
 | agent-review | akira82-ai | MIT | `LICENSE:3 Copyright (c) 2026 akira82-ai` | 待补充 |
 | career-skill-planner | 空格的键盘 | 待确认 | CREDITS 归属记录 | 待补充 |

@@ -92,6 +92,13 @@
 - 功能：AI HOT 中文 AI 资讯查询 — 查询 aihot.virxact.com 公开 REST API，实时返回中文 AI 新闻日报和动态流
 - 原仓：https://aihot.virxact.com/aihot-skill/
 
+### LearnPrompt — `luban-skill`
+
+- 目录：`skills/luban-skill/`
+- 协议：MIT (Copyright © 2026 LearnPrompt)
+- 功能：鲁班 Skill 打磨工坊 — 把一个能用的 Skill 打磨成能被理解、安装、传播、验证和持续进化的公共 Skill 资产
+- 原仓：https://github.com/LearnPrompt/luban-skill
+
 ### 空格的键盘 — `career-skill-planner`
 
 - 目录：`skills/career-skill-planner/`
@@ -111,4 +118,4 @@ GitHub: [@coriaxu](https://github.com/coriaxu)
 
 ---
 
-_最后更新：2026-05-27_
+_最后更新：2026-06-11_

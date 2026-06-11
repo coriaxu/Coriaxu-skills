@@ -13,6 +13,7 @@
 | [**yao-meta-skill**](../skills/yao-meta-skill/) | create a skill、make this a skill、把这个流程做成 skill、package skill、improve existing skill | 元技能工厂：把你日常重复的流程、零碎提示词、对话记录或笔记，系统化沉淀为带评测闭环、可复用、可交接的 agent skill。 | 姚金刚原创（MIT） |
 | [**nuwa-skill**](../skills/nuwa-skill/) | 蒸馏 XX、造一个 XX 的 skill、女娲、用 XX 的视角、distill X | 女娲造人术：输入任意人物名，自动派多 agent 并行调研并提炼心智模型与表达 DNA，一键生成一个"像那个人一样思考"的视角 skill。 | 花叔原创（MIT） |
 | [**darwin-skill**](../skills/darwin-skill/) | 优化 skill、skill 评分、自动优化、skill 质量检查、帮我改改 skill、skill review | 达尔文 skill 自动优化器：按 8 维 rubric 评分 + 爬山算法 + git 版本控制，边改 SKILL.md 边跑测试，只保留变好的版本、变差自动回滚。 | 花叔原创（灵感来自 Karpathy autoresearch） |
+| [**luban-skill**](../skills/luban-skill/) | 让鲁班看看这个 skill、班门打磨、skill 体检、skill 审计、产品化我的 skill、为什么我的 skill 没人装 | 鲁班 Skill 打磨工坊：从验料、访行、过尺、慢刨到回炉，把一个能用的 Skill 打磨成能被理解、安装、传播、验证和持续进化的公共 Skill 资产。 | LearnPrompt 原创（MIT） |
 | [**career-skill-planner**](../skills/career-skill-planner/) | 帮我规划 XX 职业的 Skill、我是 XX 帮我拆 Skill、XX 职业需要哪些 Skill | 职业 Skill 规划器：输入职业名，输出该职业的核心工作流分解，以及每个工作流对应的 Skill 制作指南（提示词 + 实现逻辑）。 | 空格的键盘原创 |
 | [**agent-review**](../skills/agent-review/) | 复盘、agent review、/复盘、/agent-review | 每日复盘：根据 Claude Code 本地对话记录，生成结构化的每日工作复盘报告。支持当天、昨天、近 3 天、近 7 天。 | akira82-ai 原创（MIT） |
 
@@ -93,4 +94,4 @@ cd ~/Code/Coriaxu-skills
 
 ---
 
-_最后更新：2026-05-27 · 本清单随仓库内容同步更新_
+_最后更新：2026-06-11 · 本清单随仓库内容同步更新_

@@ -12,6 +12,7 @@ Last checked: 2026-06-08
 | `dbs-content` | https://github.com/dontbesilent2025/dbskill | `a58f647c` | Checked from `0e87e791`; no local content change; CC BY-NC 4.0 boundary retained |
 | `dbs-diagnosis` | https://github.com/dontbesilent2025/dbskill | `a58f647c` | Checked from `0e87e791`; no local content change; CC BY-NC 4.0 boundary retained |
 | `dbskill-knowledge` | https://github.com/dontbesilent2025/dbskill | `a58f647c` | Checked `知识库/` from `0e87e791`; no local content change; local wrapper `README.md` / `LICENSE` / `SKILL.md` retained |
+| `luban-skill` | https://github.com/LearnPrompt/luban-skill | `edeb14ea` | Added; MIT license retained; upstream author is LearnPrompt |
 | `nuwa-skill` | https://github.com/alchaincyf/nuwa-skill | `8ff461d4` | Updated from `5f17d5bb`; promo assets, hero media, examples, and reference material refreshed |
 | `obsidian-bases` | https://github.com/kepano/obsidian-skills | `c4728b3e` | Updated from `553ef99`; base filter examples now show one-key recursive filter objects |
 | `obsidian-markdown` | https://github.com/kepano/obsidian-skills | `c4728b3e` | Checked from `553ef99`; no local content change; local attribution README retained |
