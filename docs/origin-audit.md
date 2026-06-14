@@ -66,7 +66,7 @@
 | 三级笔记 | 小能熊老师 | 待确认（仓内无 LICENSE） | 徐老师确认作者是小能熊老师，扫描时误判为徐浩原创 | 待徐老师补链接 |
 | agent-review | akira82-ai | MIT | `LICENSE:3 Copyright (c) 2026 akira82-ai` | 待补充 |
 | career-skill-planner | 空格的键盘 | 待确认 | CREDITS 归属记录 | 待补充 |
-| ljg-card / ljg-roundtable | 李继刚 Li Jigang | 待确认 | CREDITS 归属记录 | 待补充 |
+| ljg-roundtable | 李继刚 Li Jigang | 待确认 | CREDITS 归属记录 | 待补充 |
 | shuorenhua | MrGeDiao | MIT | `LICENSE:2 Copyright (c) 2026 MrGeDiao` | https://github.com/MrGeDiao/shuorenhua |
 | web-access | 一泽 Eze | MIT | `SKILL.md` frontmatter: `license: MIT`, `github: https://github.com/eze-is/web-access` | https://github.com/eze-is/web-access |
 | claude-to-im | op7418 | MIT | `LICENSE:3 Copyright (c) 2024-2025 op7418` | 独立 GitHub 仓（有 `.git` 目录） |
@@ -90,7 +90,7 @@
 
 1. **仓库定位**：是要「只放徐老师自创 + CREDITS 链接推荐第三方」，还是「把第三方 skill 也打包进 monorepo（保留原作者信息致谢）」？
 2. **flomo-processor / daily-review**：AI 团队署名（小萌 + 若谷）是否属实？保留还是改写？
-3. **仍缺原仓链接的第三方 skill**：`agent-review`、`三级笔记`、`career-skill-planner`、`ljg-card`、`ljg-roundtable`。
+3. **仍缺原仓链接的第三方 skill**：`agent-review`、`三级笔记`、`career-skill-planner`、`ljg-roundtable`。
 
 ---
 

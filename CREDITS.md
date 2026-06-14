@@ -69,13 +69,11 @@
 - 功能：EPUB 电子书生成器 — 博客文章、Markdown 文档、AI 搜索资料转 EPUB，支持图片下载 + 代码块渲染 + 专业封面，兼容微信读书和 Apple Books
 - 原仓：https://github.com/joeseesun/qiaomu-epub-book-generator
 
-### 李继刚 Li Jigang — `ljg-card`, `ljg-roundtable`
+### 李继刚 Li Jigang — `ljg-roundtable`
 
-- 目录：`skills/ljg-card/`、`skills/ljg-roundtable/`
+- 目录：`skills/ljg-roundtable/`
 - 协议：_待确认_
-- 功能：
-  - **ljg-card**：内容铸造器 · Content Caster — 把内容铸成六种 PNG 视觉（长卡/信息图/多卡/视觉笔记/漫画/白板）
-  - **ljg-roundtable**：结构化圆桌讨论器 — 围绕议题邀请 3-5 位真实人物展开多轮辩证
+- 功能：结构化圆桌讨论器 — 围绕议题邀请 3-5 位真实人物展开多轮辩证
 - 原仓：_待补充_
 
 ### 小能熊老师 — `三级笔记`

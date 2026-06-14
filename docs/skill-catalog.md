@@ -44,7 +44,6 @@
 | [**三级笔记**](../skills/三级笔记/) | 提炼大纲、整理笔记、总结要点、拆解文章、三级笔记、深度解读、拆书 | 深度长文阅读教练：用阅读研究者 + 编辑的双重视角，把长文章、演讲稿、论文拆成三级大纲，让你既能抓住作者观点也能看清他的思考路径。 | 小能熊老师原创 |
 | [**course-companion-open**](../skills/course-companion-open/) | 共学、学这堂课、课程笔记、study this lecture、course companion | 课程共学搭档：先调用 `three-level-notes` 拆课程骨架，再按无知识库 / 指定文件夹 / Obsidian 三种模式连接已有笔记，最后通过深度对话生成研读笔记和可选知识卡。 | 徐浩原创 |
 | [**reading-companion-open**](../skills/reading-companion-open/) | 读书陪读、开启陪读、陪我读这本书、这段怎么理解、回炉、存档、结读 | 读书陪读搭档：围绕一本书边读边聊，用户说“存档”后才预览并写入本地 Markdown 卡片，支持旧笔记回炉、书架索引和结读归档。 | 徐浩原创 |
-| [**ljg-card**](../skills/ljg-card/) | 铸、cast、做成图、做成卡片、做成信息图、视觉笔记、sketchnote、漫画、白板 | 内容铸造器 · Content Caster：把内容铸成 PNG 视觉图片，六种模具（长卡 `-l`、信息图 `-i`、多卡 `-m`、视觉笔记 `-v`、漫画 `-c`、白板 `-w`）。 | 李继刚原创 |
 | [**qiaomu-epub-book-generator**](../skills/qiaomu-epub-book-generator/) | 生成 EPUB、制作电子书、Markdown 转 EPUB、博客文章做成电子书 | EPUB 电子书生成器：博客文章、Markdown 文档、AI 搜索资料转 EPUB，支持图片下载 + 代码块渲染 + 专业封面，兼容微信读书和 Apple Books。 | 乔木原创 |
 | [**shuorenhua**](../skills/shuorenhua/) | 说人话、去 AI 味、自然一点、别像模板、别太像 ChatGPT | 清理中英文文本里的 AI 套路：保留事实和术语，按 chat / status / docs / public-writing 四种场景控制改写力度。 | MrGeDiao 原创（MIT） |
 | [**reading-notes-splitter**](../skills/reading-notes-splitter/) | 读书笔记、flomo、HTML 转 MD、拆分卡片、笔记整理 | 把 flomo 等 HTML 格式的读书笔记转换为结构化 Markdown 卡片：自动拆分每条笔记，区分标题、个人想法和原书摘要。 | 徐浩原创 |
