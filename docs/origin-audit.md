@@ -30,6 +30,7 @@
 | wechat-article-deep-reader | 原创方案 | 原创 |
 | structured-context-compressor | 原创算法 | 原创 |
 | reading-notes-splitter | 原创方案 | 原创 |
+| reading-companion-open | reading-companion 的通用公开版 | 原创 |
 | pending-zone | 徐老师个人工作流 | 原创 |
 | coriaxu-pending-zone | pending-zone 通用公开版 | 原创 |
 | init-project-claude | 原创 | 原创 |

@@ -1,0 +1,34 @@
+{
+  "name": "reading-companion-open",
+  "display_name": "读书陪读（开源版）",
+  "version": "0.2.1",
+  "owner": "Coriaxu",
+  "updated_at": "2026-06-12",
+  "review_cadence": "quarterly",
+  "status": "active",
+  "maturity_tier": "production",
+  "lifecycle_stage": "production",
+  "license": "MIT",
+  "target_platforms": [
+    "openai",
+    "claude",
+    "generic",
+    "agent-skills-compatible"
+  ],
+  "required_skills": [],
+  "package_components": [
+    "SKILL.md",
+    "README.md",
+    "agents/interface.yaml",
+    "references",
+    "examples",
+    "evals",
+    "内测使用说明.md"
+  ],
+  "quality_gates": [
+    "trigger_cases",
+    "clean_env_walkthrough",
+    "private_residue_scan"
+  ],
+  "release_notes": "0.2.1 adds a tester-facing Chinese usage guide for internal validation. 0.2.0 tightened activation boundaries, preview-confirm write rules, duplicate-card handling, config validation, and open-package privacy checks."
+}

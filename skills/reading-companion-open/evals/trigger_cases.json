@@ -1,0 +1,40 @@
+{
+  "skill": "reading-companion-open",
+  "version": "0.2.1",
+  "should_trigger": [
+    { "input": "读书陪读", "expect": "activate, read bookshelf, resume or ask which book" },
+    { "input": "开启陪读", "expect": "activate, read bookshelf" },
+    { "input": "陪我读这本书，《沉思录》", "expect": "activate, start new-book flow for 《沉思录》" },
+    { "input": "我准备开始读一本新书，先帮我了解一下背景", "expect": "activate, new-book background research" },
+    { "input": "这段怎么理解？（附书摘原文）", "expect": "activate if book context exists, discuss the passage only" },
+    { "input": "你看下我三年前写的这条读书笔记，给我一些当时没想到的角度", "expect": "activate, old-note 回炉 flow" },
+    { "input": "回炉这条笔记", "expect": "activate, 回炉 flow" },
+    { "input": "存档", "expect": "archive flow: read templates, filter content, preview card, wait for confirm" },
+    { "input": "行，存档吧，今天的讨论加上", "expect": "archive flow with today's discussion included" },
+    { "input": "这段原文我觉得是在讲人的自欺，先存档到这本书", "expect": "archive flow keeps the content judgment, filters the operational instruction, previews before writing" },
+    { "input": "换一本，陪我读《悉达多》", "expect": "ask whether the current active book should be paused or completed before switching" },
+    { "input": "这本书读完了，结读", "expect": "completion flow: index status complete, bookshelf moved to recently-finished" },
+    { "input": "read this book with me", "expect": "activate, English session, same rules" },
+    { "input": "/reading-companion-open", "expect": "activate via slash command" }
+  ],
+  "should_not_trigger": [
+    { "input": "帮我总结一下《原则》这本书的核心观点", "reason": "one-shot summary, not companionship" },
+    { "input": "存一下今天这个会议结论", "reason": "generic save request outside book-reading context" },
+    { "input": "推荐几本关于学习方法的书", "reason": "book recommendation is generic chat, no companionship requested" },
+    { "input": "把我这 300 条 flomo 笔记批量整理成卡片", "reason": "batch import/cleanup is out of scope; tell the user this skill does one-at-a-time only" },
+    { "input": "给我做一份这本书的全书拆解报告", "reason": "whole-book teardown is out of scope" },
+    { "input": "陪我学这堂课的讲稿", "reason": "course/lecture co-learning belongs to a course companion skill" }
+  ],
+  "boundary_cases": [
+    { "input": "对话中聊起第二本书", "expect": "remind the user to open a new conversation; do not mix two books in one note line" },
+    { "input": "用户说存档但当前环境无文件写权限", "expect": "switch to draft-only: output full file contents for manual saving, rules unchanged" },
+    { "input": "存档内容与已有卡片主题高度重合", "expect": "ask: 续写旧卡还是新建卡, do not overwrite silently" },
+    { "input": "生成的卡片文件名已存在", "expect": "never overwrite; ask whether to append, rename, or save as a suffixed file" },
+    { "input": "找到多个 reading-companion.config.md", "expect": "list candidate paths and ask the user to choose one; do not merge libraries" },
+    { "input": "配置文件缺少 library.root", "expect": "ask for the missing field before reading or writing any bookshelf file" },
+    { "input": "用户回复“嗯” after preview", "expect": "treat as ambiguous; do not write until explicit confirmation" },
+    { "input": "用户发言混合内容判断与操作指令", "expect": "card keeps only the content judgment; operational instructions are filtered out" },
+    { "input": "章节查不到", "expect": "chapter field says 章节待确认, never fabricated" },
+    { "input": "截图中文字读不清", "expect": "ask the user for clearer text or image; do not guess the passage" }
+  ]
+}

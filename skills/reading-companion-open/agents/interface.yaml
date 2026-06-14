@@ -1,0 +1,29 @@
+interface:
+  display_name: "读书陪读（开源版）"
+  short_description: "One book per conversation: discuss passages, revisit old notes, preview-confirm archive into a local note library"
+  default_prompt: "Use $reading-companion-open to read this book with me. Load exactly one reading-companion.config.md or create it through onboarding, check the bookshelf file, keep one active book, and never write an archive card before preview confirmation."
+compatibility:
+  canonical_format: "agent-skills"
+  adapter_targets:
+    - "openai"
+    - "claude"
+    - "generic"
+  activation:
+    mode: "manual"
+    paths: []
+  execution:
+    context: "inline"
+    shell: "bash"
+  trust:
+    source_tier: "local"
+    remote_inline_execution: "forbid"
+    remote_metadata_policy: "allow-metadata-only"
+  degradation:
+    openai: "draft-only-when-no-file-access"
+    claude: "draft-only-when-no-file-access"
+    generic: "draft-only-when-no-file-access"
+  safety:
+    write_requires_preview_confirmation: true
+    one_active_book_per_conversation: true
+    never_overwrite_existing_cards: true
+    private_path_in_examples: "forbid"
