@@ -8,7 +8,9 @@ description: >
   the user explicitly asks to archive in the current book context. Trigger on
   phrases like "读书陪读", "开启陪读", "陪我读这本书", "这段怎么理解",
   "回炉", "存档", "结读", "reading companion", or "read this book
-  with me" when the conversation is about reading a book. Do not use for
+  with me" when the conversation is about reading a book; after a confirmed
+  archive, also handle requests to turn the written card into a 9:16 PNG
+  companion page or visual card. Do not use for
   generic "save this" requests outside book reading, one-shot book summaries,
   batch note import/cleanup, whole-book teardown reports, book recommendations,
   or course/lecture co-learning.
@@ -52,8 +54,9 @@ description: >
 4. **原文与原话神圣。** 作者原文完整保留，不提炼不改写；用户发言完整保留，不压成摘要；AI 的延伸单独放一层，三层不混。
 5. **时间层分开。** 旧笔记回炉时，过去的笔记和今天的讨论必须分区存放，不得混入同一区块。
 6. **查不到不硬编。** 章节、出处、背景，能查则查，查不到明确标注「章节待确认」或「没有」，不脑补。
-7. **没有文件权限就降级。** 当前环境不能读写本地文件时，所有「写入」动作改为输出完整文件内容请用户自行保存（draft-only 模式），其余规矩不变。
-8. **不把私人信息带进开源包。** 配置、样例、验收材料不得写死个人路径、真实邮箱、私人称呼或特定用户的知识库结构。
+7. **PNG 是视觉派生的最终成品。** 用户在存档后要求生成伴读页、HTML 展现形式、视觉化卡片或做成图时，可以临时生成 HTML，但最终交付必须是 PNG。
+8. **没有文件权限就降级。** 当前环境不能读写本地文件时，所有「写入」动作改为输出完整文件内容请用户自行保存（draft-only 模式），其余规矩不变。
+9. **不把私人信息带进开源包。** 配置、样例、验收材料不得写死个人路径、真实邮箱、私人称呼或特定用户的知识库结构。
 
 ## 激活边界
 
@@ -128,7 +131,22 @@ description: >
 7. 该书第一次存档：先建 `{library.root}/《书名》/` 和索引页 `00-Index-书名.md`，把开读背景写进索引。
 8. 更新索引页：「卡片目录」追加新卡链接（链接格式按配置 `library.link_style`），同步更新「最近更新」和「下次继续」。
 9. 更新书架：该书不在「加工中」区块时追加条目，格式 `- 《书名》 — 开始于 YYYY-MM-DD`。
-10. 写入后回报写了哪些文件、卡片标题、索引和书架是否已更新；不要复述整张卡。
+10. 把本次卡片路径记为「刚写入卡片」，供后续视觉派生使用；写入后回报写了哪些文件、卡片标题、索引和书架是否已更新；不要复述整张卡。
+
+### 4.5 存档后视觉派生
+
+用户在卡片确认写入后说「生成伴读页」「生成 HTML 展现形式」「做成视觉化卡片」「做成图」「生成 PNG」或等价表达时，进入视觉派生流程。这个流程只处理已经写入的读书卡，不替代存档流程。
+
+1. **确定来源卡片。** 默认读取刚写入卡片；如果本轮没有刚写入卡片，要求用户指定书名和卡片，不猜最近文件。
+2. **构造设计 brief。** brief 必须包含书名、卡片标题、章节、用户原话、AI 延伸、卡片核心判断、可引用的短原文摘录、目标受众、输出路径和署名要求。作者原文只放短摘录，不把整段或整章搬进视觉图。
+3. **选择设计 skill。**
+   - 普通视觉卡片、信息卡、读书洞察卡：使用 `editorial-card-screenshot`。
+   - 用户明确要「HTML 伴读页」「高保真页面」「更自由设计」「概念可视化」：使用 `huashu-design`。
+4. **固定输出规格。** 默认比例 `9:16`，画布 `1080 x 1920`；用户明确指定其他比例时才覆盖。
+5. **固定署名。** PNG 右下角必须有英文艺术体署名 `Coria Xu`，低调但可辨认，不遮挡正文。
+6. **固定最终产物。** HTML 只是中间产物；最终 PNG 写入 `~/Desktop/阅读伴读视觉化/`，文件名格式 `书名-卡片标题-YYYYMMDD.png`。目录不存在时先创建。
+7. **质量检查。** 生成后检查 PNG 存在、尺寸合理、正文未裁切、署名可见、版权摘录不过量；失败就修 HTML / 设计后重新截图。
+8. **回报结果。** 只回报 PNG 路径、使用的设计 skill、比例和是否通过检查；不要把整张卡或 HTML 全文贴回聊天。
 
 ### 5. 完成结读
 
@@ -156,4 +174,5 @@ description: >
 
 - 直接说：`读书陪读`、`开启陪读`
 - 自然说：`陪我读这本书`、`这段怎么理解`、`存档`、`回炉这条笔记`、`结读`
+- 存档后说：`生成伴读页`、`生成 HTML 展现形式`、`做成视觉化卡片`、`做成图`、`生成 PNG`
 - 斜杠命令：`/reading-companion-open`

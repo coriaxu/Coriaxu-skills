@@ -1,9 +1,9 @@
 {
   "name": "reading-companion-open",
   "display_name": "读书陪读（开源版）",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "owner": "Coriaxu",
-  "updated_at": "2026-06-12",
+  "updated_at": "2026-06-14",
   "review_cadence": "quarterly",
   "status": "active",
   "maturity_tier": "production",
@@ -30,5 +30,5 @@
     "clean_env_walkthrough",
     "private_residue_scan"
   ],
-  "release_notes": "0.2.1 adds a tester-facing Chinese usage guide for internal validation. 0.2.0 tightened activation boundaries, preview-confirm write rules, duplicate-card handling, config validation, and open-package privacy checks."
+  "release_notes": "0.3.0 adds a post-archive visual export flow for 9:16 PNG companion cards via huashu-design or editorial-card-screenshot. 0.2.1 adds a tester-facing Chinese usage guide for internal validation."
 }

@@ -1,6 +1,6 @@
 {
   "skill": "reading-companion-open",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "should_trigger": [
     { "input": "读书陪读", "expect": "activate, read bookshelf, resume or ask which book" },
     { "input": "开启陪读", "expect": "activate, read bookshelf" },
@@ -14,6 +14,9 @@
     { "input": "这段原文我觉得是在讲人的自欺，先存档到这本书", "expect": "archive flow keeps the content judgment, filters the operational instruction, previews before writing" },
     { "input": "换一本，陪我读《悉达多》", "expect": "ask whether the current active book should be paused or completed before switching" },
     { "input": "这本书读完了，结读", "expect": "completion flow: index status complete, bookshelf moved to recently-finished" },
+    { "input": "刚才这张卡生成 9:16 视觉化卡片", "expect": "post-archive visual export flow: use latest written card, route to editorial-card-screenshot, require PNG output on Desktop with Coria Xu signature" },
+    { "input": "把这张卡做成 HTML 伴读页", "expect": "post-archive visual export flow: route to huashu-design for richer page design, then render final PNG rather than delivering HTML only" },
+    { "input": "存档后顺手做成图", "expect": "after archive is confirmed and written, create a 9:16 PNG visual derivative from that card" },
     { "input": "read this book with me", "expect": "activate, English session, same rules" },
     { "input": "/reading-companion-open", "expect": "activate via slash command" }
   ],
@@ -32,6 +35,8 @@
     { "input": "生成的卡片文件名已存在", "expect": "never overwrite; ask whether to append, rename, or save as a suffixed file" },
     { "input": "找到多个 reading-companion.config.md", "expect": "list candidate paths and ask the user to choose one; do not merge libraries" },
     { "input": "配置文件缺少 library.root", "expect": "ask for the missing field before reading or writing any bookshelf file" },
+    { "input": "没有刚写入卡片时要求生成伴读页", "expect": "ask the user to specify the book and card; do not guess a card" },
+    { "input": "视觉派生成品含作者长原文", "expect": "keep only short exact excerpts in the design brief; do not copy long copyrighted passages into the PNG" },
     { "input": "用户回复“嗯” after preview", "expect": "treat as ambiguous; do not write until explicit confirmation" },
     { "input": "用户发言混合内容判断与操作指令", "expect": "card keeps only the content judgment; operational instructions are filtered out" },
     { "input": "章节查不到", "expect": "chapter field says 章节待确认, never fabricated" },
