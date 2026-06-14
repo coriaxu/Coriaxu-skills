@@ -9,6 +9,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 CLI = ROOT / "scripts" / "yao.py"
 BENCHMARK_FIXTURE_DIR = ROOT / "tests" / "fixtures" / "github_benchmark_scan"
+sys.path.insert(0, str(ROOT / "scripts"))
+import yao_cli_config  # noqa: E402
 
 
 def run(*args: str, input_text: str | None = None) -> dict:
@@ -36,6 +38,11 @@ def main() -> None:
     tmp_root.mkdir(parents=True, exist_ok=True)
     remote_version = tmp_root / "remote-version.txt"
     remote_version.write_text("9.9.9\n", encoding="utf-8")
+    assert yao_cli_config.resolve_target("root")["title"] == "Root Description Optimization"
+    assert yao_cli_config.resolve_promotion_target("root") == "yao-meta-skill"
+    assert yao_cli_config.infer_archetype("Standardize team review workflow.", "")[0] == "production"
+    assert yao_cli_config.infer_archetype("Govern release policy.", "")[0] == "governed"
+    assert "--entry" in yao_cli_config.baseline_compare_args()
 
     init_result = run("init", "cli-demo-skill", "--description", "CLI demo skill.", "--output-dir", str(tmp_root))
     assert init_result["ok"], init_result
@@ -45,6 +52,8 @@ def main() -> None:
     assert (created / "reports" / "intent-dialogue.md").exists(), created
     assert (created / "reports" / "intent-confidence.md").exists(), created
     assert (created / "reports" / "skill-overview.html").exists(), created
+    assert (created / "reports" / "review-studio.html").exists(), created
+    assert (created / "reports" / "review-studio.json").exists(), created
     assert (created / "reports" / "review-viewer.html").exists(), created
     assert (created / "reports" / "reference-scan.md").exists(), created
     assert (created / "reports" / "reference-synthesis.md").exists(), created
@@ -52,8 +61,32 @@ def main() -> None:
     assert (created / "reports" / "artifact-design-profile.md").exists(), created
     assert (created / "reports" / "prompt-quality-profile.md").exists(), created
     assert (created / "reports" / "system-model.md").exists(), created
+    assert (created / "reports" / "skill-ir.json").exists(), created
+    assert (created / "reports" / "compiled_targets.md").exists(), created
+    assert (created / "reports" / "compiled_targets.json").exists(), created
     assert (created / "reports" / "iteration-directions.md").exists(), created
+    assert (created / "reports" / "adoption_drift_report.md").exists(), created
+    assert (created / "reports" / "adoption_drift_report.json").exists(), created
+    assert (created / "reports" / "review_waivers.md").exists(), created
+    assert (created / "reports" / "review_waivers.json").exists(), created
+    assert (created / "reports" / "review_annotations.md").exists(), created
+    assert (created / "reports" / "review_annotations.json").exists(), created
     assert "Honest Boundaries" in (created / "SKILL.md").read_text(encoding="utf-8"), created
+    init_report_view = init_result["payload"]["report_view"]
+    assert init_report_view["html_report"].endswith("reports/skill-overview.html"), init_report_view
+    assert Path(init_report_view["html_report"]).exists(), init_report_view
+    assert init_report_view["review_studio"].endswith("reports/review-studio.html"), init_report_view
+    assert Path(init_report_view["review_studio"]).exists(), init_report_view
+    assert "Skill 已创建完成" in init_report_view["message"], init_report_view
+    assert "Review Studio 2.0" in init_report_view["message"], init_report_view
+    assert "目标编译" in init_report_view["message"], init_report_view
+    assert "reports/compiled_targets.md" in init_report_view["message"], init_report_view
+    assert "概述、指标、原理、触发边界、输入输出、目标编译、质量评估、风险治理、包体资产和升级路线" in init_report_view["message"], init_report_view
+    assert "默认使用中文简体" in init_report_view["message"], init_report_view
+    assert "切换英文版" in init_report_view["message"], init_report_view
+    init_skill_ir = init_result["payload"]["skill_ir"]
+    assert init_skill_ir["name"] == "cli-demo-skill", init_skill_ir
+    assert init_skill_ir["trigger_samples"] >= 1, init_skill_ir
 
     quickstart_result = run(
         "quickstart",
@@ -79,18 +112,33 @@ def main() -> None:
     assert quickstart_result["ok"], quickstart_result
     quickstart_root = Path(quickstart_result["payload"]["root"])
     assert (quickstart_root / "reports" / "review-viewer.html").exists(), quickstart_root
+    assert (quickstart_root / "reports" / "review-studio.html").exists(), quickstart_root
     assert (quickstart_root / "reports" / "github-benchmark-scan.md").exists(), quickstart_root
     assert (quickstart_root / "reports" / "intent-confidence.md").exists(), quickstart_root
     assert (quickstart_root / "reports" / "reference-synthesis.md").exists(), quickstart_root
     assert (quickstart_root / "reports" / "artifact-design-profile.md").exists(), quickstart_root
     assert (quickstart_root / "reports" / "prompt-quality-profile.md").exists(), quickstart_root
     assert (quickstart_root / "reports" / "system-model.md").exists(), quickstart_root
+    assert (quickstart_root / "reports" / "compiled_targets.md").exists(), quickstart_root
+    assert (quickstart_root / "reports" / "compiled_targets.json").exists(), quickstart_root
+    assert (quickstart_root / "reports" / "adoption_drift_report.md").exists(), quickstart_root
+    assert (quickstart_root / "reports" / "review_waivers.md").exists(), quickstart_root
+    assert (quickstart_root / "reports" / "review_annotations.md").exists(), quickstart_root
     assert quickstart_result["payload"]["archetype"] == "production", quickstart_result
     assert quickstart_result["payload"]["guidance"]["experience_note"], quickstart_result
     assert quickstart_result["payload"]["guidance"]["problem_diagnosis"]["candidates"], quickstart_result
     assert quickstart_result["payload"]["intent_confidence"]["score"] >= 70, quickstart_result
     assert quickstart_result["payload"]["recommendation"]["summary"], quickstart_result
     assert quickstart_result["payload"]["reference_mode"]["mode"] == "silent", quickstart_result
+    quickstart_report_view = quickstart_result["payload"]["report_view"]
+    assert quickstart_report_view["html_report"].endswith("reports/skill-overview.html"), quickstart_report_view
+    assert Path(quickstart_report_view["html_report"]).exists(), quickstart_report_view
+    assert Path(quickstart_report_view["review_studio"]).exists(), quickstart_report_view
+    assert "Skill 已创建完成" in quickstart_report_view["message"], quickstart_report_view
+    assert "默认使用中文简体" in quickstart_report_view["message"], quickstart_report_view
+    assert quickstart_result["payload"]["guidance"]["next_steps"][0].startswith("Open reports/skill-overview.html"), quickstart_result
+    assert "reports/review-studio.html" in quickstart_result["payload"]["guidance"]["next_steps"][2], quickstart_result
+    assert "audit report" in quickstart_result["payload"]["guidance"]["next_steps"][0], quickstart_result
     assert quickstart_result["payload"]["reviewer_evidence"]["artifacts"]["reference_synthesis"].endswith(
         "reports/reference-synthesis.md"
     ), quickstart_result
@@ -100,7 +148,15 @@ def main() -> None:
     assert quickstart_result["payload"]["reviewer_evidence"]["artifacts"]["system_model"].endswith(
         "reports/system-model.md"
     ), quickstart_result
+    assert quickstart_result["payload"]["reviewer_evidence"]["artifacts"]["review_studio"].endswith(
+        "reports/review-studio.html"
+    ), quickstart_result
     assert "uncertainty_or_conflict" not in quickstart_result["payload"], quickstart_result
+    quickstart_manifest = json.loads((quickstart_root / "manifest.json").read_text(encoding="utf-8"))
+    assert quickstart_manifest["status"] == "active", quickstart_manifest
+    assert quickstart_manifest["lifecycle_stage"] == "production", quickstart_manifest
+    quickstart_validate_result = run("validate", str(quickstart_root), "--require-manifest")
+    assert quickstart_validate_result["ok"], quickstart_validate_result
 
     quickstart_conflict_result = run(
         "quickstart",
@@ -138,6 +194,71 @@ def main() -> None:
     review_viewer_result = run("review-viewer", str(created))
     assert review_viewer_result["ok"], review_viewer_result
     assert review_viewer_result["payload"]["artifacts"]["html"].endswith("reports/review-viewer.html"), review_viewer_result
+
+    review_studio_result = run("review-studio", str(created))
+    assert review_studio_result["ok"], review_studio_result
+    assert review_studio_result["payload"]["artifacts"]["html"].endswith("reports/review-studio.html"), review_studio_result
+    assert review_studio_result["payload"]["summary"]["gate_count"] == 13, review_studio_result
+
+    review_waivers_result = run(
+        "review-waivers",
+        str(created),
+        "--add-waiver",
+        "--gate-key",
+        "trust-report",
+        "--reviewer",
+        "Yao Team",
+        "--reason",
+        "Trust warning accepted for this CLI demo with bounded release follow-up.",
+        "--expires-at",
+        "2026-09-30",
+        "--generated-at",
+        "2026-06-13",
+    )
+    assert review_waivers_result["ok"], review_waivers_result
+    assert review_waivers_result["payload"]["summary"]["active_count"] == 1, review_waivers_result
+    assert "trust-report" in review_waivers_result["payload"]["summary"]["covered_gate_keys"], review_waivers_result
+
+    review_annotations_result = run(
+        "review-annotations",
+        str(created),
+        "--add-annotation",
+        "--annotation-id",
+        "ann-cli-trigger",
+        "--gate-key",
+        "trigger-lab",
+        "--target-path",
+        "SKILL.md",
+        "--line",
+        "1",
+        "--severity",
+        "note",
+        "--reviewer",
+        "Yao QA",
+        "--created-at",
+        "2026-06-13",
+        "--body",
+        "Check trigger wording before reuse.",
+    )
+    assert review_annotations_result["ok"], review_annotations_result
+    assert review_annotations_result["payload"]["summary"]["annotation_count"] == 1, review_annotations_result
+    assert (created / "reports" / "review_annotations.md").exists(), review_annotations_result
+
+    registry_result = run(
+        "registry-audit",
+        str(ROOT),
+        "--registry-dir",
+        str(tmp_root / "registry"),
+        "--output-json",
+        str(tmp_root / "registry_audit.json"),
+        "--output-md",
+        str(tmp_root / "registry_audit.md"),
+        "--generated-at",
+        "2026-06-13",
+    )
+    assert registry_result["ok"], registry_result
+    assert registry_result["payload"]["package"]["name"] == "yao-meta-skill", registry_result
+    assert registry_result["payload"]["package"]["checksums"]["package_sha256"], registry_result
 
     reference_scan_result = run(
         "reference-scan",
@@ -200,6 +321,99 @@ def main() -> None:
     assert directions_result["ok"], directions_result
     assert directions_result["payload"]["artifacts"]["markdown"].endswith("reports/iteration-directions.md"), directions_result
 
+    skill_ir_result = run("skill-ir", str(created))
+    assert skill_ir_result["ok"], skill_ir_result
+    assert skill_ir_result["payload"]["artifacts"]["json"].endswith("reports/skill-ir.json"), skill_ir_result
+    created_skill_ir = json.loads((created / "reports" / "skill-ir.json").read_text(encoding="utf-8"))
+    assert created_skill_ir["schema_version"] == "2.0.0", created_skill_ir
+    assert created_skill_ir["trigger_surface"]["description"], created_skill_ir
+
+    compile_result = run("compile-skill", str(created), "--target", "openai", "--target", "claude", "--target", "generic")
+    assert compile_result["ok"], compile_result
+    assert compile_result["payload"]["summary"]["target_count"] == 3, compile_result
+    assert compile_result["payload"]["summary"]["block_count"] == 0, compile_result
+    assert compile_result["payload"]["artifacts"]["markdown"].endswith("reports/compiled_targets.md"), compile_result
+
+    output_eval_result = run(
+        "output-eval",
+        "--cases",
+        str(ROOT / "evals" / "output" / "cases.jsonl"),
+        "--output-json",
+        str(created / "reports" / "output_quality_scorecard.json"),
+        "--output-md",
+        str(created / "reports" / "output_quality_scorecard.md"),
+        "--blind-pack-json",
+        str(created / "reports" / "output_blind_review_pack.json"),
+        "--blind-pack-md",
+        str(created / "reports" / "output_blind_review_pack.md"),
+        "--blind-answer-key-json",
+        str(created / "reports" / "output_blind_answer_key.json"),
+    )
+    assert output_eval_result["ok"], output_eval_result
+    assert output_eval_result["payload"]["summary"]["with_skill_pass_rate"] > output_eval_result["payload"]["summary"]["baseline_pass_rate"], output_eval_result
+    assert output_eval_result["payload"]["summary"]["blind_pair_count"] == 5, output_eval_result
+    assert (created / "reports" / "output_blind_review_pack.md").exists(), output_eval_result
+    assert (created / "reports" / "output_blind_answer_key.json").exists(), output_eval_result
+
+    output_exec_result = run(
+        "output-exec",
+        "--cases",
+        str(ROOT / "evals" / "output" / "cases.jsonl"),
+        "--output-json",
+        str(created / "reports" / "output_execution_runs.json"),
+        "--output-md",
+        str(created / "reports" / "output_execution_runs.md"),
+    )
+    assert output_exec_result["ok"], output_exec_result
+    assert output_exec_result["payload"]["summary"]["variant_run_count"] == 10, output_exec_result
+    assert output_exec_result["payload"]["summary"]["recorded_fixture_count"] == 10, output_exec_result
+    assert (created / "reports" / "output_execution_runs.md").exists(), output_exec_result
+
+    output_review_result = run(
+        "output-review",
+        "--blind-pack",
+        str(created / "reports" / "output_blind_review_pack.json"),
+        "--answer-key",
+        str(created / "reports" / "output_blind_answer_key.json"),
+        "--decisions",
+        str(created / "reports" / "output_review_decisions.json"),
+        "--output-json",
+        str(created / "reports" / "output_review_adjudication.json"),
+        "--output-md",
+        str(created / "reports" / "output_review_adjudication.md"),
+    )
+    assert output_review_result["ok"], output_review_result
+    assert output_review_result["payload"]["summary"]["judgment_count"] == 0, output_review_result
+    assert output_review_result["payload"]["summary"]["pending_count"] == 5, output_review_result
+    assert (created / "reports" / "output_review_adjudication.md").exists(), output_review_result
+
+    conformance_result = run("conformance", str(created))
+    assert conformance_result["ok"], conformance_result
+    assert conformance_result["payload"]["summary"]["target_count"] == 5, conformance_result
+    assert conformance_result["payload"]["artifacts"]["markdown"].endswith("reports/conformance_matrix.md"), conformance_result
+
+    trust_result = run("trust", str(created))
+    assert trust_result["ok"], trust_result
+    assert trust_result["payload"]["summary"]["secret_findings"] == 0, trust_result
+    assert trust_result["payload"]["artifacts"]["markdown"].endswith("reports/security_trust_report.md"), trust_result
+
+    atlas_result = run(
+        "skill-atlas",
+        "--workspace-root",
+        str(tmp_root),
+        "--output-dir",
+        str(tmp_root / "skill_atlas"),
+        "--report-html",
+        str(tmp_root / "skill_atlas.html"),
+        "--report-json",
+        str(tmp_root / "skill_atlas.json"),
+        "--today",
+        "2026-06-13",
+    )
+    assert atlas_result["ok"], atlas_result
+    assert atlas_result["payload"]["summary"]["skill_count"] >= 2, atlas_result
+    assert atlas_result["payload"]["artifacts"]["report_html"].endswith("skill_atlas.html"), atlas_result
+
     feedback_result = run(
         "feedback",
         str(created),
@@ -214,6 +428,24 @@ def main() -> None:
     )
     assert feedback_result["ok"], feedback_result
     assert feedback_result["payload"]["feedback"]["summary"]["count"] == 1, feedback_result
+
+    adoption_drift_result = run(
+        "adoption-drift",
+        str(created),
+        "--record-event",
+        "skill_activation",
+        "--activation-type",
+        "explicit",
+        "--outcome",
+        "accepted",
+        "--timestamp",
+        "2026-06-13T10:00:00Z",
+    )
+    assert adoption_drift_result["ok"], adoption_drift_result
+    assert adoption_drift_result["payload"]["summary"]["event_count"] == 1, adoption_drift_result
+    assert adoption_drift_result["payload"]["artifacts"]["markdown"].endswith(
+        "reports/adoption_drift_report.md"
+    ), adoption_drift_result
 
     optimize_result = run("optimize-description", "--target", "root")
     assert optimize_result["ok"], optimize_result
@@ -245,11 +477,110 @@ def main() -> None:
     assert "portability_score" in report_result["payload"]["artifacts"], report_result
     assert "artifact_design_profile" in report_result["payload"]["artifacts"], report_result
     assert "prompt_quality_profile" in report_result["payload"]["artifacts"], report_result
+    assert "compiled_targets" in report_result["payload"]["artifacts"], report_result
+    assert "output_execution" in report_result["payload"]["artifacts"], report_result
+    assert "output_review_adjudication" in report_result["payload"]["artifacts"], report_result
+    assert "adoption_drift" in report_result["payload"]["artifacts"], report_result
+    assert "review_annotations" in report_result["payload"]["artifacts"], report_result
+    report_output_execution = json.loads((ROOT / "reports" / "output_execution_runs.json").read_text(encoding="utf-8"))
+    assert report_output_execution["summary"]["command_executed_count"] == 10, report_output_execution
+    assert report_output_execution["summary"]["recorded_fixture_count"] == 0, report_output_execution
+    assert report_output_execution["summary"]["model_executed_count"] == 0, report_output_execution
 
     package_dir = tmp_root / "dist"
     package_result = run("package", ".", "--platform", "generic", "--output-dir", str(package_dir))
     assert package_result["ok"], package_result
     assert (package_dir / "targets" / "generic" / "adapter.json").exists(), package_dir
+    generic_adapter = json.loads((package_dir / "targets" / "generic" / "adapter.json").read_text(encoding="utf-8"))
+    assert generic_adapter["compiler"]["name"] == "yao-skill-ir-compiler", generic_adapter
+    assert generic_adapter["compiled_contract"]["target"] == "generic", generic_adapter
+
+    package_zip_dir = tmp_root / "dist-zip"
+    package_zip_result = run(
+        "package",
+        ".",
+        "--platform",
+        "openai",
+        "--platform",
+        "claude",
+        "--platform",
+        "generic",
+        "--expectations",
+        str(ROOT / "evals" / "packaging_expectations.json"),
+        "--output-dir",
+        str(package_zip_dir),
+        "--zip",
+    )
+    assert package_zip_result["ok"], package_zip_result
+    package_verify_result = run(
+        "package-verify",
+        ".",
+        "--package-dir",
+        str(package_zip_dir),
+        "--expectations",
+        str(ROOT / "evals" / "packaging_expectations.json"),
+        "--registry-json",
+        str(ROOT / "reports" / "registry_audit.json"),
+        "--output-json",
+        str(tmp_root / "package_verification.json"),
+        "--output-md",
+        str(tmp_root / "package_verification.md"),
+        "--require-zip",
+        "--generated-at",
+        "2026-06-13",
+    )
+    assert package_verify_result["ok"], package_verify_result
+    assert package_verify_result["payload"]["summary"]["adapter_count"] == 3, package_verify_result
+    assert package_verify_result["payload"]["summary"]["archive_sha256"], package_verify_result
+
+    runtime_permissions_result = run(
+        "runtime-permissions",
+        ".",
+        "--package-dir",
+        str(package_zip_dir),
+        "--output-json",
+        str(tmp_root / "runtime_permission_probes.json"),
+        "--output-md",
+        str(tmp_root / "runtime_permission_probes.md"),
+    )
+    assert runtime_permissions_result["ok"], runtime_permissions_result
+    assert runtime_permissions_result["payload"]["summary"]["metadata_fallback_count"] == 3, runtime_permissions_result
+    assert runtime_permissions_result["payload"]["summary"]["native_enforcement_count"] == 0, runtime_permissions_result
+
+    install_simulate_result = run(
+        "install-simulate",
+        ".",
+        "--package-dir",
+        str(package_zip_dir),
+        "--install-root",
+        str(tmp_root / "install-root"),
+        "--output-json",
+        str(tmp_root / "install_simulation.json"),
+        "--output-md",
+        str(tmp_root / "install_simulation.md"),
+        "--generated-at",
+        "2026-06-13",
+    )
+    assert install_simulate_result["ok"], install_simulate_result
+    assert install_simulate_result["payload"]["summary"]["archive_extracted"], install_simulate_result
+    assert install_simulate_result["payload"]["summary"]["adapter_count"] == 3, install_simulate_result
+
+    upgrade_result = run(
+        "upgrade-check",
+        ".",
+        "--previous-package-json",
+        str(ROOT / "registry" / "examples" / "yao-meta-skill-1.0.0.json"),
+        "--current-package-json",
+        str(ROOT / "reports" / "registry_audit.json"),
+        "--output-json",
+        str(tmp_root / "upgrade_check.json"),
+        "--output-md",
+        str(tmp_root / "upgrade_check.md"),
+        "--generated-at",
+        "2026-06-13",
+    )
+    assert upgrade_result["ok"], upgrade_result
+    assert upgrade_result["payload"]["summary"]["recommended_bump"] == "minor", upgrade_result
 
     update_result = run(
         "check-update",

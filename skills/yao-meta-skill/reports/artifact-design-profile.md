@@ -1,36 +1,51 @@
 # Artifact Design Profile
 
 Skill: `yao-meta-skill`
-Design system: `content-led editorial`
+Design system: `metric editorial`
 
 ## Primary Artifact Direction
 
-**Report or brief**
+**Code, CLI, or implementation guide**
 
-High-trust editorial report with a clear first-screen thesis, compact evidence blocks, and decisions separated from supporting detail.
+Execution-focused technical artifact with environment assumptions, copyable commands, expected outputs, and side effects made explicit.
 
 ## Matched Artifact Families
+
+### Code, CLI, or implementation guide
+- Matched keywords: code, script, command
+- Score: `3`
+- Direction: Execution-focused technical artifact with environment assumptions, copyable commands, expected outputs, and side effects made explicit.
 
 ### Report or brief
 - Matched keywords: report, summary
 - Score: `2`
 - Direction: High-trust editorial report with a clear first-screen thesis, compact evidence blocks, and decisions separated from supporting detail.
 
-### Code, CLI, or implementation guide
-- Matched keywords: script
+### Review viewer
+- Matched keywords: review, viewer
+- Score: `2`
+- Direction: Side-by-side reviewer studio with explicit tradeoffs, evidence readiness, and fast paths for approving, blocking, or requesting one focused fix.
+
+### Dashboard or metrics page
+- Matched keywords: table
 - Score: `1`
-- Direction: Execution-focused technical artifact with environment assumptions, copyable commands, expected outputs, and side effects made explicit.
+- Direction: Metric-first dashboard with stable dimensions, short labels, visible deltas, and narrative callouts only where they change interpretation.
+
+### Screenshot or visual evidence
+- Matched keywords: screenshot
+- Score: `1`
+- Direction: Evidence-led visual artifact that records source, viewport, crop intent, and the exact region the reader should inspect.
 
 ## Layout Patterns To Prefer
 
-- thesis
-- evidence blocks
-- decision table
-- risks
-- next actions
 - prerequisites
 - commands
 - expected output
+- failure handling
+- rollback or cleanup
+- thesis
+- evidence blocks
+- decision table
 
 ## Design Tokens
 
@@ -56,12 +71,14 @@ High-trust editorial report with a clear first-screen thesis, compact evidence b
 
 ## Quality Gates
 
-- Keep the first screen useful without requiring the reader to parse every detail.
-- Use tables only for comparisons; move explanations below the table.
-- Keep source notes readable without flooding the body with markers.
 - Name the working directory and required inputs for commands.
 - Mark destructive, networked, or external side-effect operations.
 - Prefer the smallest runnable snippet over broad framework scaffolding.
+- Keep the first screen useful without requiring the reader to parse every detail.
+- Use tables only for comparisons; move explanations below the table.
+- Keep source notes readable without flooding the body with markers.
+- Make differences visible instead of hiding them in prose.
+- Separate author-facing recommendations from reviewer-only evidence.
 
 ## Anti-Patterns
 

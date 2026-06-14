@@ -1,7 +1,10 @@
 <h1 align="center">说人话：中文 AI 味清理 skill</h1>
 
 <p align="center">
-  <img src="assets/readme-logo.png" alt="说人话：中文 AI 味清理 skill" width="760">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/banner-dark.svg">
+    <img src="assets/banner-light.svg" alt="说人话：中文 AI 味清理 skill — 先保信息，再谈风格" width="100%">
+  </picture>
 </p>
 
 <p align="center">
@@ -11,7 +14,7 @@
 <p align="center">
   给 Codex、Claude Code、Cursor、ChatGPT 和自建 agent 用。
   <br>
-  改聊天、README、release note、论坛帖和 issue 回复：先保住事实，再把那股“一眼 AI”的腔调降下来。
+  改聊天、技术同步、README、论坛帖和中文长文：先保住事实，再把那股“一眼 AI”的腔调降下来。
 </p>
 
 <p align="center">
@@ -23,12 +26,12 @@
 </p>
 
 <p align="center">
-  <a href="#快速开始">快速开始</a> ·
-  <a href="#场景能力">场景能力</a> ·
-  <a href="#效果">前后对比</a> ·
+  <a href="#改成什么样">改成什么样</a> ·
+  <a href="#30-秒上手">30 秒上手</a> ·
+  <a href="#它怎么判断怎么改">怎么改</a> ·
   <a href="#评测">评测</a> ·
   <a href="#安装">安装</a> ·
-  <a href="#star-history">Star History</a>
+  <a href="#常见问题">FAQ</a>
 </p>
 
 `说人话` 专治那种“每个字都对，但一看就不是你写的”中文。它不把空话包装得更漂亮，也不替你编新事实；它先护住版本、命令、责任和证据，再拆掉过度承接、工程师腔、小红书 AI 腔、翻译腔和无源权威铺垫。目标很简单：改完你敢直接发。
@@ -41,82 +44,13 @@
 | 技术状态同步 | 保住事实、版本、命令、报错和责任归属，压低套话 |
 | README / release note | 先讲清楚项目、变更、验证和限制，不写发布宣言 |
 | 论坛帖 / issue 回复 | 像维护者在认真沟通，不像客服公告或营销稿 |
-| 中文长文 | 用 `in-place` 句内改写保住字数和节奏，再清理旁白腔、翻译腔、无源权威铺垫和结构反模式 |
-
-## 项目状态
-
-| 项 | 当前状态 |
-|----|----------|
-| 最新版本 | `v1.8.6`：新增 `bounded` edit scope（长文默认），把整句空话进删除清单交用户确认，补 v1.8.5 `in-place` 去味偏弱的问题（见 [#4](https://github.com/MrGeDiao/shuorenhua/issues/4)） |
-| 规则覆盖 | 210+ 中文短语、96 条英文短语、19 类结构反模式 |
-| 评测集 | 72 条 benchmark：41 条该改，31 条不该误杀 |
-| 真实样本 | 19 条整段样本，按自然 / 保真 / 可直接发评分，长文加 `长度节奏` 维度 |
-| 许可证 | [MIT](LICENSE) |
+| 中文长文 | 句内清理保住节奏，整句空话列「建议删除」清单交你确认，不让长文越改越短 |
 
 英文去 AI 味已经有 [stop-slop](https://github.com/hardikpandya/stop-slop) 和 [humanizer](https://github.com/blader/humanizer)。`说人话` 补的是中文这一层：互联网黑话、工程师腔、小红书 AI 腔、翻译腔、语域混搭、场景分档和事实保真。
 
-## 快速开始
+## 改成什么样
 
-新安装先看这里：
-
-```bash
-git clone https://github.com/MrGeDiao/shuorenhua.git
-cd shuorenhua
-```
-
-Codex 单次使用：
-
-```bash
-codex exec -C . "读取 ./SKILL.md，按其中规则改写以下文本：..."
-```
-
-只做诊断，不直接改写：
-
-```bash
-codex exec -C . "读取 ./SKILL.md，只按 annotation mode（只标注不改写）标出下面这段文字里的问题：..."
-```
-
-长期使用建议加载完整包：`SKILL.md` + `references/`。只加载 `SKILL.md` 是 lite 用法，适合临时改写或上下文紧张；full 用法更适合长期项目、公开文本、技术文档和需要误杀防护的场景。
-
-## 场景能力
-
-### v1.8.0：Scene Packs
-
-v1.8.0 把可发布文本再拆成 4 个子场景。它们不是简单换语气，而是按“这段文字准备发到哪里”来决定怎么改。
-
-| 子场景 | 目标 | 容易修掉的问题 |
-|--------|------|----------------|
-| README | 第一屏说清“这是什么、给谁用、解决什么问题” | 标语堆叠、价值宣言、功能列表没重点 |
-| release note | 列清变更、验证、限制和迁移影响 | 发版感言、过度庆祝、没说清测试 |
-| forum post | 像维护者分享真实观察和取舍 | 公司公告腔、营销腔、空泛号召 |
-| issue reply | 先确认问题、影响范围和下一步 | 客服式安抚、过度承诺、绕开复现条件 |
-
-### 基础场景
-
-| 大场景 | 默认强度 | 处理策略 |
-|--------|----------|----------|
-| `chat` | 轻 | 只砍明显套话，不把聊天改成公文 |
-| `status` | 中 | 保留动作、状态、阻塞点和下一步 |
-| `docs` | 中 | 技术表达优先，二次回读更保守 |
-| `public-writing` | 重 | 全规则扫描，并按需要触发 Scene Packs |
-
-### v1.8.5 / v1.8.6：长文的三档 scope
-
-长文按默认 structural 动作改写时，删句、并句、重排段落容易叠加，一篇 1800 字的稿子可能被压到 1000 字（见 [#4](https://github.com/MrGeDiao/shuorenhua/issues/4)）。但反过来只做句内改写（`in-place`），整句级的空话（无源引用、价值拔高收尾）又删不掉、去味偏弱——v1.8.6 用真实模型实跑验证了这一点：两个模型在 `in-place` 下都把无源引用和拔高收尾整句留了下来。
-
-所以长文的 scope 分三档（和 `minimal / standard / aggressive` 力度正交）：
-
-| scope | 删整句 | 适用 |
-|-------|--------|------|
-| `structural` | 自由删并重排 | 短文、明确要重写 |
-| `bounded`（v1.8.6，长文默认） | 只把"整句空话"进删除清单，交用户确认 | `public-writing` 长文 |
-| `in-place`（v1.8.5） | 一句都不删，只句内降调 | 用户明确要"完全原样" |
-
-`bounded` 的取舍：句内洗实句直接改、承担节奏的重复不动；整句都是空话的（剥掉引导词就什么都不剩）进「建议删除（待确认）」清单，删多少由用户拍板。这样既不像 `structural` 那样不可控地缩水，也不像 `in-place` 那样把整句空话留在文里。
-
-## 效果
-
-### 示例 1：接住体 / 过度承接
+### 接住体，先颁奖再共情
 
 **改写前**
 
@@ -128,7 +62,7 @@ v1.8.0 把可发布文本再拆成 4 个子场景。它们不是简单换语气�
 
 问题不在某个单词，而在整套姿态链：先替对方做心理判断，再表演共情，最后给对方颁奖。完整样本见 [evals/real-samples.md](evals/real-samples.md) RS-13。
 
-### 示例 2：微信里被对象吐槽“一股子 AI 味”
+### 工程师腔溢出到生活
 
 **改写前**
 
@@ -140,7 +74,7 @@ v1.8.0 把可发布文本再拆成 4 个子场景。它们不是简单换语气�
 
 这类文本的问题是把 debug 口吻带进生活对话。信息可以保留，工程报告感不需要保留。
 
-### 示例 3：公开介绍
+### 公开介绍的宏大开场
 
 **改写前**
 
@@ -152,24 +86,88 @@ v1.8.0 把可发布文本再拆成 4 个子场景。它们不是简单换语气�
 
 更多例子见 [references/examples.md](references/examples.md) 和 [evals/real-samples.md](evals/real-samples.md)。
 
-## 怎么工作
+## 30 秒上手
 
-`说人话` 不是见词就替换，而是先判断场景和风险，再决定改写力度。
+**Codex** — clone 后单次使用：
 
-1. 先判场景：`chat` / `status` / `docs` / `public-writing`
-2. 划出 protected spans：数字、日期、版本、命令、路径、报错、引用原文等不能乱动
-3. 判断问题强度等级：轻微模板感、明显 AI 腔、结构性表演感
-4. 决定改写档位：轻改、正常改、重写
-5. 命中 README、release note、论坛帖或 issue 回复时，进入 Scene Packs
-6. 先按模式处理，再按正向风格目标和词条兜底
-7. 做保真回读：检查事实、术语、语域、保护片段和断裂感
-8. 按需做 Residual Audit：只查开场残留、总结残留、旁白腔残留、空泛判断残留、句长过匀
+```bash
+git clone https://github.com/MrGeDiao/shuorenhua.git && cd shuorenhua
+codex exec -C . "读取 ./SKILL.md，按其中规则改写以下文本：……"
+```
 
-核心原则只有一句话：
+**Claude Code** — 放进 skills 目录，之后自动触发：
+
+```bash
+git clone https://github.com/MrGeDiao/shuorenhua.git
+mkdir -p ~/.claude/skills
+cp -r shuorenhua ~/.claude/skills/shuorenhua
+```
+
+装好后在对话里说「把这段去 AI 味」就会命中。想跟随仓库更新，用软链接代替 cp，见 [install/claude-code.md](install/claude-code.md)。
+
+**ChatGPT** — 什么都不用装：[说人话 GPT](https://chatgpt.com/g/g-69d5d86a32608191b523efd7a4048736-shuo-ren-hua)（需 Plus / Pro），完整规则已内置。
+
+**只想先看问题、不要改稿**：指令里加一句「按 annotation mode 只标注不改写」。
+
+Cursor、OpenClaw 和自建 agent 见[安装](#安装)。
+
+## 它怎么判断怎么改
+
+`说人话` 不是见词就替换。一句话原则：
 
 > **先保信息，再谈风格。**
 
-### 保护片段
+完整流程固定六步：
+
+1. 判场景：`chat / status / docs / public-writing`；命中 README、release note、论坛帖、issue 回复时，再进对应的 Scene Pack
+2. 划保护片段：数字、版本、命令、路径、报错、引用原文先锁住
+3. 按命中强度定力度（`minimal / standard / aggressive`），按能删到什么程度定 scope（`structural / bounded / in-place`）
+4. 先按模式改，词表只兜底
+5. 保真回读：事实、术语、语域、保护片段逐项过
+6. 仍有残味才做第二遍 Residual Audit，只允许轻量修正
+
+### 场景与力度
+
+四个场景的默认力度：
+
+| 大场景 | 默认强度 | 处理策略 |
+|--------|----------|----------|
+| `chat` | 轻 | 只砍明显套话，不把聊天改成公文 |
+| `status` | 中 | 保留动作、状态、阻塞点和下一步 |
+| `docs` | 中 | 技术表达优先，二次回读更保守 |
+| `public-writing` | 重 | 全规则扫描，并按需要触发 Scene Packs |
+
+### 按发布目的细分（Scene Packs）
+
+可发布文本再按「发到哪里」细分，不是换语气，是按发布目的决定改法：
+
+| 子场景 | 目标 | 容易修掉的问题 |
+|--------|------|----------------|
+| README | 第一屏说清“这是什么、给谁用、解决什么问题” | 标语堆叠、价值宣言、功能列表没重点 |
+| release note | 列清变更、验证、限制和迁移影响 | 发版感言、过度庆祝、没说清测试 |
+| forum post | 像维护者分享真实观察和取舍 | 公司公告腔、营销腔、空泛号召 |
+| issue reply | 先确认问题、影响范围和下一步 | 客服式安抚、过度承诺、绕开复现条件 |
+
+### 长文不缩水：三档 scope
+
+长文按默认动作改写，删句、并句会叠加，1800 字可能被压到 1000 字；反过来一句不删，整句的空话又留在文里。所以长文把「删到什么程度」单独分成三档，和力度档位正交：
+
+| scope | 删整句吗 | 适用 |
+|-------|----------|------|
+| `structural` | 自由删并重排 | 短文、明确要重写 |
+| `bounded`（长文默认） | 整句空话列成「建议删除（待确认）」清单，删多少你拍板 | `public-writing` 长文 |
+| `in-place` | 一句都不删，只句内降调 | 明确要求「完全原样」 |
+
+<details>
+<summary>为什么是这三档：issue #4 的实测过程</summary>
+
+长文按默认 structural 动作改写时，删句、并句、重排段落容易叠加，一篇 1800 字的稿子可能被压到 1000 字（见 [#4](https://github.com/MrGeDiao/shuorenhua/issues/4)）。但反过来只做句内改写（`in-place`），整句级的空话（无源引用、价值拔高收尾）又删不掉、去味偏弱——v1.8.6 用真实模型实跑验证了这一点：两个模型在 `in-place` 下都把无源引用和拔高收尾整句留了下来。
+
+`bounded` 的取舍：句内洗实句直接改、承担节奏的重复不动；整句都是空话的（剥掉引导词就什么都不剩）进「建议删除（待确认）」清单，删多少由用户拍板。这样既不像 `structural` 那样不可控地缩水，也不像 `in-place` 那样把整句空话留在文里。
+
+</details>
+
+### 哪些内容永远优先保护
 
 这些内容默认优先保护：
 
@@ -180,7 +178,7 @@ v1.8.0 把可发布文本再拆成 4 个子场景。它们不是简单换语气�
 | 事实归属 | 人名、组织名、责任主体、时间线 |
 | 引用和证据 | 引号内原文、报错、状态码、实验结果 |
 
-### 正向风格目标
+### 改完往哪个方向靠
 
 清理不是只删词。它也会把文本往这些方向拉：
 
@@ -190,6 +188,8 @@ v1.8.0 把可发布文本再拆成 4 个子场景。它们不是简单换语气�
 - 按场景校准，不把聊天改成公告，也不把文档改成段子
 
 ## 评测
+
+规则层覆盖 210+ 中文短语、96 条英文短语、19 类结构反模式。
 
 当前评测集共 72 条：
 
@@ -202,9 +202,7 @@ v1.8.0 把可发布文本再拆成 4 个子场景。它们不是简单换语气�
 | Long-form In-place | 4 | 长文保长度场景，检查字数留存、句数对齐和关键转场 |
 | Bounded | 2 | 长文整句空话进删除清单，但不误删实句和节奏句 |
 
-覆盖范围包括：套话清理、工程师腔、小红书 AI 腔、无源引用、事实保真、保护片段、代码上下文保护、Residual Audit / 二次审稿、Scene Packs、Long-form In-place，以及真实技术文本误杀防护。
-
-当前用例集见 [evals/benchmark.md](evals/benchmark.md)（72 条）。v1.8.6 首次做了**模型实跑**（Codex + Claude 双模型跑 `structural` / `in-place` 两版，见 [evals/results-v1.8.6.md](evals/results-v1.8.6.md)），此前各版 `results-*.md` 是**静态复核**口径（按规则逐条走查）。历史归档可参考 [evals/results-v1.8.5.md](evals/results-v1.8.5.md)、[evals/results-v1.8.3.md](evals/results-v1.8.3.md)、[evals/results-v1.8.0.md](evals/results-v1.8.0.md)、[evals/results-v1.7.4.md](evals/results-v1.7.4.md) 和 [evals/results-v1.7.1.md](evals/results-v1.7.1.md)。
+v1.8.6 起引入模型实跑（Codex + Claude 双模型，见 [evals/results-v1.8.6.md](evals/results-v1.8.6.md)）；此前各版 `results-*.md` 为静态复核口径（按规则逐条走查）。完整用例集见 [evals/benchmark.md](evals/benchmark.md)，整段真实样本见 [evals/real-samples.md](evals/real-samples.md)。
 
 ## 安装
 
@@ -216,6 +214,8 @@ v1.8.0 把可发布文本再拆成 4 个子场景。它们不是简单换语气�
 | OpenClaw | [install/openclaw.md](install/openclaw.md) |
 | ChatGPT / Custom GPT | [install/chatgpt.md](install/chatgpt.md) |
 
+核心只需要 `SKILL.md` 一个文件（lite）；长期项目、公开文本和需要误杀防护的场景，建议带上 `references/` 完整包（full）。
+
 项目内长期使用时，可以在 `AGENTS.md` 加一段触发规则：
 
 ```markdown
@@ -223,51 +223,6 @@ v1.8.0 把可发布文本再拆成 4 个子场景。它们不是简单换语气�
 当任务涉及“去 AI 味”“说人话”“自然一点”“别像模板”这类改写时，遵循 `shuorenhua/SKILL.md`。
 对外文本优先按它处理；代码、日志、配置和命令输出不套这个 skill。
 ```
-
-## 项目结构
-
-```text
-shuorenhua/
-├── assets/
-│   ├── icon.png              # 项目 icon
-│   ├── icon-hd.png           # 高清版
-│   └── readme-logo.png       # README 顶部横幅
-├── SKILL.md                 # 规则入口、工作流和评分口径
-├── README.md
-├── CHANGELOG.md
-├── CONTRIBUTING.md
-├── evals/
-│   ├── benchmark.md          # 评测集（72 条）
-│   ├── real-samples.md       # 19 条整段真实样本
-│   ├── run-eval.md           # 评测指令
-│   └── results-*.md          # 历次版本归档
-├── install/
-│   ├── codex.md
-│   ├── claude-code.md
-│   ├── cursor.md
-│   ├── openclaw.md
-│   ├── chatgpt.md
-│   └── chatgpt-gpt-instructions.md
-├── references/
-│   ├── examples.md           # 改写示例
-│   ├── operation-manual.md
-│   ├── positive-style.md     # 正向风格目标
-│   ├── protected-spans.md    # 不可改写片段
-│   ├── scene-packs.md        # README / release note / forum post / issue reply
-│   ├── scene-guardrails.md
-│   ├── phrases-zh.md         # 中文禁用短语（210+）
-│   ├── phrases-en.md         # 英文禁用短语（96）
-│   ├── structures.md         # 19 种结构反模式
-│   ├── severity.md
-│   └── boundary-cases.md
-└── LICENSE                   # MIT
-```
-
-核心只需要 `SKILL.md` 一个文件；完整体验建议同时带上 `references/`。本项目把这两种用法分别叫作 lite 和 full。
-
-## Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=MrGeDiao/shuorenhua&type=Date)](https://www.star-history.com/#MrGeDiao/shuorenhua&Date)
 
 ## 常见问题
 
@@ -287,11 +242,11 @@ shuorenhua/
 
 正常不会按聊天口吻去改技术文档。`docs`、`status`、`code-context` 都有更保守的保护策略，命令、路径、版本、报错和指标优先保真。
 
-## 贡献
+## 贡献：bad case 比 star 有用
 
 欢迎提交新的评测样本、边界案例、真实问题案例、改写前后样本和误杀防护。
 
-如果你遇到“改完还是像 AI”的具体文本，可以用 [bad case 模板](.github/ISSUE_TEMPLATE/bad-case.md) 提交。请先脱敏，不要贴未授权私聊全文、密钥、内部链接或真实个人身份信息。
+如果你遇到“改完还是像 AI”的具体文本，可以用 [bad case 模板](.github/ISSUE_TEMPLATE/bad-case.md) 提交。请先脱敏，不要贴未授权私聊全文、密钥、内部链接或真实个人身份信息。也可以直接贴到[征集 issue](https://github.com/MrGeDiao/shuorenhua/issues/5)。
 
 在提交新词之前，先想一件事：
 
@@ -304,6 +259,10 @@ shuorenhua/
 - [stop-slop](https://github.com/hardikpandya/stop-slop)：英文 AI slop 规则和评分框架
 - [humanizer](https://github.com/blader/humanizer)：英文 AI 模式分类
 - [avoid-ai-writing](https://github.com/conorbronsdon/avoid-ai-writing)：AI 写作问题分类和严重度参考
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=MrGeDiao/shuorenhua&type=Date)](https://www.star-history.com/#MrGeDiao/shuorenhua&Date)
 
 ## 许可
 

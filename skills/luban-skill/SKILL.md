@@ -49,6 +49,8 @@ description: |
 - GitHub仓库结构与commit/issue/star等公开信号
 - ClawHub/skills.sh/Tessl等页面的展示方式
 
+发布就绪项的核对底线见 `references/birth-checklist.md`(出生证清单)——缺的每一项都是现成的差距条目。
+
 ### 班规总纲
 
 - **先验料，再动手。** 不要一上来改文案。
@@ -192,6 +194,8 @@ description: |
 
 ### 九维评分
 
+结构尺的底线项先一键体检：`bash tools/check-skill-repo.sh <目标路径或GitHub仓库链接>`——输出 PASS/WARN/FAIL 加出生证段，FAIL/WARN 直接转成差距清单条目，不要靠肉眼逐项数。
+
 对当前Skill打分，满分100。三把尺一起量：**结构尺**量它写得清不清楚，**实测尺**量它跑起来灵不灵，**活体尺**量它在真实世界里活得好不好。不要只看格式。
 
 ```markdown
@@ -325,6 +329,8 @@ description: |
 ## 第七步：亮活——README与Showcase升级
 
 公共Skill必须有"摆出来给人看"的意识。README不是说明书，是安装前的销售页 + 安装后的操作入口。
+
+完整的README模板与十条风格铁律见 `references/house-style.md`;给全新的Skill开料(生成出生即合规的仓库骨架)用 `tools/scaffold-skill.sh`;发布前对照 `references/birth-checklist.md` 逐项打勾。
 
 ### README建议结构
 

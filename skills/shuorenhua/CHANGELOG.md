@@ -1,5 +1,29 @@
 # Changelog
 
+## [1.8.8] - 2026-06-10 — README v2
+
+### Changed
+- `README.md` 整体重排：before/after 三组示例前置；新增「30 秒上手」（Codex / Claude Code / ChatGPT 三入口 + annotation mode 一句话用法）；场景、力度、scope 压缩为三表一流程；issue #4 的 scope 实测过程折叠进 `<details>`。
+- 横幅从位图换成手写 SVG（`assets/banner-light.svg` / `banner-dark.svg`），用 `<picture>` 适配 GitHub 亮暗主题：文字全部转矢量轮廓（字形来自 Noto Sans SC，SIL OFL 1.1），不依赖访问者系统字体，跨平台渲染一致；视觉改走「红笔审稿」方向——划掉的套话、红色句号、一枚「可直接发」印章。原 `assets/readme-logo.png` 保留未删。
+- 移除项目状态表和项目结构文件树：版本信息由 release 徽章和 CHANGELOG 承担，规则覆盖数字并入评测区。
+- 小节标题去掉版本号，避免随版本腐烂。
+
+### Notes
+- 本版只动 `README.md`、`assets/`（新增两个 banner SVG）与本文件，不改规则与评测；计数为实测同步（benchmark 72 条 = 41 SF + 31 SNF，real samples 19 条）。
+
+## [1.8.7] - 2026-06-10 — Maintenance Surface 2 / 安装口径与 bounded 下沉
+
+### Changed
+- `install/claude-code.md` 重写：Claude Code 会按 `SKILL.md` frontmatter 的 description 自动发现并触发 skill，移除“不会自动发现、CLAUDE.md 说明不能省略”的过时断言；CLAUDE.md 触发说明降级为可选增强；新增软链接“跟随更新”安装方式。
+- `install/` 全部平台文档补「长文改写的三档 scope」小节（structural / bounded / in-place 与长文默认值）——v1.8.6 的 scope 能力此前没有下沉到任何安装入口。
+- `install/chatgpt-gpt-instructions.md` 执行流程补 scope 判断一行（需维护者手动同步到 Custom GPT 后台）。
+- `references/examples.md` 新增 Bounded 双合同示例（正文 + 建议删除清单，合成文本，含「句内洗 vs 进清单」的边界说明）。
+- `references/positive-style.md` 长文节奏边界补一句 bounded 口径：节奏句不进清单，进清单的必须是纯空句。
+
+### Notes
+- 本版不改 `SKILL.md` 与 `evals/`，是 v1.8.4 之后第二个维护面版本。
+- 仓库杂项：移除空的 `docs/` 目录；`CLAUDE.md → AGENTS.md` 软链纳入版本控制，Claude Code 用户 clone 后直接生效。
+
 ## [1.8.6] - 2026-06-03 — Bounded Scope / 长文去味与保长度的中间态
 
 针对 [#4](https://github.com/MrGeDiao/shuorenhua/issues/4) 复测反馈:v1.8.5 的 `in-place` 把长度接住了(实测 95–96%),但去 AI 味效果明显弱于 `structural`——长文里整句级的空话(无源引用、价值拔高收尾)在 `in-place` 下规则上删不掉,只会被软化保留。本版在 `structural` 和 `in-place` 之间补一个 `bounded` scope。

@@ -1,0 +1,91 @@
+{
+  "ok": true,
+  "schema_version": "2.0",
+  "skill_dir": ".",
+  "registry_dir": "registry",
+  "package": {
+    "schema_version": "2.0",
+    "name": "yao-meta-skill",
+    "version": "1.1.0",
+    "description": "Create, refactor, evaluate, and package agent skills from workflows, prompts, transcripts, docs, or notes. Use when asked to create a skill, turn a repeated process into a reusable skill, improve an existing skill, add evals, or package a skill for team reuse.",
+    "targets": [
+      "openai",
+      "claude",
+      "generic",
+      "agent-skills-compatible"
+    ],
+    "maturity": "governed",
+    "owner": "Yao Team",
+    "review_cadence": "quarterly",
+    "trust_level": "local",
+    "license": "MIT",
+    "checksums": {
+      "package_sha256": "742dc905b0d221c4f336e741d168861edaf7b75e97fe1e89f7d454c1cabf928f",
+      "archive_sha256": "7bc83805501d24cf8e5932ef76e0454100398d5a73652e7440be47984d0cf4a9"
+    },
+    "compatibility": {
+      "openai": "pass",
+      "claude": "pass",
+      "agent-skills": "pass",
+      "vscode": "pass",
+      "generic": "pass",
+      "agent-skills-compatible": "pass"
+    },
+    "source": {
+      "skill_dir": ".",
+      "skill_ir": "skill-ir/examples/yao-meta-skill.json",
+      "ir_schema_version": "2.0.0",
+      "canonical_metadata": "agents/interface.yaml"
+    },
+    "artifacts": {
+      "overview_html": "reports/skill-overview.html",
+      "review_studio_html": "reports/review-studio.html",
+      "trust_report": "reports/security_trust_report.md",
+      "conformance_matrix": "reports/conformance_matrix.md",
+      "compiled_targets": "reports/compiled_targets.md",
+      "package_verification": "reports/package_verification.md",
+      "install_simulation": "reports/install_simulation.md",
+      "adoption_drift": "reports/adoption_drift_report.md",
+      "review_waivers": "reports/review_waivers.md",
+      "review_annotations": "reports/review_annotations.md",
+      "package_metadata": "registry/packages/yao-meta-skill.json"
+    },
+    "distribution": {
+      "archive_verified": true,
+      "archive_sha256": "7bc83805501d24cf8e5932ef76e0454100398d5a73652e7440be47984d0cf4a9",
+      "package_verification": "reports/package_verification.json",
+      "install_simulated": true,
+      "install_simulation": "reports/install_simulation.json"
+    },
+    "generated_at": "2026-06-13"
+  },
+  "index": {
+    "schema_version": "2.0",
+    "generated_at": "2026-06-13",
+    "package_count": 1,
+    "packages": [
+      {
+        "name": "yao-meta-skill",
+        "version": "1.1.0",
+        "maturity": "governed",
+        "owner": "Yao Team",
+        "targets": [
+          "openai",
+          "claude",
+          "generic",
+          "agent-skills-compatible"
+        ],
+        "package_metadata": "registry/packages/yao-meta-skill.json",
+        "package_sha256": "742dc905b0d221c4f336e741d168861edaf7b75e97fe1e89f7d454c1cabf928f"
+      }
+    ]
+  },
+  "failures": [],
+  "warnings": [],
+  "artifacts": {
+    "index": "registry/index.json",
+    "package": "registry/packages/yao-meta-skill.json",
+    "json": "reports/registry_audit.json",
+    "markdown": "reports/registry_audit.md"
+  }
+}

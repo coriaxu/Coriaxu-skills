@@ -5,6 +5,7 @@
 > 把你的Skill拿到班门前，让祖师爷重新打磨一遍。
 
 [![Agent Skills](https://img.shields.io/badge/Agent%20Skills-luban-blueviolet)](SKILL.md)
+[![skills.sh](https://skills.sh/b/LearnPrompt/luban-skill)](https://skills.sh/LearnPrompt/luban-skill)
 [![实战案例](https://img.shields.io/badge/%E5%AE%9E%E6%88%98%E6%A1%88%E4%BE%8B-ai--news--radar%20v0.7.0-green)](examples/ai-news-radar-case.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
@@ -45,8 +46,17 @@
 
 ## 快速开始
 
+![luban demo](assets/demo.gif)
+
 ```bash
 npx skills add LearnPrompt/luban-skill -g
+```
+
+Claude Code 用户也可以走 plugin marketplace（自动更新）：
+
+```text
+/plugin marketplace add LearnPrompt/luban-skill
+/plugin install luban
 ```
 
 装完对Agent说：
@@ -97,9 +107,12 @@ npx skills add LearnPrompt/luban-skill -g
 
 ```text
 luban-skill/
-├── SKILL.md                        # 工作流本体：五个动作、九步流程、班规与验收单
-├── examples/
-│   └── ai-news-radar-case.md      # 实战案例：真实仓库、真实数字、全程可查证
+├── skills/luban/
+│   ├── SKILL.md                    # 工作流本体：五个动作、九步流程、班规与验收单
+│   └── examples/
+│       └── ai-news-radar-case.md  # 实战案例：真实仓库、真实数字、全程可查证
+├── assets/                         # demo GIF 与可复现的录制脚本（vhs tape）
+├── .claude-plugin/                 # Claude Code plugin marketplace 清单
 ├── README.md
 └── LICENSE
 ```
@@ -134,5 +147,17 @@ luban-skill/
 *验料 · 访行 · 过尺 · 慢刨 · 回炉*
 
 **学手艺，不偷皮。**
+
+</div>
+
+---
+
+<div align="center">
+
+**[LearnPrompt](https://github.com/LearnPrompt) 出品** · 同门手艺
+
+[鲁班·Skill打磨](https://github.com/LearnPrompt/luban-skill) · [庖丁·博主蒸馏](https://github.com/LearnPrompt/paoding-skill) · [蔡伦·对话造纸](https://github.com/LearnPrompt/cailun-skill) · [阿福·LLM Todo](https://github.com/LearnPrompt/afu-llm-todo) · [AI雷达·零API资讯](https://github.com/LearnPrompt/ai-news-radar) · [淘金小镇·ClawHub日榜](https://github.com/LearnPrompt/skillrush-town) · [Irasutoya·正文配图](https://github.com/LearnPrompt/carl-irasutoya-illustrations) · [Humanize PPT·简报编排](https://github.com/LearnPrompt/humanize-ppt) · [CC Harness·六件套](https://github.com/LearnPrompt/cc-harness-skills)
+
+<sub>公众号「卡尔的AI沃茨」 · [X @aiwarts](https://x.com/aiwarts) · [learnprompt.pro](https://www.learnprompt.pro)</sub>
 
 </div>
