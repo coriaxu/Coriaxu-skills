@@ -14,7 +14,6 @@
 | [**nuwa-skill**](../skills/nuwa-skill/) | 蒸馏 XX、造一个 XX 的 skill、女娲、用 XX 的视角、distill X | 女娲造人术：输入任意人物名，自动派多 agent 并行调研并提炼心智模型与表达 DNA，一键生成一个"像那个人一样思考"的视角 skill。 | 花叔原创（MIT） |
 | [**darwin-skill**](../skills/darwin-skill/) | 优化 skill、skill 评分、自动优化、skill 质量检查、帮我改改 skill、skill review | 达尔文 skill 自动优化器：按 8 维 rubric 评分 + 爬山算法 + git 版本控制，边改 SKILL.md 边跑测试，只保留变好的版本、变差自动回滚。 | 花叔原创（灵感来自 Karpathy autoresearch） |
 | [**luban-skill**](../skills/luban-skill/) | 让鲁班看看这个 skill、班门打磨、skill 体检、skill 审计、产品化我的 skill、为什么我的 skill 没人装 | 鲁班 Skill 打磨工坊：从验料、访行、过尺、慢刨到回炉，把一个能用的 Skill 打磨成能被理解、安装、传播、验证和持续进化的公共 Skill 资产。 | LearnPrompt 原创（MIT） |
-| [**career-skill-planner**](../skills/career-skill-planner/) | 帮我规划 XX 职业的 Skill、我是 XX 帮我拆 Skill、XX 职业需要哪些 Skill | 职业 Skill 规划器：输入职业名，输出该职业的核心工作流分解，以及每个工作流对应的 Skill 制作指南（提示词 + 实现逻辑）。 | 空格的键盘原创 |
 | [**agent-review**](../skills/agent-review/) | 复盘、agent review、/复盘、/agent-review | 每日复盘：根据 Claude Code 本地对话记录，生成结构化的每日工作复盘报告。支持当天、昨天、近 3 天、近 7 天。 | akira82-ai 原创（MIT） |
 
 ---
@@ -27,7 +26,6 @@
 |---------|--------|---------------|------|
 | [**elon-musk-perspective**](../skills/elon-musk-perspective/) | 用 Musk 的视角、Musk perspective、像 Musk 一样思考 | 像 Elon Musk 一样思考：应用他的思维模型（第一性原理、The Algorithm、级联策略）、决策启发式和沟通风格，分析问题、评估策略、挑战假设。 | 基于 nuwa-skill 自建（80+ 一手信源） |
 | [**peter-senge-perspective**](../skills/peter-senge-perspective/) | 用圣吉的视角、圣吉会怎么看、第五项修炼视角、系统思考 | 像彼得·圣吉一样思考：基于 40+ 一手来源提炼的 5 个核心心智模型和 8 条决策启发式，分析组织问题、审视变革策略、诊断学习障碍。 | 基于 nuwa-skill 自建（40+ 一手信源） |
-| [**ljg-roundtable**](../skills/ljg-roundtable/) | 圆桌讨论、圆桌、roundtable、辩论、多视角辩证 | 结构化圆桌讨论器：围绕一个议题邀请 3-5 位真实历史或当代人物展开多轮辩证讨论，由主持人持续提炼核心争议、生成 ASCII 思考框架图。 | 李继刚原创 |
 | [**dbs**](../skills/dbs/) | /dbs、/商业、帮我看看 | dontbesilent 商业工具箱主入口：根据你的问题自动路由到最合适的诊断 skill（问诊 / 体检 / 内容 / 对标 / 概念拆解）。 | dontbesilent 原创 |
 | [**dbs-diagnosis**](../skills/dbs-diagnosis/) | /dbs-diagnosis、/问诊、帮我看看商业模式、诊断一下我的业务 | dontbesilent 商业模式诊断：两种模式，问诊（消解问题）和体检（拆解商业模式），用本体论框架给业务做全身检查。 | dontbesilent 原创 |
 | [**dbs-content**](../skills/dbs-content/) | /dbs-content、/内容诊断、这个内容怎么做、帮我看看这个文案 | dontbesilent 内容创作诊断：选题通过后，五维检测内容质量，诊断怎么把这个选题做成好内容。 | dontbesilent 原创 |

@@ -69,13 +69,6 @@
 - 功能：EPUB 电子书生成器 — 博客文章、Markdown 文档、AI 搜索资料转 EPUB，支持图片下载 + 代码块渲染 + 专业封面，兼容微信读书和 Apple Books
 - 原仓：https://github.com/joeseesun/qiaomu-epub-book-generator
 
-### 李继刚 Li Jigang — `ljg-roundtable`
-
-- 目录：`skills/ljg-roundtable/`
-- 协议：_待确认_
-- 功能：结构化圆桌讨论器 — 围绕议题邀请 3-5 位真实人物展开多轮辩证
-- 原仓：_待补充_
-
 ### 小能熊老师 — `三级笔记`
 
 - 目录：`skills/三级笔记/`
@@ -96,13 +89,6 @@
 - 协议：MIT (Copyright © 2026 LearnPrompt)
 - 功能：鲁班 Skill 打磨工坊 — 把一个能用的 Skill 打磨成能被理解、安装、传播、验证和持续进化的公共 Skill 资产
 - 原仓：https://github.com/LearnPrompt/luban-skill
-
-### 空格的键盘 — `career-skill-planner`
-
-- 目录：`skills/career-skill-planner/`
-- 协议：_待确认_
-- 功能：职业 Skill 规划器 — 输入职业名输出核心工作流分解 + 每个工作流的 Skill 制作指南
-- 原仓：_待补充_
 
 ## 📝 协议说明
 

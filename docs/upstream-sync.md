@@ -21,4 +21,4 @@ Last checked: 2026-06-15
 | `web-access` | https://github.com/eze-is/web-access | `7af34af6` | Checked; no upstream change |
 | `yao-meta-skill` | https://github.com/yaojingang/yao-meta-skill | `5ba1c93a` | Updated from `811c9052`; Skill OS 2.0 registry, review, runtime, and package verification surfaces added |
 
-Still missing a verified upstream URL: `agent-review`, `career-skill-planner`, `ljg-roundtable`, `三级笔记`.
+Still missing a verified upstream URL: `agent-review`, `三级笔记`.
