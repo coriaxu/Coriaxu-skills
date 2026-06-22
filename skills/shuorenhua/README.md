@@ -20,7 +20,7 @@
 <p align="center">
   <a href="https://github.com/MrGeDiao/shuorenhua/stargazers"><img src="https://img.shields.io/github/stars/MrGeDiao/shuorenhua?style=for-the-badge&amp;label=stars" alt="GitHub stars"></a>
   <a href="https://github.com/MrGeDiao/shuorenhua/releases"><img src="https://img.shields.io/github/v/release/MrGeDiao/shuorenhua?style=for-the-badge&amp;label=release" alt="GitHub release"></a>
-  <a href="evals/benchmark.md"><img src="https://img.shields.io/badge/benchmark-72%20cases-2563eb?style=for-the-badge" alt="Benchmark: 72 cases"></a>
+  <a href="evals/benchmark.md"><img src="https://img.shields.io/badge/benchmark-73%20cases-2563eb?style=for-the-badge" alt="Benchmark: 73 cases"></a>
   <a href="evals/real-samples.md"><img src="https://img.shields.io/badge/real%20samples-19-16a34a?style=for-the-badge" alt="Real samples: 19"></a>
   <a href="LICENSE"><img src="https://img.shields.io/github/license/MrGeDiao/shuorenhua?style=for-the-badge" alt="License"></a>
 </p>
@@ -191,18 +191,18 @@ Cursor、OpenClaw 和自建 agent 见[安装](#安装)。
 
 规则层覆盖 210+ 中文短语、96 条英文短语、19 类结构反模式。
 
-当前评测集共 72 条：
+当前评测集共 73 条：
 
 | 类型 | 数量 | 目标 |
 |------|------|------|
 | SF | 41 | 应该改的文本必须命中并改掉主要问题 |
-| SNF | 31 | 不该误杀的文本必须放行或轻提示 |
+| SNF | 32 | 不该误杀的文本必须放行或轻提示 |
 | Real Samples | 19 | 整段样本按自然、保真、可直接发三项评分，长文加 `长度节奏` |
 | Scene Packs | 8 | README / release note / forum post / issue reply 的正反样本 |
 | Long-form In-place | 4 | 长文保长度场景，检查字数留存、句数对齐和关键转场 |
-| Bounded | 2 | 长文整句空话进删除清单，但不误删实句和节奏句 |
+| Bounded | 3 | 长文整句空话进删除清单，但不误删实句和节奏句 |
 
-v1.8.6 起引入模型实跑（Codex + Claude 双模型，见 [evals/results-v1.8.6.md](evals/results-v1.8.6.md)）；此前各版 `results-*.md` 为静态复核口径（按规则逐条走查）。完整用例集见 [evals/benchmark.md](evals/benchmark.md)，整段真实样本见 [evals/real-samples.md](evals/real-samples.md)。
+v1.9.0 起 benchmark 改为双模型实跑口径（Codex + Claude 交叉判分，见 [evals/results-v1.9.0.md](evals/results-v1.9.0.md)）；静态走查退为发版前快速自查。完整用例集见 [evals/benchmark.md](evals/benchmark.md)，整段真实样本见 [evals/real-samples.md](evals/real-samples.md)。`results-v1.8.6.md` 保留为 v1.8.6 首次模型实跑归档。
 
 ## 安装
 

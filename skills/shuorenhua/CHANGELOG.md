@@ -1,5 +1,27 @@
 # Changelog
 
+## [1.9.0] - 2026-06-18 — Eval Harness / 模型实跑评测
+
+### Added
+- 新增 `automation/eval/` 三件套：`rewrite-prompt.md`、`judge-prompt.md`、`README.md`，把 benchmark 改写和交叉判分流程固化成可复制命令。
+- 新增 `evals/results-v1.9.0.md`，归档首轮完整双模型实跑结果、非绿用例点评、bounded 尾巴补跑和成本基线。
+- `evals/benchmark.md` 新增 `SNF-32`：`bounded` 下商业黑话壳句不得与紧随其后的具体数据句合并，数据句必须逐字保留。
+
+### Changed
+- README 评测区切换为 v1.9.0 起的双模型实跑口径；静态走查退为发版前快速自查。
+- benchmark 计数同步为 73 条（41 SF + 32 SNF），`evals/run-eval.md` 和 `evals/real-samples.md` 同步 SNF 32 口径。
+- `evals/run-eval.md` 补充 bounded 防并句判分：壳句与紧随其后的数据句被合并成一句，记 `❌`。
+
+### Tested
+- 小样试跑 `SF-01–05 + SNF-01–03` 第二轮格式可用，改写输出与 judge 表格可逐条对照。
+- 首轮完整实跑：Codex 改写由 Claude 判，SF 39/41，SNF 0/32 误杀；Claude Opus 4.8 改写由 Codex 判，SF 34/41，SNF 0/32 误杀。
+- `SNF-32` 用同一套 harness 补跑：Codex 与 Claude 均 0/1 误杀，未并句，数据句保留。
+
+### Notes
+- 本版不改 `SKILL.md` 或 `references/` 的规则行为，只新增 eval harness、归档和防并句用例。
+- 成本基线：Codex rewrite 6 runs 记录 input 1,218,624 / cached 784,384 / output 103,780 / reasoning 87,653；Codex judge 6 runs 记录 input 866,815 / cached 446,720 / output 41,710 / reasoning 32,856。Codex CLI 未提供稳定 cost / duration 字段。
+- Claude 可回收记录：SF rewrite 三批 416.503s / $2.629105，judge 六批 375.170s / $2.922822；可回收小计 791.673s / $5.551927。Claude SNF rewrite 小批缺 CLI cost / duration，不手算进小计。实际模型确认为 `claude-opus-4-8`。
+
 ## [1.8.8] - 2026-06-10 — README v2
 
 ### Changed

@@ -1,7 +1,7 @@
 {
   "ok": true,
   "schema_version": "2.0",
-  "generated_at": "2026-06-14T19:09:51Z",
+  "generated_at": "2026-06-22T03:28:26Z",
   "skill_dir": ".",
   "privacy_contract": {
     "storage": "local-first",
@@ -25,6 +25,7 @@
   },
   "summary": {
     "event_count": 1,
+    "adoption_sample_count": 1,
     "activation_count": 1,
     "accepted_count": 1,
     "edited_count": 0,
@@ -42,12 +43,17 @@
     "event_types": {
       "skill_activation": 1
     },
-    "failure_types": {}
+    "failure_types": {},
+    "source_types": {
+      "manual": 1
+    },
+    "command_counts": {}
   },
   "adoption_by_skill": [
     {
       "skill": "yao-meta-skill",
       "events": 1,
+      "adoption_events": 1,
       "accepted": 1,
       "edited": 0,
       "rejected": 0,
@@ -58,8 +64,10 @@
   "next_iteration_candidates": [],
   "recent_events": [
     {
+      "command": "unknown",
       "event": "skill_activation",
       "skill": "yao-meta-skill",
+      "source": "manual",
       "version": "1.1.0",
       "activation_type": "explicit",
       "outcome": "accepted",

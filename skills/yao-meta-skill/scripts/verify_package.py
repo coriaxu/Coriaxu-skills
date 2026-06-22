@@ -54,9 +54,14 @@ def generated_zip_entries(names: list[str]) -> list[str]:
     generated = []
     for name in names:
         parts = PurePosixPath(name).parts
-        if "dist" in parts or (len(parts) > 2 and parts[1] == "tests" and any(part.startswith("tmp") for part in parts[2:])):
+        if ".previews" in parts or "dist" in parts or (len(parts) > 2 and parts[1] == "tests" and any(part.startswith("tmp") for part in parts[2:])):
             generated.append(name)
     return generated
+
+
+def non_root_skill_entries(names: list[str], package_root: str) -> list[str]:
+    root_entry = f"{package_root}/SKILL.md"
+    return sorted(name for name in names if PurePosixPath(name).name == "SKILL.md" and name != root_entry)
 
 
 def required_targets(expectations: dict[str, Any], package_dir: Path) -> list[str]:
@@ -75,6 +80,10 @@ def add_check(checks: list[dict[str, str]], failures: list[str], check_id: str, 
         failures.append(detail)
 
 
+def package_name(manifest: dict[str, Any], skill_dir: Path) -> str:
+    return str(manifest.get("name") or skill_dir.name)
+
+
 def verify_package(
     skill_dir: Path,
     package_dir: Path,
@@ -91,6 +100,7 @@ def verify_package(
 
     manifest_path = package_dir / "manifest.json"
     manifest = load_json(manifest_path)
+    package_root = package_name(manifest, skill_dir)
     add_check(checks, failures, "package-manifest", bool(manifest), f"Package manifest exists: {display_path(manifest_path)}")
 
     targets = required_targets(expectations, package_dir)
@@ -108,15 +118,16 @@ def verify_package(
                 field in adapter,
                 f"{target} adapter includes field: {field}",
             )
-    for target, key in (
-        ("openai", "openai_required_files"),
-        ("claude", "claude_required_files"),
-        ("generic", "generic_required_files"),
-    ):
-        for rel in expectations.get(key, []):
+    required_files_by_target = {
+        key[: -len("_required_files")]: value
+        for key, value in expectations.items()
+        if key.endswith("_required_files")
+    }
+    for target, required_files in required_files_by_target.items():
+        for rel in required_files:
             add_check(checks, failures, f"{target}-file-{rel}", (package_dir / rel).exists(), f"Package contains {rel}")
 
-    archive_path = package_dir / f"{skill_dir.name}.zip"
+    archive_path = package_dir / f"{package_root}.zip"
     archive_sha = ""
     archive_entries: list[str] = []
     if archive_path.exists():
@@ -127,16 +138,24 @@ def verify_package(
             add_check(checks, failures, "archive-readable", False, f"Archive is not a readable zip: {display_path(archive_path)}")
         else:
             unsafe_entries = unsafe_zip_entries(archive_entries)
+            nested_skill_entries = non_root_skill_entries(archive_entries, package_root)
             required_entries = [
-                f"{skill_dir.name}/SKILL.md",
-                f"{skill_dir.name}/manifest.json",
-                f"{skill_dir.name}/agents/interface.yaml",
+                f"{package_root}/SKILL.md",
+                f"{package_root}/manifest.json",
+                f"{package_root}/agents/interface.yaml",
             ]
             add_check(checks, failures, "archive-safe-paths", not unsafe_entries, "Archive has no absolute or parent-traversal entries")
             for entry in required_entries:
                 add_check(checks, failures, f"archive-entry-{entry}", entry in archive_entries, f"Archive contains {entry}")
+            add_check(
+                checks,
+                failures,
+                "archive-single-skill-entrypoint",
+                not nested_skill_entries,
+                "Archive exposes only the root SKILL.md entrypoint",
+            )
             generated_entries = generated_zip_entries(archive_entries)
-            add_check(checks, failures, "archive-excludes-generated", not generated_entries, "Archive excludes generated dist/ and tests/tmp* contents")
+            add_check(checks, failures, "archive-excludes-generated", not generated_entries, "Archive excludes generated dist/, .previews/, and tests/tmp* contents")
     elif require_zip:
         add_check(checks, failures, "archive-present", False, f"Missing required package archive: {display_path(archive_path)}")
     else:
@@ -183,6 +202,7 @@ def verify_package(
             "archive_present": archive_path.exists(),
             "archive_sha256": archive_sha,
             "archive_entry_count": len(archive_entries),
+            "nested_skill_entry_count": len(non_root_skill_entries(archive_entries, package_root)),
             "failure_count": len(failures),
             "warning_count": len(warnings),
         },
@@ -207,6 +227,7 @@ def render_markdown(report: dict[str, Any]) -> str:
         f"- Targets: `{summary['adapter_count']} / {summary['target_count']}` adapters present",
         f"- Archive present: `{summary['archive_present']}`",
         f"- Archive SHA256: `{summary['archive_sha256'] or 'n/a'}`",
+        f"- Nested SKILL.md entries: `{summary.get('nested_skill_entry_count', 0)}`",
         f"- Failures: `{summary['failure_count']}`",
         f"- Warnings: `{summary['warning_count']}`",
         "",

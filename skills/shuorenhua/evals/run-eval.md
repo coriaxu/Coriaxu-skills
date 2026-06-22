@@ -45,7 +45,7 @@
 - 对 `Scene Packs` 类 SF 用例，额外判断是否命中 `README / release-note / forum-post / issue-reply` 子场景，并按发布目的收束语气
 - 对 `Long-form / in-place` 类 SF 用例，额外检查是否保留句数、段落顺序和关键转场；如果删整句、合并相邻句、重排段落，记 `❌`
 
-### 对 Should NOT Fix（SNF-01 到 SNF-31）：
+### 对 Should NOT Fix（SNF-01 到 SNF-32）：
 - 判断这条文本为什么不该改
 - 如果保持原样或只做最小无害调整 → ✅ 通过
 - 如果错误修改了术语、系统主语、技术报告、引用原文、边界案例中的合理表达 → ❌ 误杀，说明误杀点
@@ -66,7 +66,7 @@
 
 并给出：
 - SF 通过率：X/41
-- SNF 误杀率：X/31
+- SNF 误杀率：X/32
 - 是否达到目标：SF > 90%，SNF 误杀率 < 10%
 
 **注意：**
@@ -74,6 +74,7 @@
 - `code-context` 样本只处理注释 / docstring / commit message 中的文字，不改动代码本身
 - `Scene Packs` 样本先保大场景和 protected spans，再按子场景的发布目的处理，不要把 release note 写成营销稿、forum post 写成公告、issue reply 写成客服话术
 - `Long-form / in-place` 样本不删整句、不合并相邻句、不重排段落；字数留存率目标 ≥ 0.90，硬下限 0.85
+- `Bounded` 样本不直接删整句空话，不把实句放进删除清单，也不把商业黑话壳句和紧随其后的数据句合并成一句
 
 ---
 
@@ -100,4 +101,4 @@ codex exec -C . --sandbox read-only \
 2. 把 `SKILL.md`、`references/` 下的文件和 `evals/benchmark.md` 的内容一起贴给模型
 3. token 不够时，优先保留 `SKILL.md` + `benchmark.md` + `scene-packs.md` + `severity.md` + `boundary-cases.md`
 
-注意：token 窗口较短的模型可能无法一次跑完 72 条，可以分批（先跑 SF，再跑 SNF）。
+注意：token 窗口较短的模型可能无法一次跑完 73 条，可以分批（先跑 SF，再跑 SNF）。
