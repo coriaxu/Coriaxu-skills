@@ -1,10 +1,10 @@
 {
   "schema_version": "1.0",
   "ok": true,
-  "generated_at": "2026-06-22T03:27:48Z",
+  "generated_at": "2026-07-02T06:33:07Z",
   "skill_dir": ".",
   "decision": "curator-review",
-  "week_id": "2026-W26",
+  "week_id": "2026-W27",
   "daily_report_count": 5,
   "opportunity_count": 25,
   "unique_opportunity_count": 5,
@@ -24,7 +24,7 @@
   "failure_count": 0,
   "summary": {
     "decision": "curator-review",
-    "week_id": "2026-W26",
+    "week_id": "2026-W27",
     "daily_report_count": 5,
     "opportunity_count": 25,
     "unique_opportunity_count": 5,
@@ -93,7 +93,7 @@
     "reports/skillops/daily/2026-06-17.json",
     "reports/skillops/daily/2026-06-20.json",
     "reports/skillops/daily/2026-06-21.json",
-    "reports/skillops/daily/2026-06-22.json"
+    "reports/skillops/daily/2026-07-02.json"
   ],
   "opportunity_summary": {
     "action_type_counts": {
@@ -317,7 +317,7 @@
     "world_class_ledger": "reports/world_class_evidence_ledger.json"
   },
   "artifacts": {
-    "json": "reports/skillops/weekly/2026-W26.json",
-    "markdown": "reports/skillops/weekly/2026-W26.md"
+    "json": "reports/skillops/weekly/2026-W27.json",
+    "markdown": "reports/skillops/weekly/2026-W27.md"
   }
 }
