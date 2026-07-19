@@ -21,7 +21,7 @@
   <a href="https://github.com/MrGeDiao/shuorenhua/stargazers"><img src="https://img.shields.io/github/stars/MrGeDiao/shuorenhua?style=for-the-badge&amp;label=stars" alt="GitHub stars"></a>
   <a href="https://github.com/MrGeDiao/shuorenhua/releases"><img src="https://img.shields.io/github/v/release/MrGeDiao/shuorenhua?style=for-the-badge&amp;label=release" alt="GitHub release"></a>
   <a href="evals/benchmark.md"><img src="https://img.shields.io/badge/benchmark-80%20cases-2563eb?style=for-the-badge" alt="Benchmark: 80 cases"></a>
-  <a href="evals/real-samples.md"><img src="https://img.shields.io/badge/real%20samples-19-16a34a?style=for-the-badge" alt="Real samples: 19"></a>
+  <a href="evals/real-samples.md"><img src="https://img.shields.io/badge/scenario%20samples-19-16a34a?style=for-the-badge" alt="Scenario samples: 19"></a>
   <a href="LICENSE"><img src="https://img.shields.io/github/license/MrGeDiao/shuorenhua?style=for-the-badge" alt="License"></a>
 </p>
 
@@ -96,17 +96,16 @@ release note 的读者要的是变更清单，不是发布宣言。版本号保�
 
 ## 30 秒上手
 
-**先试效果，什么都不用装** — [说人话 GPT](https://chatgpt.com/g/g-69d5d86a32608191b523efd7a4048736-shuo-ren-hua)（ChatGPT，需 Plus / Pro），完整规则已内置，贴文本就能改。
+**先试效果，什么都不用装** — [说人话 GPT](https://chatgpt.com/g/g-6a5829b1163481919e1e45851f6bc709-shuo-ren-hua)（ChatGPT，需 Plus / Pro），完整规则已内置，贴文本就能改。
 
-**Claude Code** — 放进 skills 目录，之后自动触发：
+**Claude Code** — 对话里两条命令装完，之后自动触发：
 
-```bash
-git clone https://github.com/MrGeDiao/shuorenhua.git
-mkdir -p ~/.claude/skills
-cp -r shuorenhua ~/.claude/skills/shuorenhua
+```text
+/plugin marketplace add MrGeDiao/shuorenhua
+/plugin install shuorenhua@shuorenhua
 ```
 
-装好后在对话里说「把这段去 AI 味」就会命中。想跟随仓库更新，用软链接代替 cp，见 [install/claude-code.md](install/claude-code.md)。
+装好后在对话里说「把这段去 AI 味」就会命中。手动安装（cp / 软链跟随更新）见 [install/claude-code.md](install/claude-code.md)。
 
 **Codex** — clone 后单次使用：
 
@@ -131,7 +130,7 @@ Cursor、OpenClaw 和自建 agent 见[安装](#安装)。
 
 1. 判场景：`chat / status / docs / public-writing`；命中 README、release note、论坛帖、issue 回复时，再进对应的 Scene Pack
 2. 划保护片段：数字、版本、命令、路径、报错、引用原文、人名和责任归属先锁住（完整清单见 [references/protected-spans.md](references/protected-spans.md)）
-3. 按命中强度定力度（`minimal / standard / aggressive`），按能删到什么程度定 scope（`structural / bounded / in-place`）
+3. 判命中强度（`Tier 1 / 2 / 3`），再分别定改写力度（`minimal / standard / aggressive`）和 scope（`structural / bounded / in-place`）；Tier 只描述问题命中多重，不直接等于力度
 4. 先按模式改，词表只兜底
 5. 保真回读：事实、术语、语域、保护片段逐项过
 6. 仍有残味才做第二遍 Residual Audit，只允许轻量修正
@@ -182,12 +181,12 @@ Cursor、OpenClaw 和自建 agent 见[安装](#安装)。
 |------|------|------|
 | SF | 45 | 应该改的文本必须命中并改掉主要问题 |
 | SNF | 35 | 不该误杀的文本必须放行或轻提示 |
-| Real Samples | 19 | 整段样本按自然、保真、可直接发三项评分，长文加 `长度节奏` |
+| 场景样本 | 19 | 整段样本按自然、保真、可直接发三项评分，长文加 `长度节奏` |
 | Scene Packs | 8 | README / release note / forum post / issue reply 的正反样本 |
 | Long-form In-place | 4 | 长文保长度场景，检查字数留存、句数对齐和关键转场 |
 | Bounded | 3 | 长文整句空话进删除清单，但不误删实句和节奏句 |
 
-v1.9.0 起 benchmark 改为双模型实跑口径（Codex + Claude 交叉判分，见 [evals/results-v1.9.0.md](evals/results-v1.9.0.md)）；静态走查退为发版前快速自查。完整用例集见 [evals/benchmark.md](evals/benchmark.md)，整段真实样本见 [evals/real-samples.md](evals/real-samples.md)。`results-v1.8.6.md` 保留为 v1.8.6 首次模型实跑归档。
+v1.9.0 起 benchmark 改为双模型实跑口径（Codex + Claude 交叉判分，见 [evals/results-v1.9.0.md](evals/results-v1.9.0.md)）；v2.0.0 起实跑盲测化：被测模型只看匿名乱序、不含预期的 [evals/benchmark-blind.md](evals/benchmark-blind.md)，judge 按映射表判分，每次实跑的评测集版本、模型和口径登记在 [evals/run-manifest.md](evals/run-manifest.md)。静态走查退为发版前快速自查。完整用例集见 [evals/benchmark.md](evals/benchmark.md)，整段场景样本（高拟真合成）见 [evals/real-samples.md](evals/real-samples.md)。`results-v1.8.6.md` 保留为 v1.8.6 首次模型实跑归档。
 
 ## 安装
 
@@ -208,6 +207,10 @@ v1.9.0 起 benchmark 改为双模型实跑口径（Codex + Claude 交叉判分�
 当任务涉及“去 AI 味”“说人话”“自然一点”“别像模板”这类改写时，遵循 `shuorenhua/SKILL.md`。
 对外文本优先按它处理；代码、日志、配置和命令输出不套这个 skill。
 ```
+
+## English
+
+**shuorenhua (说人话)** is a Chinese-first rewrite skill for Codex, Claude Code, Cursor, and ChatGPT. It removes AI-flavored patterns in Chinese text — sycophantic openers, performative engineer-speak, translationese, unsourced authority claims — while preserving facts, numbers, commands, terminology, and attribution. It ships with an 80-case model-tested benchmark including false-positive guards, and a long-form mode that cleans up the text without shrinking it. Claude Code users can install it in two commands: `/plugin marketplace add MrGeDiao/shuorenhua`, then `/plugin install shuorenhua@shuorenhua`. Other install guides: [install/](install/). Everything else in this repo is written in Chinese.
 
 ## 常见问题
 
