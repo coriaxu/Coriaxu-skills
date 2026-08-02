@@ -2,18 +2,18 @@
 
 This file records the latest verified upstream snapshot used to refresh third-party skills in this repository.
 
-Last checked: 2026-07-27
+Last checked: 2026-08-03
 
 | Local skill | Upstream | Ref used | Status / notes |
 |---|---|---|---|
-| `aihot` | https://aihot.virxact.com/aihot-skill/ | fetched 2026-07-27, sha256 `4f5837b0` | Updated from `e9576960`; v1.1.2 strengthens API routing, caching, and safe handling of untrusted returned content |
-| `darwin-skill` | https://github.com/alchaincyf/darwin-skill | `7c7b7909` | Checked; no upstream change |
-| `dbs` | https://github.com/dontbesilent2025/dbskill | `b862fa83` | Updated from `daca0716`; adds the cross-Skill handoff contract and standard-answer routing; CC BY-NC 4.0 boundary retained |
-| `dbs-content` | https://github.com/dontbesilent2025/dbskill | `b862fa83` | Updated handoff guidance to return to `/dbs`; CC BY-NC 4.0 boundary retained |
-| `dbs-diagnosis` | https://github.com/dontbesilent2025/dbskill | `b862fa83` | Updated boundary and handoff guidance to preserve diagnosis context; CC BY-NC 4.0 boundary retained |
-| `dbskill-knowledge` | https://github.com/dontbesilent2025/dbskill | `b862fa83` | Updated upstream `原子库/README.md`; local wrapper `README.md` / `LICENSE` / `SKILL.md` retained |
+| `aihot` | https://aihot.virxact.com/aihot-skill/ | fetched 2026-08-03, sha256 `47f57f15` | Updated from `4f5837b0`; v1.3.0 standardizes the public v1 API workflow and safeguards handling of returned content |
+| `darwin-skill` | https://github.com/alchaincyf/darwin-skill | `2fbaf417` | Updated from `7c7b7909`; v2.1 uses paired, same-judge majority comparisons for keep/revert and weighted-gap triage |
+| `dbs` | https://github.com/dontbesilent2025/dbskill | `8282f010` | Upstream advanced from `b862fa83`; included skill content unchanged; CC BY-NC 4.0 boundary retained |
+| `dbs-content` | https://github.com/dontbesilent2025/dbskill | `8282f010` | Updated from `b862fa83`; removes stale deep-reference guidance; CC BY-NC 4.0 boundary retained |
+| `dbs-diagnosis` | https://github.com/dontbesilent2025/dbskill | `8282f010` | Updated from `b862fa83`; removes stale deep-reference guidance; CC BY-NC 4.0 boundary retained |
+| `dbskill-knowledge` | https://github.com/dontbesilent2025/dbskill | `8282f010` | Checked at new ref; knowledge-pack content unchanged; local wrapper `README.md` / `LICENSE` / `SKILL.md` retained |
 | `luban-skill` | https://github.com/LearnPrompt/luban-skill | `cea2da3` | Upstream advanced from `89b1f0dd`; checked its relocated `skills/luban/` source and found no change to the included skill files |
-| `nuwa-skill` | https://github.com/alchaincyf/nuwa-skill | `72857dc` | Updated from `550a8e1`; added community contribution docs, fidelity scorecards, English triggers, cost-tier guidance, and failure/checkpoint safeguards |
+| `nuwa-skill` | https://github.com/alchaincyf/nuwa-skill | `27642f5` | Updated from `72857dc`; refreshes the upstream package and adds template output-discipline guidance |
 | `obsidian-bases` | https://github.com/kepano/obsidian-skills | `a1dc48e6` | Checked; no upstream change; local attribution README retained |
 | `obsidian-markdown` | https://github.com/kepano/obsidian-skills | `a1dc48e6` | Checked; no upstream change |
 | `qiaomu-epub-book-generator` | https://github.com/joeseesun/qiaomu-epub-book-generator | `c558598b` | Checked; no upstream change |
