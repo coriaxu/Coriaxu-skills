@@ -34,12 +34,12 @@
 2. 再按需读取 `references/` 下的文件，补齐短语、结构、边界和误杀防护
 3. 然后读取 `./evals/benchmark.md`，对其中每一条测试用例执行评测
 
-### 对 Should Fix（SF-01 到 SF-46）：
+### 对 Should Fix（SF-01 到 SF-47）：
 - 先判断主场景（chat / status / docs / public-writing）和问题类型
 - 判断改写档位（minimal / standard / aggressive）
 - 判断 scope（structural / bounded / in-place）；长 `public-writing` 默认 `bounded`（整句空话进删除清单、实句句内洗、不并句不重排）；用户要求完全原样、或样本明确标为 `Long-form / in-place` 时，按 `in-place` 的句内改写边界处理
 - 回读先做保真回读；只有第一遍已经保住事实、但仍有明显残留味时，才再做 `Residual Audit`
-- 第二遍固定只查 5 件事：开场残留、总结残留、narrator 残留、空泛判断残留、句长过匀
+- 第二遍固定只查 5 件事：开场残留、总结残留、narrator 残留、空泛判断残留、节奏过匀（句长 + 同型句式骨架密度）
 - 按规则处理原文：默认输出改写后的文本；无源论断按 `audit-only` 处理时，对该论断输出缺来源 / 缺归属的风险说明即可、不强行改写它；但 `audit-only` 只约束无源论断本身，同段其他病灶仍按各自规则清理，不能整段只输出风险说明
 - 列出命中项（问题类型 + 命中的具体词/结构）
 - 判断是否通过（✅ 通过 / ⚠️ 部分通过 / ❌ 未通过），简短说明理由
@@ -48,7 +48,7 @@
 - 对 `Scene Packs` 类 SF 用例，额外判断是否命中 `README / release-note / forum-post / issue-reply` 子场景，并按发布目的收束语气
 - 对 `Long-form / in-place` 类 SF 用例，额外检查是否保留句数、段落顺序和关键转场；如果删整句、合并相邻句、重排段落，记 `❌`
 
-### 对 Should NOT Fix（SNF-01 到 SNF-36）：
+### 对 Should NOT Fix（SNF-01 到 SNF-37）：
 - 判断这条文本为什么不该改
 - 如果保持原样或只做最小无害调整 → ✅ 通过
 - 如果错误修改了术语、系统主语、技术报告、引用原文、边界案例中的合理表达 → ❌ 误杀，说明误杀点
@@ -75,8 +75,8 @@
 ```
 
 并给出：
-- SF 通过率：X/46
-- SNF 误杀率：X/36
+- SF 通过率：X/47
+- SNF 误杀率：X/37
 - 硬约束失败清单：<编号列表；没有就写“无”>
 - 是否达到发布门槛：硬约束失败 0 且 SNF 误杀率 < 10%；SF 风格通过率按模型报告并与上一版对比，不设统一 90% 线（门槛全文见 [benchmark-tiers.md](./benchmark-tiers.md)）
 
@@ -93,7 +93,7 @@
 
 ```bash
 codex exec -C . --sandbox read-only \
-  "先读取 ./SKILL.md，再结合 ./references/ 下的相关文件，评测 ./evals/benchmark.md 中的所有用例。对 SF 用例先判断场景、Tier、改写档位和 scope，再按规则处理并判断是否通过；如果是 README、release note、forum post、issue reply，补看 ./references/scene-packs.md 并按对应子场景处理；如果是 Long-form / in-place 样本，必须遵守不删整句、不合并相邻句、不重排段落的边界，检查字数留存、句数对齐和关键转场保留。回读先做保真回读，只有第一遍已经保住事实、但仍有明显残留味时，才再做 Residual Audit。Residual Audit 只查开场残留、总结残留、narrator 残留、空泛判断残留、句长过匀，且只允许轻量修正。默认输出改写结果，但对按 audit-only 通过的无源引用样本，允许只输出缺来源或缺归属的风险说明，不强行整段重写。无源引用类 SF 需要按场景判定：public-writing/chat 默认删掉无证据权威铺垫算通过，docs/status 默认明确标注缺来源且不伪装成已证实算通过。对 SNF 用例判断是否误杀。注意 mixed 样本只处理真正有问题的正文，不要改用户指令、引用和被讨论词。code-context 样本只改注释/docstring/commit message，不动代码。Scene Packs 样本不能删版本号、路径、链接、编号和责任归属。最后输出汇总表格、SF 通过率和 SNF 误杀率。"
+  "先读取 ./SKILL.md，再结合 ./references/ 下的相关文件，评测 ./evals/benchmark.md 中的所有用例。对 SF 用例先判断场景、Tier、改写档位和 scope，再按规则处理并判断是否通过；如果是 README、release note、forum post、issue reply，补看 ./references/scene-packs.md 并按对应子场景处理；如果是 Long-form / in-place 样本，必须遵守不删整句、不合并相邻句、不重排段落的边界，检查字数留存、句数对齐和关键转场保留。回读先做保真回读，只有第一遍已经保住事实、但仍有明显残留味时，才再做 Residual Audit。Residual Audit 只查开场残留、总结残留、narrator 残留、空泛判断残留、节奏过匀（句长 + 同型句式骨架密度），且只允许轻量修正。默认输出改写结果，但对按 audit-only 通过的无源引用样本，允许只输出缺来源或缺归属的风险说明，不强行整段重写。无源引用类 SF 需要按场景判定：public-writing/chat 默认删掉无证据权威铺垫算通过，docs/status 默认明确标注缺来源且不伪装成已证实算通过。对 SNF 用例判断是否误杀。注意 mixed 样本只处理真正有问题的正文，不要改用户指令、引用和被讨论词。code-context 样本只改注释/docstring/commit message，不动代码。Scene Packs 样本不能删版本号、路径、链接、编号和责任归属。最后输出汇总表格、SF 通过率和 SNF 误杀率。"
 ```
 
 ## Claude Code 快速运行
@@ -101,7 +101,7 @@ codex exec -C . --sandbox read-only \
 在项目目录下启动 Claude Code，对话里直接说：
 
 ```text
-读取 ./SKILL.md 和 ./references/ 下的所有文件，然后评测 ./evals/benchmark.md 中的所有用例。对 SF 用例先判断场景、Tier、改写档位和 scope，再按规则处理并判断是否通过；如果是 README、release note、forum post、issue reply，补看 ./references/scene-packs.md 并按对应子场景处理；如果是 Long-form / in-place 样本，必须遵守不删整句、不合并相邻句、不重排段落的边界，检查字数留存、句数对齐和关键转场保留。回读先做保真回读，只有第一遍已经保住事实、但仍有明显残留味时，才再做 Residual Audit。Residual Audit 只查开场残留、总结残留、narrator 残留、空泛判断残留、句长过匀，且只允许轻量修正。默认输出改写结果，但对按 audit-only 通过的无源引用样本，允许只输出缺来源或缺归属的风险说明，不强行整段重写。无源引用类 SF 按场景判定：public-writing/chat 默认删掉无证据权威铺垫算通过，docs/status 默认明确标注缺来源且不伪装成已证实算通过。对 SNF 用例判断是否误杀。注意 mixed 样本只处理真正有问题的正文，不要改用户指令、引用和被讨论词。code-context 样本只改注释/docstring/commit message，不动代码。Scene Packs 样本不能删版本号、路径、链接、编号和责任归属。最后输出汇总表格、SF 通过率和 SNF 误杀率。
+读取 ./SKILL.md 和 ./references/ 下的所有文件，然后评测 ./evals/benchmark.md 中的所有用例。对 SF 用例先判断场景、Tier、改写档位和 scope，再按规则处理并判断是否通过；如果是 README、release note、forum post、issue reply，补看 ./references/scene-packs.md 并按对应子场景处理；如果是 Long-form / in-place 样本，必须遵守不删整句、不合并相邻句、不重排段落的边界，检查字数留存、句数对齐和关键转场保留。回读先做保真回读，只有第一遍已经保住事实、但仍有明显残留味时，才再做 Residual Audit。Residual Audit 只查开场残留、总结残留、narrator 残留、空泛判断残留、节奏过匀（句长 + 同型句式骨架密度），且只允许轻量修正。默认输出改写结果，但对按 audit-only 通过的无源引用样本，允许只输出缺来源或缺归属的风险说明，不强行整段重写。无源引用类 SF 按场景判定：public-writing/chat 默认删掉无证据权威铺垫算通过，docs/status 默认明确标注缺来源且不伪装成已证实算通过。对 SNF 用例判断是否误杀。注意 mixed 样本只处理真正有问题的正文，不要改用户指令、引用和被讨论词。code-context 样本只改注释/docstring/commit message，不动代码。Scene Packs 样本不能删版本号、路径、链接、编号和责任归属。最后输出汇总表格、SF 通过率和 SNF 误杀率。
 ```
 
 ## 通用 LLM / API
@@ -112,4 +112,4 @@ codex exec -C . --sandbox read-only \
 2. 把 `SKILL.md`、`references/` 下的文件和 `evals/benchmark.md` 的内容一起贴给模型
 3. token 不够时，优先保留 `SKILL.md` + `benchmark.md` + `scene-packs.md` + `severity.md` + `boundary-cases.md`
 
-注意：token 窗口较短的模型可能无法一次跑完 82 条，可以分批（先跑 SF，再跑 SNF）。
+注意：token 窗口较短的模型可能无法一次跑完 84 条，可以分批（先跑 SF，再跑 SNF）。

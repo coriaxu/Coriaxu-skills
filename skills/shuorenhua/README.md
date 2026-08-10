@@ -14,13 +14,13 @@
 <p align="center">
   给 Codex、Claude Code、Cursor、ChatGPT 和自建 agent 用。
   <br>
-  改聊天、技术同步、README、论坛帖和中文长文：先保住事实，再把那股“一眼 AI”的腔调降下来。
+  改聊天、技术同步、README、论坛帖和中文长文。压掉那股“一眼 AI”的腔调，事实、版本和责任一个都不动。
 </p>
 
 <p align="center">
   <a href="https://github.com/MrGeDiao/shuorenhua/stargazers"><img src="https://img.shields.io/github/stars/MrGeDiao/shuorenhua?style=for-the-badge&amp;label=stars" alt="GitHub stars"></a>
   <a href="https://github.com/MrGeDiao/shuorenhua/releases"><img src="https://img.shields.io/github/v/release/MrGeDiao/shuorenhua?style=for-the-badge&amp;label=release" alt="GitHub release"></a>
-  <a href="evals/benchmark.md"><img src="https://img.shields.io/badge/benchmark-82%20cases-2563eb?style=for-the-badge" alt="Benchmark: 82 cases"></a>
+  <a href="evals/benchmark.md"><img src="https://img.shields.io/badge/benchmark-84%20cases-2563eb?style=for-the-badge" alt="Benchmark: 84 cases"></a>
   <a href="evals/real-samples.md"><img src="https://img.shields.io/badge/scenario%20samples-19-16a34a?style=for-the-badge" alt="Scenario samples: 19"></a>
   <a href="LICENSE"><img src="https://img.shields.io/github/license/MrGeDiao/shuorenhua?style=for-the-badge" alt="License"></a>
 </p>
@@ -35,7 +35,7 @@
   <a href="#常见问题">FAQ</a>
 </p>
 
-`说人话` 专治那种“每个字都对，但一看就不是你写的”中文。它不把空话包装得更漂亮，也不替你编新事实；它先护住版本、命令、责任和证据，再拆掉过度承接、工程师腔、小红书 AI 腔、翻译腔和无源权威铺垫。目标很简单：改完你敢直接发。
+`说人话` 专治那种“每个字都对，但一看就不是你写的”中文。它清理过度承接、工程师腔、小红书 AI 腔、翻译腔和无源权威铺垫，同时锁住版本、命令、责任和证据。它不替你编新事实，也不把空话包装得更漂亮。改完你敢直接发。
 
 它适合这些场景：
 
@@ -43,11 +43,9 @@
 |------|------------|
 | 日常聊天 | 删掉过度承接、推销式结尾和工程汇报腔，保留口语感 |
 | 技术状态同步 | 保住事实、版本、命令、报错和责任归属，压低套话 |
-| README / release note | 先讲清楚项目、变更、验证和限制，不写发布宣言 |
+| README / release note | 第一屏说清这是什么、给谁用；变更、验证和限制列全 |
 | 论坛帖 / issue 回复 | 像维护者在认真沟通，不像客服公告或营销稿 |
 | 中文长文 | 句内清理保住节奏，整句空话列「建议删除」清单交你确认，不让长文越改越短 |
-
-检索关键词：中文 AI 写作、中文 humanizer、去 AI 味、AI writing humanizer、Chinese writing style。
 
 ## 改成什么样
 
@@ -81,7 +79,7 @@
 >
 > 这版不做 Voice Calibration；相关方向推迟到 v1.9 评估。
 
-release note 的读者要的是变更清单，不是发布宣言。版本号保住，姿态层拆掉，没做的事也写出来。完整样本见 [evals/real-samples.md](evals/real-samples.md) RS-16。
+release note 的读者要的是变更清单，不是发布宣言。上面这条改写保住了版本号，拆掉了发布宣言那层，还把「这版不做 Voice Calibration」这种没做的事也写了出来。完整样本见 [evals/real-samples.md](evals/real-samples.md) RS-16。
 
 ### 删掉渲染词，数字不能跟着丢
 
@@ -99,7 +97,7 @@ release note 的读者要的是变更清单，不是发布宣言。版本号保�
 
 > 这次优化把接口 p95 延迟从 480ms 降到 160ms。
 
-清完落在哪是有合同的：原文给了具体信息就必须落回去，不许变泛。这条对应评测集里的硬约束用例（[evals/benchmark.md](evals/benchmark.md) SF-46）。更多例子见 [references/examples.md](references/examples.md) 和 [evals/real-samples.md](evals/real-samples.md)。
+清完落在哪是有合同的：原文给了具体信息，改写后就得把它落回去，不能拿更泛的说法顶替。这条对应评测集里的硬约束用例（[evals/benchmark.md](evals/benchmark.md) SF-46）。更多例子见 [references/examples.md](references/examples.md) 和 [evals/real-samples.md](evals/real-samples.md)。
 
 ## 30 秒上手
 
@@ -149,7 +147,7 @@ Cursor、OpenClaw 和自建 agent 见[安装](#安装)。
 
 ## 它怎么判断怎么改
 
-`说人话` 不是见词就替换。一句话原则：
+`说人话` 不是见词就替换。
 
 > **先保信息，再谈风格。**
 
@@ -191,7 +189,7 @@ Cursor、OpenClaw 和自建 agent 见[安装](#安装)。
 
 ### 按发布目的细分（Scene Packs）
 
-可发布文本再按「发到哪里」细分，不是换语气，是按发布目的决定改法：README 第一屏要说清这是什么、给谁用；release note 要列清变更、验证和限制；论坛帖像维护者分享观察和取舍，不像公司公告；issue 回复先确认问题和下一步，不做客服式安抚。每个子场景的目标和常见病灶见 [references/scene-packs.md](references/scene-packs.md)。
+可发布文本再按「发到哪里」细分。这不是换语气，是按发布目的决定改法：README 第一屏要说清这是什么、给谁用；release note 要列清变更、验证和限制；论坛帖像维护者分享观察和取舍，不像公司公告；issue 回复先确认问题和下一步。每个子场景的目标和常见病灶见 [references/scene-packs.md](references/scene-packs.md)。
 
 ### 长文不缩水：三档 scope
 
@@ -203,27 +201,27 @@ Cursor、OpenClaw 和自建 agent 见[安装](#安装)。
 | `bounded`（长文默认） | 整句空话列成「建议删除（待确认）」清单，删多少你拍板 | `public-writing` 长文 |
 | `in-place` | 一句都不删，只句内降调 | 明确要求「完全原样」 |
 
-三档的取舍过程和模型实跑数据见 [#4](https://github.com/MrGeDiao/shuorenhua/issues/4) 和 [evals/results-v1.8.6.md](evals/results-v1.8.6.md)。
+三档的取舍过程见 [#4](https://github.com/MrGeDiao/shuorenhua/issues/4)，`structural` 缩水不可控的双模型对照实跑见 [evals/results-v1.8.6.md](evals/results-v1.8.6.md)。后续各版的 scope 回归结果登记在 [evals/run-manifest.md](evals/run-manifest.md)，最近一轮是 v2.2.1 的两条 `in-place` 长文误杀防护（[evals/results-v2.2.1.md](evals/results-v2.2.1.md) §7）。
 
 ### 改完往哪个方向靠
 
-清理不是只删词。它也会把文本往这些方向拉：
+清理不只是删词，它也会把文本往这些方向拉：
 
 - 具体动作优先于抽象拔高
 - 真主语和真动作优先于姿态层
 - 允许轻微不对称，不把每句都抛光成同一种腔
-- 按场景校准，不把聊天改成公告，也不把文档改成段子
+- 按场景校准，聊天和文档不套同一种腔
 
 ## 评测
 
 规则层覆盖 210+ 中文短语、96 条英文短语、20 类结构反模式。
 
-当前评测集共 82 条：
+当前评测集共 84 条：
 
 | 类型 | 数量 | 目标 |
 |------|------|------|
-| SF | 46 | 应该改的文本必须命中并改掉主要问题 |
-| SNF | 36 | 不该误杀的文本必须放行或轻提示 |
+| SF | 47 | 应该改的文本必须命中并改掉主要问题 |
+| SNF | 37 | 不该误杀的文本必须放行或轻提示 |
 | 场景样本 | 19 | 整段样本按自然、保真、可直接发三项评分，长文加 `长度节奏` |
 | Scene Packs | 8 | README / release note / forum post / issue reply 的正反样本 |
 | Long-form In-place | 4 | 长文保长度场景，检查字数留存、句数对齐和关键转场 |
@@ -250,6 +248,8 @@ Claude 首轮那 1 个 L1 不是规则缺口：判定链已经写明“不得补
 
 评测怎么跑：被测模型只看匿名乱序、不含预期的 [evals/benchmark-blind.md](evals/benchmark-blind.md)，judge 按映射表判分；每次实跑的评测集版本、模型和口径登记在 [evals/run-manifest.md](evals/run-manifest.md)。完整用例集见 [evals/benchmark.md](evals/benchmark.md)，整段场景样本（高拟真合成）见 [evals/real-samples.md](evals/real-samples.md)。
 
+v2.2.0 起，改写输出落盘后先用零依赖硬判脚本 `python3 automation/eval/hard_metrics.py --run <批次目录>/` 批量算出字数留存率、破折号密度和 protected spans 粗核（自动配对 `evals/benchmark-blind.md` 原文），judge 不再自己数长文留存，缺失报警仍由 judge 复核；使用口径见 [automation/eval/README.md](automation/eval/README.md)。
+
 ## 安装
 
 | 平台 | 文档 |
@@ -272,9 +272,11 @@ Claude 首轮那 1 个 L1 不是规则缺口：判定链已经写明“不得补
 
 ## English
 
-**shuorenhua (说人话)** is a Chinese-first AI writing humanizer for Codex, Claude Code, Cursor, and ChatGPT. It removes AI-flavored patterns in Chinese text — sycophantic openers, performative engineer-speak, translationese, unsourced authority claims — under a fidelity contract: numbers stay attached to what they measure, relations and attribution never drift, and missing facts are never invented. It ships with an 82-case benchmark (blind inputs, dual-model judging, false-positive guards) and a long-form mode that cleans text without shrinking it.
+**shuorenhua (说人话)** is a Chinese-first AI writing humanizer for Codex, Claude Code, Cursor, and ChatGPT. It removes AI-flavored patterns in Chinese text — sycophantic openers, performative engineer-speak, translationese, unsourced authority claims — under a fidelity contract: numbers stay attached to what they measure, relations and attribution never drift, and missing facts are never invented. It ships with an 84-case benchmark (blind inputs, dual-model judging, false-positive guards) and a long-form mode that cleans text without shrinking it.
 
 Claude Code: `/plugin marketplace add MrGeDiao/shuorenhua`, then `/plugin install shuorenhua@shuorenhua`. Other agents: `npx skills add MrGeDiao/shuorenhua`. More guides: [install/](install/). Everything else in this repo is written in Chinese.
+
+<sub>关键词 / keywords：中文 AI 写作、中文 humanizer、去 AI 味、AI writing humanizer、Chinese writing style</sub>
 
 ## 常见问题
 
@@ -311,6 +313,7 @@ Claude Code: `/plugin marketplace add MrGeDiao/shuorenhua`, then `/plugin instal
 - [stop-slop](https://github.com/hardikpandya/stop-slop)：英文 AI slop 规则和评分框架
 - [humanizer](https://github.com/blader/humanizer)：英文 AI 模式分类
 - [avoid-ai-writing](https://github.com/conorbronsdon/avoid-ai-writing)：AI 写作问题分类和严重度参考
+- [speak-human-tw](https://github.com/Raymondhou0917/speak-human-tw)：繁体中文去 AI 味，覆盖电子报、社群贴文、销售页和客服信
 
 ## Star 增长
 

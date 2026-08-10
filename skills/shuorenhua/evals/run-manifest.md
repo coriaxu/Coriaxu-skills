@@ -98,6 +98,30 @@
 - 归档：`results-v2.1.0.md` §8
 - 原始输出：`tasks/current/eval-runs/2026-07-23-v2.1.0-release-final-d8408ce/`、`tasks/current/eval-runs/2026-07-23-v2.1.0-release-confirmation-d8408ce/`（未入库）
 
+## v2.2.1 targeted 回归（2026-08-06）
+
+- 评测集：`benchmark.md` @ v2.2.1（84 条：47 SF + 37 SNF）；范围 = B-12 / B-38（SF-47 / SNF-37）
+- 口径：targeted 双模型交叉；盲测 = 是（`benchmark-blind.md` 2026-08-06 用固定种子重新生成）
+- 被测模型：codex-cli 0.146.1（Codex 侧）/ Claude Opus 5 冷启动 subagent（Claude 侧）
+- judge 模型：Codex 判 Claude 改写、Claude 判 Codex 改写（r2 轮双向交叉）
+- CLI 版本：codex 0.146.1 / claude 2.1.222
+- 已知偏差：本轮在 Claude Agent SDK 宿主环境下跑，凭证由宿主托管、不落盘（`CLAUDE_CODE_PROVIDER_MANAGED_BY_HOST` 已设，无 `~/.claude/.credentials.json`），从 shell 另起的 `claude` 子进程拿不到 token（报 `Not logged in`，非账号问题）。Claude 侧因此改用冷启动 subagent，文件访问纪律与 CLI 口径一致（只给 `SKILL.md` + `references/` + `benchmark-blind.md`，不给含预期的文件）；同模型（Opus 5），但与历史轮次的 `claude --print` 进程路径不完全可比
+- 结果：四轮迭代（r1 因用例卡阈值边界作废 / r2 / r3 出现由本版改动引入的回归 / r4 修复）；L1 硬失败 0（全轮）；SNF 误杀 0；SF-47 终轮 Claude ✅、Codex ⚠️（L2，不阻塞）
+- 归档：`results-v2.2.1.md`
+- 原始输出：`tasks/current/eval-runs/2026-08-06-{codex,claude,judge}/`（未入库）
+
+## v2.2.1 影响面回归 7 条（2026-08-06）
+
+- 评测集：`benchmark.md` @ v2.2.1（84 条：47 SF + 37 SNF）；范围 = B-12 / B-15 / B-25 / B-53 / B-54 / B-63 / B-79（SF-47 / SF-16 / SF-39 / SF-04 / SNF-29 / SF-40 / SNF-30）
+- 口径：targeted 双模型交叉；盲测 = 是；选样依据 = 全库扫描后按新密度阈值行为会改变的全部用例（15 条含骨架，7 条达阈值），非抽样
+- 被测模型：codex-cli 0.146.1 / Claude Opus 5 冷启动 subagent
+- judge 模型：Codex 判 Claude、Claude 判 Codex（双向）
+- CLI 版本：codex 0.146.1 / claude 2.1.222
+- 结果：L1 硬失败 0（双侧）；**SNF 误杀 0/2（双侧）**；L2 口径 Codex 判 Claude 1/4、Claude 判 Codex 2/4；L3（SF-40）双侧 ✅
+- 结论：新密度判据未引入误杀，也未造成「该改的反而不改」；两条 ⚠️ 的成因分别是词表层漏改与预期骨架覆盖不全，与第 1 条无关
+- 归档：`results-v2.2.1.md` §7
+- 原始输出：`tasks/current/eval-runs/2026-08-06-{codex,claude,judge}/*regression7*`（未入库）
+
 ## 登记模板（新一轮实跑照抄填写）
 
 ```markdown

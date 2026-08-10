@@ -28,7 +28,12 @@
 输入会提供：
 - 盲测区间（例如 B-01 到 B-16）
 - 被测模型输出
-- 若包含 Long-form / in-place 用例，运行者会提供原文字符数、输出字符数和留存百分比
+- 若包含 Long-form / in-place 用例，运行者会提供 `automation/eval/hard_metrics.py` 的硬判结果（字数留存率、破折号密度、protected spans 粗核报警），以报告数字为准
+
+硬指标口径（由脚本产出，judge 不再自己数）：
+- 字数留存率：只对 `public-writing / long / in-place` 用例判定；目标 ≥ 0.90、硬下限 0.85，低于硬下限按 run-eval.md 记硬约束 ❌。bounded 长文与 no-op（保留原文）用例不适用留存率判据；no-op 会校验「判定链力度=no-op 证据」或「正文≈原文」，标 `noop_unverified` 的按实际留存率判，不能当 no-op 放行。
+- 破折号密度：单段 ≥ 4 处 `——` 或输出首句仍以 `——` 起手，命中 SF-43 破折号过密信号，需按该用例预期复核是否算标点腔未处理。
+- protected spans 粗核：数字、版本号、路径、反引号片段等逐字存在性检查，只报警不判死——缺失项仍需你按 benchmark.md 的预期复核是否真漂移（例如 bounded 删除清单内的无源论断按规则删掉不算漂移）。
 
 判分标准：
 - 直接引用 ./evals/run-eval.md 的口径，不另造标准。
@@ -39,7 +44,7 @@
 - SNF：保持原样或只做最小无害调整，记 ✅。
 - SNF：错误修改术语、系统主语、技术报告、引用原文、被讨论词、合理转场、实句或 protected spans，记 ❌。
 - Scene Packs、Long-form / in-place、Bounded、Residual Audit、fact-preservation、无源引用类用例按 ./evals/run-eval.md 的对应小节判。
-- 长文留存百分比只使用运行者提供的数字；你不要自己数，也不要估算。
+- 长文留存百分比只使用运行者提供的硬判数字；你不要自己数，也不要估算。
 
 输出格式必须严格如下：
 
