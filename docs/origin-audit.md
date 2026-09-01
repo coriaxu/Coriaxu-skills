@@ -3,7 +3,7 @@
 **扫描时间**：2026-04-18
 **扫描范围**：`/Users/surfin/.claude/skills/` 下候选开源的 ~40 个 skill
 **扫描方式**：SKILL.md frontmatter + LICENSE 文件 + README.md 归属关键词
-**更新记录**：2026-05-27 依据已确认上游仓库补全来源链接与许可信息；2026-06-11 新增 LearnPrompt 的 `luban-skill`。
+**更新记录**：2026-05-27 依据已确认上游仓库补全来源链接与许可信息；2026-06-11 新增 LearnPrompt 的 `luban-skill`；2026-09-01 将 `coriaxu-pending-zone` 标为退役，不再列入可安装目录。
 
 ## 溯源结果总览
 
@@ -32,7 +32,7 @@
 | reading-notes-splitter | 原创方案 | 原创 |
 | reading-companion-open | reading-companion 的通用公开版 | 原创 |
 | pending-zone | 徐老师个人工作流 | 原创 |
-| coriaxu-pending-zone | pending-zone 通用公开版 | 原创 |
+| coriaxu-pending-zone | pending-zone 通用公开版 | 已退役；源目录已删除，本表只保留溯源记录 |
 | init-project-claude | 原创 | 原创 |
 | init-memory-claude | 原创 | 原创 |
 | skill-manager | 原创 | 原创 |
