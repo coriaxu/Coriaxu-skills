@@ -56,13 +56,13 @@ cd "$HOME/Code/Coriaxu-skills" && ./install.sh <skill-name>
 cd "$HOME/Code/Coriaxu-skills" && ./install.sh yao-meta-skill nuwa-skill
 ```
 
-`install.sh` 会自动把 skill 同步到 `~/.claude/skills/`、`~/.codex/skills/`、`~/.gemini/antigravity/skills/` 中本机实际存在的那几处，不存在的目录会跳过，不会报错。
+`install.sh` 会自动把 skill 安装到 `~/.agent/skills/`。Claude Code、Codex、Gemini Antigravity 的 `skills` 目录会作为软链接指向这个中立总部。
 
 ### 步骤 4 — 告诉用户结果
 
 安装成功后，给用户两句话的反馈：
 
-1. 已经装好了 `<skill-name>`，同步到了哪几个 Agent 目录（照 `install.sh` 输出的 Target 行回报）
+1. 已经装好了 `<skill-name>`，安装到了 `~/.agent/skills/`，三端通过软链接读取同一份。
 2. 提示用户 **重启对应的 AI Agent**（Claude Code / Codex / Gemini Antigravity）才能加载新 skill
 
 ### 常见问题处理
@@ -94,7 +94,7 @@ cd "$HOME/Code/Coriaxu-skills" && ./install.sh yao-meta-skill nuwa-skill
 >
 > *[运行步骤 2 + 3 的命令]*
 >
-> 已同步到 `~/.claude/skills/nuwa-skill/`。请重启 Claude Code，`nuwa-skill` 就可以用了。触发词："女娲"、"蒸馏 XX"、"造一个 XX 的 skill"。
+> 已安装到 `~/.agent/skills/nuwa-skill/`。Claude Code、Codex、Gemini Antigravity 会通过软链接读取同一份。触发词："女娲"、"蒸馏 XX"、"造一个 XX 的 skill"。
 
 ---
 

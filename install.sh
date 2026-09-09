@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 # Coriaxu-skills install.sh
 #
-# Sync one or more skills from this repo's skills/ to the three local targets:
-#   ~/.claude/skills/           (Claude Code)
-#   ~/.codex/skills/            (Codex)
-#   ~/.gemini/antigravity/skills/   (Gemini Antigravity)
-# Targets that don't exist on this machine are skipped automatically.
+# Sync one or more skills from this repo's skills/ to the neutral skill hub:
+#   ~/.agent/skills/
+# Claude Code, Codex, and Gemini Antigravity keep compatibility through symlinks:
+#   ~/.claude/skills -> ~/.agent/skills
+#   ~/.codex/skills -> ~/.agent/skills
+#   ~/.gemini/antigravity/skills -> ~/.agent/skills
 #
 # Usage:
 #   ./install.sh                        # install ALL skills in this repo
@@ -19,8 +20,9 @@ set -euo pipefail
 
 REPO_ROOT="$(cd "$(dirname "$0")" && pwd)"
 SKILLS_SRC="$REPO_ROOT/skills"
+SKILL_HUB="$HOME/.agent/skills"
 
-TARGETS=(
+COMPAT_LINKS=(
   "$HOME/.claude/skills"
   "$HOME/.codex/skills"
   "$HOME/.gemini/antigravity/skills"
@@ -88,28 +90,50 @@ if [[ ${#SKILL_LIST[@]} -eq 0 ]]; then
   exit 0
 fi
 
-SYNCED_ANY=0
-for target in "${TARGETS[@]}"; do
-  if [[ ! -d "$(dirname "$target")" ]]; then
-    echo "⏭  Skipping $target (parent directory missing — this agent not installed?)"
-    continue
-  fi
-  mkdir -p "$target"
-  echo "→ Target: $target"
-  for skill in "${SKILL_LIST[@]}"; do
-    rsync -a --delete --exclude='.git' --exclude='.DS_Store' $DRY_RUN \
-      "$SKILLS_SRC/$skill/" \
-      "$target/$skill/"
-    echo "  ✓ $skill"
+if [[ -n "$DRY_RUN" ]]; then
+  echo "→ Hub: $SKILL_HUB"
+  for link in "${COMPAT_LINKS[@]}"; do
+    echo "→ Compatibility link: $link -> $SKILL_HUB"
   done
-  SYNCED_ANY=1
-  echo
-done
-
-if [[ $SYNCED_ANY -eq 0 ]]; then
-  echo "⚠️  No known AI agents detected on this machine (none of the target parent directories exist)."
-  echo "    Nothing was synced. Install Claude Code / Codex / Gemini Antigravity first."
-  exit 1
+else
+  mkdir -p "$SKILL_HUB"
+  for link in "${COMPAT_LINKS[@]}"; do
+    parent="$(dirname "$link")"
+    [[ -d "$parent" ]] || continue
+    if [[ -L "$link" ]]; then
+      current="$(readlink "$link")"
+      if [[ "$current" != "$SKILL_HUB" ]]; then
+        rm "$link"
+        ln -s "$SKILL_HUB" "$link"
+      fi
+    elif [[ -e "$link" ]]; then
+      backup="${link}.backup-$(date +%Y%m%d-%H%M%S)"
+      mv "$link" "$backup"
+      ln -s "$SKILL_HUB" "$link"
+      echo "  backup: $backup"
+    else
+      ln -s "$SKILL_HUB" "$link"
+    fi
+  done
 fi
+
+echo "→ Target: $SKILL_HUB"
+for skill in "${SKILL_LIST[@]}"; do
+  rsync -a --delete --exclude='.git' --exclude='.DS_Store' $DRY_RUN \
+    "$SKILLS_SRC/$skill/" \
+    "$SKILL_HUB/$skill/"
+  echo "  ✓ $skill"
+done
+echo
+
+for link in "${COMPAT_LINKS[@]}"; do
+  if [[ -L "$link" ]]; then
+    echo "  link: $link -> $(readlink "$link")"
+  elif [[ -e "$link" ]]; then
+    echo "  link: $link is not a symlink"
+  else
+    echo "  link: $link missing"
+  fi
+done
 
 echo "✅ Done. Restart Claude Code / Codex / Gemini Antigravity to pick up the new skill(s)."

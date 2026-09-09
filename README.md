@@ -49,11 +49,15 @@ cd ~/Code/Coriaxu-skills
 ./install.sh --list
 ```
 
-`install.sh` 会自动把 skill 同步到本机实际存在的这几处（不存在的目录会跳过）：
+`install.sh` 会自动把 skill 安装到中立总部：
 
-- `~/.claude/skills/`（Claude Code）
-- `~/.codex/skills/`（Codex）
-- `~/.gemini/antigravity/skills/`（Gemini Antigravity）
+- `~/.agent/skills/`
+
+Claude Code、Codex、Gemini Antigravity 通过软链接读取同一份 skill：
+
+- `~/.claude/skills -> ~/.agent/skills`
+- `~/.codex/skills -> ~/.agent/skills`
+- `~/.gemini/antigravity/skills -> ~/.agent/skills`
 
 ## 更新已有 skill
 
@@ -105,7 +109,12 @@ Coriaxu-skills/
 
 ## 协议
 
-本仓库整体采用 [MIT 协议](LICENSE)。第三方 skill 各自保留原始 LICENSE 文件（均为 MIT）。详见 [CREDITS.md](CREDITS.md)。
+本仓库自身的代码与文档采用 [MIT 协议](LICENSE)。第三方 skill 的协议并不统一，**不要默认它们都是 MIT**：
+
+- `dbs`、`dbs-content`、`dbs-diagnosis`、`dbskill-knowledge` 来自 dontbesilent 的 dbskill，采用 **CC BY-NC 4.0**，带商用限制。商业场景下使用或再分发前，先读这四个目录内的 LICENSE。
+- 其余第三方 skill 为 MIT 或按 MIT 处理，少数目录内没有 LICENSE 文件，协议以原作者仓库为准。
+
+逐个 skill 的作者、来源与协议见 [CREDITS.md](CREDITS.md)，以各自目录内的 LICENSE 为准。
 
 ## 致谢
 
