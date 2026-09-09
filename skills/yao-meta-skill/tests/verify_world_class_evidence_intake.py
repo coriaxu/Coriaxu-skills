@@ -563,8 +563,8 @@ def main() -> None:
     }, payload["templates"]
     assert all(item["status"] == "pass" and item["template_only"] is True for item in payload["templates"]), payload["templates"]
     human_template = json.loads((ROOT / "evidence" / "world_class" / "templates" / "human-adjudication.intake.json").read_text(encoding="utf-8"))
-    decision_ref = next(item for item in human_template["artifact_refs"] if item["path"] == "reports/output_review_decisions.json")
-    assert "required reason" in decision_ref["note"], human_template
+    decision_ref = next(item for item in human_template["artifact_refs"] if item["path"] == "reports/provider_reviewer_registry.json")
+    assert "packet hashes" in decision_ref["note"], human_template
     assert human_template["provenance"]["reviewed_at"] == "YYYY-MM-DD", human_template
     assert human_template["provenance"]["reviewer_reason_required"] is True, human_template
     assert "reason" in human_template["provenance"]["decision_fields"], human_template
@@ -583,20 +583,20 @@ def main() -> None:
     assert checklist["provider-holdout"]["submission_path"] == f"{empty_submissions_rel}/provider-holdout.json", checklist["provider-holdout"]
     assert checklist["provider-holdout"]["commands"]["prepare_submission"] == (
         "python3 scripts/yao.py world-class-submission-kit . "
-        f"--evidence-key provider-holdout --output-dir {empty_submissions_rel}"
+        f"--evidence-key provider-holdout --output-dir {empty_submissions_rel} --self"
     ), checklist["provider-holdout"]
-    assert checklist["provider-holdout"]["commands"]["validate_intake"] == f"python3 scripts/yao.py world-class-intake . --submissions-dir {empty_submissions_rel}", checklist["provider-holdout"]
-    assert checklist["provider-holdout"]["commands"]["submission_review"] == f"python3 scripts/yao.py world-class-submission-review . --submissions-dir {empty_submissions_rel}", checklist["provider-holdout"]
-    assert checklist["provider-holdout"]["commands"]["refresh_ledger"] == f"python3 scripts/yao.py world-class-ledger . --submissions-dir {empty_submissions_rel}", checklist["provider-holdout"]
+    assert checklist["provider-holdout"]["commands"]["validate_intake"] == f"python3 scripts/yao.py world-class-intake . --submissions-dir {empty_submissions_rel} --self", checklist["provider-holdout"]
+    assert checklist["provider-holdout"]["commands"]["submission_review"] == f"python3 scripts/yao.py world-class-submission-review . --submissions-dir {empty_submissions_rel} --self", checklist["provider-holdout"]
+    assert checklist["provider-holdout"]["commands"]["refresh_ledger"] == f"python3 scripts/yao.py world-class-ledger . --submissions-dir {empty_submissions_rel} --self", checklist["provider-holdout"]
     assert "provider-backed model run" in checklist["provider-holdout"]["must_collect"]["provenance_requirements"], checklist["provider-holdout"]
-    assert any("--provider-runner openai" in step for step in checklist["provider-holdout"]["must_collect"]["runbook"]), checklist["provider-holdout"]
-    assert any("--provider-runner deepseek" in step for step in checklist["provider-holdout"]["must_collect"]["runbook"]), checklist["provider-holdout"]
-    assert "reports/output_execution_runs.json summary.model_executed_count > 0" in checklist["provider-holdout"]["must_collect"]["success_checks"], checklist["provider-holdout"]
+    assert any("evidence-build . --run-id" in step for step in checklist["provider-holdout"]["must_collect"]["runbook"]), checklist["provider-holdout"]
+    assert not any("--provider-runner" in step for step in checklist["provider-holdout"]["must_collect"]["runbook"]), checklist["provider-holdout"]
+    assert "reports/provider_output_evaluation.json summary.model_executed_count == 40" in checklist["provider-holdout"]["must_collect"]["success_checks"], checklist["provider-holdout"]
     assert checklist["provider-holdout"]["anti_overclaim"]["local_command_runner_counts_as_provider_model"] is False, checklist["provider-holdout"]
     assert checklist["provider-holdout"]["source_accepted"] is True, checklist["provider-holdout"]
-    assert checklist["provider-holdout"]["observed_state"]["model_executed_count"] > 0, checklist["provider-holdout"]
-    assert checklist["provider-holdout"]["observed_state"]["timing_observed_count"] > 0, checklist["provider-holdout"]
-    assert checklist["provider-holdout"]["observed_state"]["token_observed_count"] > 0, checklist["provider-holdout"]
+    assert checklist["provider-holdout"]["observed_state"]["contract_version"] == "phase1", checklist["provider-holdout"]
+    assert checklist["provider-holdout"]["observed_state"]["model_executed_count"] == 40, checklist["provider-holdout"]
+    assert checklist["provider-holdout"]["observed_state"]["call_count"] == 40, checklist["provider-holdout"]
     markdown = default_md.read_text(encoding="utf-8")
     assert "World-Class Evidence Intake" in markdown, markdown
     assert "ready to claim world-class: `false`" in markdown, markdown
@@ -605,12 +605,12 @@ def main() -> None:
     assert "operator checklist: `0` ready / `4` total" in markdown, markdown
     assert "0 existing / 0 sha256 verified / 0 required verified / 1 refs" in markdown, markdown
     assert f"`{empty_submissions_rel}/provider-holdout.json`" in markdown, markdown
-    assert f"`python3 scripts/yao.py world-class-submission-kit . --evidence-key provider-holdout --output-dir {empty_submissions_rel}`" in markdown, markdown
-    assert f"`python3 scripts/yao.py world-class-submission-review . --submissions-dir {empty_submissions_rel}`" in markdown, markdown
-    assert f"`python3 scripts/yao.py world-class-ledger . --submissions-dir {empty_submissions_rel}`" in markdown, markdown
+    assert f"`python3 scripts/yao.py world-class-submission-kit . --evidence-key provider-holdout --output-dir {empty_submissions_rel} --self`" in markdown, markdown
+    assert f"`python3 scripts/yao.py world-class-submission-review . --submissions-dir {empty_submissions_rel} --self`" in markdown, markdown
+    assert f"`python3 scripts/yao.py world-class-ledger . --submissions-dir {empty_submissions_rel} --self`" in markdown, markdown
     assert "Source Runbook" in markdown, markdown
-    assert "--provider-runner openai" in markdown, markdown
-    assert "--provider-runner deepseek" in markdown, markdown
+    assert "evidence-build . --run-id" in markdown, markdown
+    assert "--provider-runner" not in markdown, markdown
     assert "<redacted>" not in markdown, markdown
     assert "OPENAI_API_KEY=<redacted>" not in markdown, markdown
     assert "Templates and planned work do not count as accepted evidence." in markdown, markdown
@@ -618,7 +618,10 @@ def main() -> None:
     assert "Real submissions must replace template submitter, date, and provenance placeholders with concrete evidence metadata." in markdown, markdown
     schema = json.loads((ROOT / "evidence" / "world_class" / "intake.schema.json").read_text(encoding="utf-8"))
     assert schema_contains_path_kind(schema, "reports/output_execution_runs.json", "aggregate-report"), schema
+    assert schema_contains_path_kind(schema, "reports/provider_output_evaluation.json", "aggregate-report"), schema
     assert schema_contains_path_kind(schema, "reports/output_review_decisions.json", "review-decisions"), schema
+    assert schema_contains_path_kind(schema, "reports/provider_output_adjudication.json", "adjudication-report"), schema
+    assert schema_contains_path_kind(schema, "reports/provider_reviewer_registry.json", "reviewer-registry"), schema
     assert schema_contains_path_kind(schema, "reports/runtime_permission_probes.json", "runtime-probe-report"), schema
     assert schema_contains_path_kind(schema, "reports/telemetry_hook_recipes.json", "hook-recipes"), schema
 
@@ -693,7 +696,7 @@ def main() -> None:
     assert unrelated_payload["summary"]["decision"] == "fix-intake", unrelated_payload["summary"]
     assert unrelated_payload["summary"]["invalid_submission_count"] == 1, unrelated_payload["summary"]
     unrelated_errors = unrelated_payload["submissions"][0]["errors"]
-    assert any("required evidence artifact reports/output_execution_runs.json" in error for error in unrelated_errors), unrelated_errors
+    assert any("complete evidence artifact group" in error for error in unrelated_errors), unrelated_errors
     assert unrelated_payload["submissions"][0]["artifact_integrity"]["artifact_sha256_verified_count"] == 1, unrelated_payload["submissions"]
     assert unrelated_payload["submissions"][0]["artifact_integrity"]["required_artifact_verified_count"] == 0, unrelated_payload["submissions"]
     print(json.dumps({"ok": True}, ensure_ascii=False, indent=2))

@@ -20,7 +20,15 @@ def load_yaml(path: Path) -> dict:
 
 
 def find_ir(root: Path) -> tuple[dict, str]:
-    return find_skill_ir(root, root.name, fallback_source="missing")
+    manifest_path = root / "manifest.json"
+    manifest = load_json(manifest_path) if manifest_path.exists() else {}
+    name = str(manifest.get("name") or "").strip()
+    if not name and (root / "SKILL.md").exists():
+        text = (root / "SKILL.md").read_text(encoding="utf-8", errors="replace")
+        if text.startswith("---") and len(text.split("---", 2)) == 3:
+            frontmatter = yaml.safe_load(text.split("---", 2)[1]) or {}
+            name = str(frontmatter.get("name") or "").strip()
+    return find_skill_ir(root, name or root.name, fallback_source="missing")
 
 
 def band_for(score: int) -> str:
@@ -124,7 +132,7 @@ def render_markdown(report: dict) -> str:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Render a portability score from neutral metadata, contracts, and snapshots.")
-    parser.add_argument("skill_dir", nargs="?", default=str(ROOT), help="Skill directory to inspect. Defaults to this repo root.")
+    parser.add_argument("skill_dir", help="Explicit Skill directory to inspect")
     parser.add_argument("--output-json", default="reports/portability_score.json")
     parser.add_argument("--output-md", default="reports/portability_score.md")
     args = parser.parse_args()

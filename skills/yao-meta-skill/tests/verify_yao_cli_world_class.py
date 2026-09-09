@@ -12,6 +12,8 @@ TMP = ROOT / "tests" / "tmp_yao_cli_world_class"
 
 
 def run(*args: str) -> dict:
+    if str(ROOT) in args and "--self" not in args:
+        args = (*args, "--self")
     env = dict(os.environ)
     env["YAO_CLI_TELEMETRY"] = "0"
     env.pop("YAO_CLI_TELEMETRY_EVENTS", None)
@@ -97,7 +99,7 @@ def main() -> None:
     empty_submissions_arg = str(empty_submissions.relative_to(ROOT))
     assert provider_checklist["commands"]["prepare_submission"] == (
         "python3 scripts/yao.py world-class-submission-kit . "
-        f"--evidence-key provider-holdout --output-dir {empty_submissions_arg}"
+        f"--evidence-key provider-holdout --output-dir {empty_submissions_arg} --self"
     ), provider_checklist
     assert world_class_ledger_result["payload"]["summary"]["ready_to_claim_world_class"] is False, world_class_ledger_result
 
@@ -118,9 +120,10 @@ def main() -> None:
     assert kit_payload["summary"]["decision"] == "submission-kit-ready", world_class_submission_kit_result
     assert kit_payload["summary"]["written_count"] == 1, world_class_submission_kit_result
     assert kit_payload["summary"]["drafts_count_as_evidence"] is False, world_class_submission_kit_result
-    assert kit_payload["summary"]["repair_checklist_count"] == 0, world_class_submission_kit_result
+    assert kit_payload["summary"]["repair_checklist_count"] >= 1, world_class_submission_kit_result
     assert kit_payload["summary"]["repair_counts_as_completion"] is False, world_class_submission_kit_result
-    assert kit_payload["repair_checklist"] == [], world_class_submission_kit_result
+    assert {item["phase"] for item in kit_payload["repair_checklist"]} >= {"attach-artifacts"}, world_class_submission_kit_result
+    assert all(item["counts_as_completion"] is False for item in kit_payload["repair_checklist"]), world_class_submission_kit_result
     assert kit_payload["artifacts"]["html"].endswith("tests/tmp_yao_cli_world_class/world_class_submission_kit.html"), world_class_submission_kit_result
     assert (TMP / "world_class_submission_kit" / "provider-holdout.json").exists(), world_class_submission_kit_result
     assert (TMP / "world_class_submission_kit" / "submission_manifest.json").exists(), world_class_submission_kit_result

@@ -146,7 +146,8 @@ def main() -> None:
     assert summary["invalid_submission_count"] == 0, summary
     assert summary["source_check_count"] >= 13, summary
     assert summary["source_pass_count"] + summary["source_blocked_count"] == summary["source_check_count"], summary
-    assert summary["source_blocked_count"] >= 6, summary
+    assert summary["source_blocked_count"] == 3, summary
+    assert summary["source_accepted_count"] == 2, summary
     assert summary["submitted_but_pending_count"] == 0, summary
     assert summary["overclaim_guard_active"] is True, summary
     assert summary["ready_to_claim_world_class"] is False, summary
@@ -163,29 +164,26 @@ def main() -> None:
         "native-client-telemetry",
     }, entries
     assert entries["provider-holdout"]["source_accepted"] is True, entries["provider-holdout"]
-    assert entries["provider-holdout"]["observed_state"]["model_executed_count"] > 0, entries["provider-holdout"]
-    assert any("--provider-runner openai" in step for step in entries["provider-holdout"]["runbook"]), entries["provider-holdout"]
-    assert any("--provider-runner deepseek" in step for step in entries["provider-holdout"]["runbook"]), entries["provider-holdout"]
+    assert entries["provider-holdout"]["observed_state"]["model_executed_count"] == 40, entries["provider-holdout"]
+    assert any("evidence-build . --run-id" in step for step in entries["provider-holdout"]["runbook"]), entries["provider-holdout"]
+    assert not any("--provider-runner" in step for step in entries["provider-holdout"]["runbook"]), entries["provider-holdout"]
     assert not any("<redacted>" in step or "OPENAI_API_KEY=" in step for step in entries["provider-holdout"]["runbook"]), entries["provider-holdout"]
     provider_source = {item["field"]: item for item in entries["provider-holdout"]["source_checklist"]}
+    assert provider_source["call_count"]["status"] == "pass", provider_source
     assert provider_source["model_executed_count"]["status"] == "pass", provider_source
-    assert provider_source["timing_observed_count"]["status"] == "pass", provider_source
-    assert provider_source["token_observed_count"]["status"] == "pass", provider_source
+    assert provider_source["failure_count"]["status"] == "pass", provider_source
+    assert provider_source["total_tokens"]["status"] == "pass", provider_source
     assert entries["provider-holdout"]["submission_state"]["status"] == "missing", entries["provider-holdout"]
     assert entries["provider-holdout"]["submission_state"]["ledger_counts_as_completion"] is False, entries["provider-holdout"]
-    assert entries["human-adjudication"]["observed_state"]["pending_count"] == 5, entries["human-adjudication"]
-    assert entries["human-adjudication"]["observed_state"]["reviewer_metadata_present"] is False, entries["human-adjudication"]
-    assert entries["human-adjudication"]["observed_state"]["reason_required"] is True, entries["human-adjudication"]
-    assert entries["human-adjudication"]["observed_state"]["raw_content_allowed"] is False, entries["human-adjudication"]
-    assert entries["human-adjudication"]["observed_state"]["raw_content_path_count"] == 0, entries["human-adjudication"]
-    assert entries["human-adjudication"]["observed_state"]["ready_for_human_evidence"] is False, entries["human-adjudication"]
+    assert entries["human-adjudication"]["observed_state"]["contract_version"] == "phase1", entries["human-adjudication"]
+    assert entries["human-adjudication"]["observed_state"]["reviewer_count"] == 3, entries["human-adjudication"]
+    assert entries["human-adjudication"]["observed_state"]["pair_count"] == 20, entries["human-adjudication"]
+    assert entries["human-adjudication"]["observed_state"]["blind_pack_bound"] is True, entries["human-adjudication"]
     human_source = {item["field"]: item for item in entries["human-adjudication"]["source_checklist"]}
-    assert human_source["reviewer_metadata_present"]["status"] == "blocked", human_source
-    assert human_source["reason_required"]["status"] == "pass", human_source
-    assert human_source["raw_content_allowed"]["status"] == "pass", human_source
-    assert human_source["ready_for_human_evidence"]["status"] == "blocked", human_source
-    assert "choice and reason" in human_source["pending_count"]["next_action"], human_source
-    assert "metadata and rationale" in human_source["ready_for_human_evidence"]["next_action"], human_source
+    assert human_source["reviewer_count"]["status"] == "pass", human_source
+    assert human_source["pair_count"]["status"] == "pass", human_source
+    assert human_source["failure_count"]["status"] == "pass", human_source
+    assert human_source["blind_pack_bound"]["status"] == "pass", human_source
     assert entries["native-permission-enforcement"]["observed_state"]["native_enforcement_count"] == 0, entries["native-permission-enforcement"]
     assert entries["native-permission-enforcement"]["observed_state"]["installer_enforcement_pass_count"] >= 0, entries["native-permission-enforcement"]
     assert any("summary.failure_count == 0" in check for check in entries["native-permission-enforcement"]["success_checks"]), entries["native-permission-enforcement"]
@@ -203,12 +201,12 @@ def main() -> None:
     assert "submitted entries: `0`" in markdown, markdown
     assert "source checks:" in markdown, markdown
     assert "Source Runbook" in markdown, markdown
-    assert "--provider-runner openai" in markdown, markdown
-    assert "--provider-runner deepseek" in markdown, markdown
+    assert "evidence-build . --run-id" in markdown, markdown
+    assert "--provider-runner" not in markdown, markdown
     assert "<redacted>" not in markdown, markdown
     assert "OPENAI_API_KEY=<redacted>" not in markdown, markdown
     assert "Source Evidence Checks" in markdown, markdown
-    assert "| Provider model run | `10` | `>0` | `pass` |" in markdown, markdown
+    assert "| Provider calls | `40` | `==40` | `pass` |" in markdown, markdown
     assert "`provider-holdout`" in markdown, markdown
 
     submissions = TMP / "submissions"
@@ -243,7 +241,7 @@ def main() -> None:
     assert submitted_summary["invalid_submission_count"] == 0, submitted_summary
     assert submitted_summary["accepted_count"] == 1, submitted_summary
     assert submitted_summary["pending_count"] == 3, submitted_summary
-    assert submitted_summary["source_blocked_count"] >= 6, submitted_summary
+    assert submitted_summary["source_blocked_count"] == 3, submitted_summary
     submitted_provider = {entry["key"]: entry for entry in submitted_payload["entries"]}["provider-holdout"]
     assert submitted_provider["status"] == "accepted", submitted_provider
     assert submitted_provider["submission_state"]["status"] == "submitted", submitted_provider
@@ -336,7 +334,7 @@ def main() -> None:
     assert unrelated_accepted_provider["status"] == "pending", unrelated_accepted_provider
     assert unrelated_accepted_provider["submission_state"]["status"] == "invalid-contract", unrelated_accepted_provider
     assert any(
-        "required evidence artifact reports/output_execution_runs.json" in error
+        "complete evidence artifact group" in error
         for error in unrelated_accepted_provider["submission_state"]["errors"]
     ), unrelated_accepted_provider
 

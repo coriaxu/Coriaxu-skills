@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
 import argparse
 import json
+import os
 import subprocess
+import sys
 from pathlib import Path
+
+sys.dont_write_bytecode = True
+os.environ["PYTHONDONTWRITEBYTECODE"] = "1"
 
 from yao_cli_config import (
     baseline_compare_args,
@@ -21,6 +26,8 @@ from yao_cli_create_commands import command_init, command_quickstart
 from yao_cli_distribution_commands import (
     command_compile_skill,
     command_conformance,
+    command_evidence_build,
+    command_evidence_finalize_review,
     command_install_simulate,
     command_package,
     command_package_verify,
@@ -73,7 +80,22 @@ from yao_cli_report_commands import (
     command_world_class_submission_kit,
     command_world_class_submission_review,
 )
-from yao_cli_runtime import ROOT, allow_report_status, run_adoption_drift_if_source_exists, run_script
+from yao_cli_runtime import (
+    ROOT,
+    allow_report_status,
+    run_adoption_drift_if_source_exists,
+    run_script,
+    set_script_execution_cwd,
+)
+from yao_cli_target_policy import (
+    TargetPolicyError,
+    configure_target_policies,
+    prepare_target_context,
+)
+from yao_cli_update_commands import command_check_update, command_self_update
+
+
+COMMAND_LINE_TOOLS_MAKE = Path("/Library/Developer/CommandLineTools/usr/bin/make")
 from yao_cli_telemetry import add_telemetry_args, maybe_record_cli_event
 
 
@@ -436,7 +458,7 @@ def command_workspace_flow(args: argparse.Namespace) -> int:
             {"phase": "report-refresh", "result": run_script("render_baseline_compare.py", baseline_compare_args())},
             {"phase": "report-refresh", "result": run_script("render_regression_history.py", [])},
             {"phase": "report-refresh", "result": run_script("render_context_reports.py", [])},
-            {"phase": "report-refresh", "result": run_script("render_portability_report.py", [])},
+            {"phase": "report-refresh", "result": run_script("render_portability_report.py", [str(ROOT)])},
             {"phase": "report-refresh", "result": run_script("python_compat_check.py", [str(ROOT)])},
             {"phase": "report-refresh", "result": run_script("render_architecture_maintainability.py", [str(ROOT)])},
             {"phase": "report-refresh", "result": run_script("compile_skill.py", [str(ROOT)])},
@@ -506,8 +528,9 @@ def command_workspace_flow(args: argparse.Namespace) -> int:
 
 
 def command_test(args: argparse.Namespace) -> int:
+    make_executable = str(COMMAND_LINE_TOOLS_MAKE) if COMMAND_LINE_TOOLS_MAKE.is_file() else "make"
     proc = subprocess.run(
-        ["make", args.target],
+        [make_executable, args.target],
         cwd=ROOT,
         capture_output=True,
         text=True,
@@ -523,37 +546,26 @@ def command_test(args: argparse.Namespace) -> int:
     return 0 if report["ok"] else 2
 
 
-def command_check_update(args: argparse.Namespace) -> int:
-    cmd = []
-    if args.force:
-        cmd.append("--force")
-    if args.no_cache:
-        cmd.append("--no-cache")
-    if args.version_url:
-        cmd.extend(["--version-url", args.version_url])
-    if args.manifest_url:
-        cmd.extend(["--manifest-url", args.manifest_url])
-    if args.timeout is not None:
-        cmd.extend(["--timeout", str(args.timeout)])
-    if args.allow_custom_update_url:
-        cmd.append("--allow-custom-update-url")
-    result = run_script("check_update.py", cmd)
-    print(json.dumps(result["payload"] if result["payload"] is not None else result, ensure_ascii=False, indent=2))
-    return 0 if result["ok"] else 2
-
-
 def build_parser() -> argparse.ArgumentParser:
     parser = build_cli_parser({name: value for name, value in globals().items() if name.startswith("command_")})
     add_telemetry_args(parser)
+    configure_target_policies(parser)
     return parser
 
 
 def main() -> None:
     parser = build_parser()
     args = parser.parse_args()
+    invocation_cwd = Path.cwd()
     returncode = 2
     try:
+        context = prepare_target_context(ROOT, args)
+        execution_cwd = context.target_root if context.policy in {"skill", "workspace", "self"} else invocation_cwd
+        set_script_execution_cwd(execution_cwd or invocation_cwd)
         returncode = args.func(args)
+    except TargetPolicyError as exc:
+        print(json.dumps(exc.payload, ensure_ascii=False, indent=2))
+        returncode = 2
     finally:
         maybe_record_cli_event(ROOT, args, returncode)
     raise SystemExit(returncode)

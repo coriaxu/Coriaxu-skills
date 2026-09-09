@@ -6,6 +6,8 @@ import json
 import re
 import subprocess
 import sys
+import traceback
+import types
 from pathlib import Path
 from urllib.parse import unquote
 
@@ -24,23 +26,27 @@ ANCHORS = (
     ("README.md", r"^\| SF \| (\d+) \|", "sf", 1),
     ("README.md", r"^\| SNF \| (\d+) \|", "snf", 1),
     ("README.md", r"^\| 场景样本 \| (\d+) \|", "rs", 1),
-    ("README.md", r"an (\d+)-case benchmark", "total", 1),
+    # 冠词随数字读音变（an 84-case / a 95-case），两种都要能匹配
+    ("README.md", r"\ban? (\d+)-case benchmark", "total", 1),
     ("evals/run-eval.md", r"^### 对 Should Fix（SF-01 到 SF-(\d+)）：$", "sf", 1),
     ("evals/run-eval.md", r"^### 对 Should NOT Fix（SNF-01 到 SNF-(\d+)）：$", "snf", 1),
     ("evals/run-eval.md", r"^- SF 通过率：X/(\d+)$", "sf", 1),
     ("evals/run-eval.md", r"^- SNF 误杀率：X/(\d+)$", "snf", 1),
     ("evals/run-eval.md", r"^注意：token .*一次跑完 (\d+) 条", "total", 1),
-    ("evals/real-samples.md", r"^> v1\.7\.2 新增.*v1\.8\.5 扩到 (\d+) 条。", "rs", 1),
+    # 贪婪匹配到最后一个「扩到 N 条。」，扩样本时只改正文不用改这条正则
+    ("evals/real-samples.md", r"^> v1\.7\.2 新增.*扩到 (\d+) 条。", "rs", 1),
     ("evals/real-samples.md", r"^\| 数量 \| (\d+) 条，持续扩充 \|", "total", 1),
     ("evals/real-samples.md", r"^\| 数量 \| \d+ 条，持续扩充 \| (\d+) 条，质量优先 \|", "rs", 1),
     ("evals/real-samples.md", r"^> 现在覆盖 .*?(\d+) 条 benchmark。", "total", 1),
-    ("evals/real-samples.md", r"^### RS-(19)\b", "rs", 1),
+    ("evals/real-samples.md", r"^### RS-(20)\b", "rs", 1),
     ("evals/benchmark-blind.md", r"^> 共 (\d+) 条。", "total", 1),
     ("evals/benchmark-map.md", r"^> 共 (\d+) 条 = \d+ SF \+ \d+ SNF。$", "total", 1),
     ("evals/benchmark-map.md", r"^> 共 \d+ 条 = (\d+) SF \+ \d+ SNF。$", "sf", 1),
     ("evals/benchmark-map.md", r"^> 共 \d+ 条 = \d+ SF \+ (\d+) SNF。$", "snf", 1),
-    ("automation/eval/README.md", r"^\| `B65-(\d+)` \| B-65 到 B-\1 \|$", "total", 1),
+    ("automation/eval/README.md", r"^\| `B97-(\d+)` \| B-97 到 B-\1 \|$", "total", 1),
 )
+
+CN_NUM = {"一": 1, "二": 2, "三": 3, "四": 4, "五": 5, "六": 6, "七": 7, "八": 8, "九": 9, "十": 10}
 
 LINK_RE = re.compile(r"!?\[[^\]\n]*\]\(\s*(<[^>\n]+>|[^)\s]+)")
 HTML_LINK_RE = re.compile(r'(?:href|src)="([^"]+)"')
@@ -223,14 +229,258 @@ def check_meta(issues):
                 if not value:
                     add_issue(issues, "SKILL.md", number, "meta", f"frontmatter 的 {key} 不能为空")
 
+    payloads = {}
     for relative in (".claude-plugin/plugin.json", ".claude-plugin/marketplace.json"):
         text = read_text(relative, issues, "meta")
         if text is None:
             continue
         try:
-            json.loads(text)
+            payloads[relative] = json.loads(text)
         except json.JSONDecodeError as exc:
             add_issue(issues, relative, exc.lineno, "meta", f"JSON 无法解析：{exc.msg}")
+
+    plugin = payloads.get(".claude-plugin/plugin.json")
+    marketplace = payloads.get(".claude-plugin/marketplace.json")
+    if ".claude-plugin/plugin.json" in payloads and not isinstance(plugin, dict):
+        add_issue(issues, ".claude-plugin/plugin.json", 1, "meta", "顶层 JSON 必须是 object")
+    if ".claude-plugin/marketplace.json" in payloads and not isinstance(marketplace, dict):
+        add_issue(issues, ".claude-plugin/marketplace.json", 1, "meta", "顶层 JSON 必须是 object")
+    if not isinstance(plugin, dict) or not isinstance(marketplace, dict):
+        return
+    plugin_name = plugin.get("name")
+    plugin_version = plugin.get("version")
+    if not isinstance(plugin_name, str) or not plugin_name:
+        add_issue(issues, ".claude-plugin/plugin.json", 1, "meta", "name 必须是非空字符串")
+        return
+    metadata = marketplace.get("metadata")
+    if not isinstance(metadata, dict):
+        add_issue(issues, ".claude-plugin/marketplace.json", 1, "meta", "metadata 必须是 object")
+        return
+    marketplace_version = metadata.get("version")
+    entries = marketplace.get("plugins")
+    if not isinstance(entries, list):
+        add_issue(issues, ".claude-plugin/marketplace.json", 1, "meta", "plugins 必须是数组")
+        return
+    matches = [entry for entry in entries if isinstance(entry, dict) and entry.get("name") == plugin_name]
+    if len(matches) != 1:
+        add_issue(
+            issues,
+            ".claude-plugin/marketplace.json",
+            1,
+            "meta",
+            f"应有且只有一个 name={plugin_name!r} 的 plugin 条目，实际 {len(matches)} 个",
+        )
+        return
+    entry_version = matches[0].get("version")
+    if not isinstance(plugin_version, str) or not plugin_version:
+        add_issue(issues, ".claude-plugin/plugin.json", 1, "meta", "version 必须是非空字符串")
+    elif marketplace_version != plugin_version or entry_version != plugin_version:
+        add_issue(
+            issues,
+            ".claude-plugin/marketplace.json",
+            1,
+            "meta",
+            "版本不一致："
+            f"plugin.json={plugin_version!r}, metadata={marketplace_version!r}, plugin entry={entry_version!r}",
+        )
+
+
+def normalized_corpus_body(text):
+    text = text.replace("\r\n", "\n").replace("\r", "\n")
+    return "\n".join(line.rstrip() for line in text.splitlines()).strip()
+
+
+def human_benchmark_duplicates(records, cases, strip_blockquote):
+    """返回 HUMAN 正文与 SF/SNF benchmark 正文的精确重复关系。"""
+    benchmark = {}
+    for cid, _, body in cases:
+        if cid.startswith(("SF-", "SNF-")):
+            benchmark.setdefault(normalized_corpus_body(strip_blockquote(body)), []).append(cid)
+    return [
+        (record, benchmark[normalized_corpus_body(record["text"])])
+        for record in records
+        if normalized_corpus_body(record["text"]) in benchmark
+    ]
+
+
+def check_human_corpus(issues):
+    """校验 v2.3.1 必需的 HUMAN 语料、发布 cohort 与 benchmark 隔离。"""
+    relative = "evals/human-corpus.jsonl"
+    manifest = ROOT / relative
+    if not manifest.exists():
+        add_issue(issues, relative, "-", "human-corpus", "v2.3.1 发布要求 8–12 篇逐篇核验公开许可的 HUMAN 正文，manifest 缺失")
+        return 0
+
+    module = load_hard_metrics(issues)
+    if module is None:
+        return 0
+    try:
+        records = module.load_human_corpus(ROOT, manifest)
+        active = module.validate_human_cohort(records)
+    except module.HumanCorpusError as exc:
+        add_issue(issues, relative, "-", "human-corpus", str(exc))
+        return 0
+
+    try:
+        module.validate_human_representativeness(records)
+    except module.HumanCorpusError as exc:
+        add_issue(issues, relative, "-", "human-representativeness", str(exc))
+
+    for target in ("evals/benchmark.md", "evals/benchmark-blind.md", "evals/benchmark-map.md"):
+        text = read_text(target, issues, "human-corpus")
+        if text is None:
+            continue
+        match = re.search(r"\bHUMAN-\d+\b", text)
+        if match:
+            add_issue(
+                issues,
+                target,
+                line_number(text, match.start()),
+                "human-corpus",
+                "HUMAN 只作 residual 对照，不得进入 benchmark/blind/map",
+            )
+
+    try:
+        cases = module.parse_cases(ROOT)
+    except SystemExit:
+        add_issue(issues, relative, "-", "human-corpus", "无法解析 benchmark 正文，不能验证 HUMAN 隔离")
+        return 0
+    for record, case_ids in human_benchmark_duplicates(active, cases, module.strip_blockquote):
+        add_issue(
+            issues,
+            relative,
+            record["manifest_line"],
+            "human-corpus",
+            f"{record['id']} 正文与 benchmark {', '.join(case_ids)} 完全重复；HUMAN 不得进入 rewrite/judge 分母",
+        )
+    return len(active)
+
+
+# hard_metrics.py 里的词表是判据的脚本实现，references/structures.md 的正文是同一
+# 判据的规则真源。两边各自维护，改一边忘另一边就会静默漂移——v2.3.0 新增的借喻场
+# 和名词化空动词都是硬编码在脚本里的枚举，属于高风险项。
+# 分级对待：正文明说是完整枚举的（借喻「常见 N 套」、名词化空动词）双向核对；正文
+# 按「清单是举例不是边界」写的（连词），只查正文列到的词脚本里有，不反向要求穷举。
+def load_hard_metrics(issues):
+    """直接编译源码取词表，不走 importlib 的字节码缓存。
+
+    pyc 的失效判定依赖解释器版本与构建配置：timestamp-based 只看「秒级 mtime +
+    文件大小」，同秒内的等长修改会被判成没变；hash-based 才看内容。本机 3.14 实测
+    改内容即失效，但这是个防漂移的检查，不该把正确性押在 CI 那边的缓存策略上。
+    """
+    relative = "automation/eval/hard_metrics.py"
+    path = ROOT / relative
+    try:
+        source = path.read_text(encoding="utf-8")
+    except (OSError, UnicodeError) as exc:
+        add_issue(issues, relative, "-", "rule-tables", f"无法读取：{exc}")
+        return None
+    module = types.ModuleType("hard_metrics")
+    module.__file__ = str(path)
+    try:
+        exec(compile(source, str(path), "exec"), module.__dict__)
+    except Exception:  # noqa: BLE001 — 加载期任何异常都应报成检查失败
+        # 只留最后几行：定位到出错的文件、行号和异常类型，不刷屏
+        detail = " | ".join(traceback.format_exc().strip().splitlines()[-3:])
+        add_issue(issues, relative, "-", "rule-tables", f"加载失败：{detail}")
+        return None
+    return module
+
+
+def rule_section(text, number):
+    return re.search(rf"^## {number}\. .*?(?=^## |\Z)", text, re.S | re.M)
+
+
+def code_span_terms(line):
+    terms = []
+    for span in re.findall(r"`([^`]+)`", line):
+        terms += [term.strip() for term in span.split("/") if term.strip()]
+    return terms
+
+
+def check_rule_tables(issues):
+    module = load_hard_metrics(issues)
+    text = read_text("references/structures.md", issues, "rule-tables")
+    if module is None or text is None:
+        return 0
+
+    relative = "references/structures.md"
+    checked = 0
+
+    # 第 25 条借喻场：正文「常见 N 套：A、B、……」与 METAPHOR_FIELDS 双向一致，
+    # 且声明的数量词要和实际列出的套数对得上（加场时忘改数字也算漂移）。
+    section = rule_section(text, 25)
+    match = re.search(r"常见([一二三四五六七八九十]+)套：([^。]+)。", section.group()) if section else None
+    if match is None:
+        add_issue(issues, relative, "-", "rule-tables", "第 25 条找不到「常见 N 套：……」枚举，无法与 METAPHOR_FIELDS 对照")
+    else:
+        line = line_number(text, section.start() + match.start())
+        doc_fields = [item.strip() for item in match.group(2).split("、") if item.strip()]
+        code_fields = list(module.METAPHOR_FIELDS)
+        if CN_NUM.get(match.group(1)) != len(doc_fields):
+            add_issue(issues, relative, line, "rule-tables", f"第 25 条声称「{match.group(1)}套」，实际列了 {len(doc_fields)} 套")
+        if set(doc_fields) != set(code_fields):
+            add_issue(
+                issues,
+                relative,
+                line,
+                "rule-tables",
+                f"第 25 条与 hard_metrics.METAPHOR_FIELDS 不一致："
+                f"仅正文有 {sorted(set(doc_fields) - set(code_fields)) or '无'}，"
+                f"仅脚本有 {sorted(set(code_fields) - set(doc_fields)) or '无'}",
+            )
+        checked += 1
+
+    # 第 21 条名词化：正文列的空动词与 NOMINALIZATION_PATTERNS 的起手动词双向一致。
+    # 范围只到起手动词，不含后面的动名词宾语（`优化 / 分析 / 梳理` 那批）：正文把宾语写在
+    # 「检测」节且按举例列，脚本侧是穷举，两边口径本就不同，强行对账只会误报。
+    section = rule_section(text, 21)
+    match = re.search(r"\*\*模式\*\*：(.+)", section.group()) if section else None
+    if match is None:
+        add_issue(issues, relative, "-", "rule-tables", "第 21 条找不到「**模式**：」行，无法与 NOMINALIZATION_PATTERNS 对照")
+    else:
+        line = line_number(text, section.start() + match.start())
+        doc_verbs = set(code_span_terms(match.group(1)))
+        code_verbs = set()
+        for pattern in module.NOMINALIZATION_PATTERNS:
+            head = re.match(r"[一-鿿]+", pattern.pattern)
+            if not head:
+                continue
+            verb = head.group()
+            # `实现了?` / `完成了?对` 里的「了」是可选量词标记，不属于空动词本身
+            if verb.endswith("了") and pattern.pattern[head.end() : head.end() + 1] == "?":
+                verb = verb[:-1]
+            code_verbs.add(verb)
+        if doc_verbs != code_verbs:
+            add_issue(
+                issues,
+                relative,
+                line,
+                "rule-tables",
+                f"第 21 条与 hard_metrics.NOMINALIZATION_PATTERNS 的空动词不一致："
+                f"仅正文有 {sorted(doc_verbs - code_verbs) or '无'}，"
+                f"仅脚本有 {sorted(code_verbs - doc_verbs) or '无'}",
+            )
+        checked += 1
+
+    # 第 23 条连词：正文是举例，只单向要求它列到的词脚本里都有。
+    section = rule_section(text, 23)
+    match = re.search(r"\*\*模式\*\*：(.+)", section.group()) if section else None
+    if match is None:
+        add_issue(issues, relative, "-", "rule-tables", "第 23 条找不到「**模式**：」行，无法与 CONJUNCTIONS_ZH 对照")
+    else:
+        missing = [term for term in code_span_terms(match.group(1)) if term not in module.CONJUNCTIONS_ZH]
+        if missing:
+            add_issue(
+                issues,
+                relative,
+                line_number(text, section.start() + match.start()),
+                "rule-tables",
+                f"第 23 条正文列的连词不在 hard_metrics.CONJUNCTIONS_ZH 里：{missing}",
+            )
+        checked += 1
+
+    return checked
 
 
 def main():
@@ -241,13 +491,16 @@ def main():
     links = check_links(files, issues)
     check_case_ids(files, case_matches, rs_matches, issues)
     check_meta(issues)
+    human = check_human_corpus(issues)
+    tables = check_rule_tables(issues)
 
     if issues:
         print("\n".join(issues))
         print(f"check_repo: FAIL（{len(issues)} 个问题）")
         return 1
     total = sf + snf
-    print(f"check_repo: OK（{total} 用例 / {len(rs_matches)} 样本 / {anchors} 锚点 / {links} 链接）")
+    human_text = f" / HUMAN {human} 篇" if human else ""
+    print(f"check_repo: OK（{total} 用例 / {len(rs_matches)} 样本{human_text} / {anchors} 锚点 / {links} 链接 / {tables} 词表）")
     return 0
 
 

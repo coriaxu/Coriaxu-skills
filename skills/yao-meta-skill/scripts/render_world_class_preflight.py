@@ -30,7 +30,7 @@ PREFLIGHT_SPECS: dict[str, list[dict[str, Any]]] = {
             "key": "output-cases",
             "label": "Output eval cases",
             "kind": "file",
-            "path": "evals/output/cases.jsonl",
+            "path": "evals/output/holdout_cases.zh-CN.jsonl",
             "required": True,
             "next_action": "Keep output holdout cases available before provider execution.",
         },
@@ -45,20 +45,11 @@ PREFLIGHT_SPECS: dict[str, list[dict[str, Any]]] = {
         {
             "key": "provider-api-key",
             "label": "Provider credential",
-            "kind": "env_any",
-            "names": ["OPENAI_API_KEY", "DEEPSEEK_API_KEY"],
+            "kind": "env",
+            "name": "DEEPSEEK_API_KEY",
             "required": True,
             "secret": True,
-            "next_action": "Set one provider API key in the operator shell, such as OPENAI_API_KEY or DEEPSEEK_API_KEY; never commit or print the value.",
-        },
-        {
-            "key": "provider-model",
-            "label": "Provider model",
-            "kind": "env",
-            "name": "YAO_OUTPUT_EVAL_MODEL",
-            "required": False,
-            "default": "provider-specific model, or pass --provider-model",
-            "next_action": "Optionally set YAO_OUTPUT_EVAL_MODEL, or pass --provider-model for the selected provider.",
+            "next_action": "Set DEEPSEEK_API_KEY in the operator shell; never commit or print the value.",
         },
     ],
     "human-adjudication": [
@@ -66,32 +57,32 @@ PREFLIGHT_SPECS: dict[str, list[dict[str, Any]]] = {
             "key": "review-kit",
             "label": "Blind review kit",
             "kind": "file",
-            "path": "reports/output_review_kit.html",
+            "path": "scripts/finalize_provider_review.py",
             "required": True,
-            "next_action": "Open the blind review kit and record real reviewer choices with required rationale.",
+            "next_action": "Use the provider run's role-neutral pack and finalizer for three controlled reviews.",
         },
         {
             "key": "decision-template",
             "label": "Decision template",
             "kind": "file",
-            "path": "reports/output_review_decisions.json",
+            "path": "scripts/adjudicate_multi_reviewer.py",
             "required": True,
-            "next_action": "Import real A/B decisions with reviewer, reviewed_at, winner_variant, confidence, reason, and truthful blind-review attestation via `python3 scripts/yao.py output-review-import --input <reviewer-decisions.json> --blind-review-attested --run-adjudication`.",
+            "next_action": "Collect three exact 20-pair reviewer packets with integrity and independent-review attestations.",
         },
         {
             "key": "decision-importer",
             "label": "Decision importer",
             "kind": "file",
-            "path": "scripts/import_output_review_decisions.py",
+            "path": "evals/output/provider_matrix.json",
             "required": True,
-            "next_action": "Use the importer to reject raw content fields and normalize reviewer decisions before adjudication.",
+            "next_action": "Keep the fixed reviewer count and promotion thresholds unchanged.",
         },
         {
             "key": "human-reviewer",
             "label": "Human reviewer",
             "kind": "human",
             "required": True,
-            "next_action": "Assign a real reviewer identity before claiming human adjudication.",
+            "next_action": "Assign three independent controlled reviewer identities before claiming human adjudication.",
         },
     ],
     "native-permission-enforcement": [
@@ -160,14 +151,14 @@ def build_submission_commands(skill_dir: Path, submissions_dir: Path, evidence_k
     prepare = f"python3 scripts/yao.py world-class-submission-kit . --output-dir {output_dir}"
     if evidence_key:
         prepare = f"python3 scripts/yao.py world-class-submission-kit . --evidence-key {evidence_key} --output-dir {output_dir}"
-    prefilled_prepare = f"{prepare} --prefill-artifacts"
+    prefilled_prepare = f"{prepare} --prefill-artifacts --self"
     return {
-        "prepare_submission": prepare,
+        "prepare_submission": f"{prepare} --self",
         "prepare_prefilled_submission": prefilled_prepare,
-        "validate_intake": f"python3 scripts/yao.py world-class-intake . --submissions-dir {output_dir}",
-        "submission_review": f"python3 scripts/yao.py world-class-submission-review . --submissions-dir {output_dir}",
-        "refresh_ledger": f"python3 scripts/yao.py world-class-ledger . --submissions-dir {output_dir}",
-        "guard_claim": "python3 scripts/yao.py world-class-claim-guard .",
+        "validate_intake": f"python3 scripts/yao.py world-class-intake . --submissions-dir {output_dir} --self",
+        "submission_review": f"python3 scripts/yao.py world-class-submission-review . --submissions-dir {output_dir} --self",
+        "refresh_ledger": f"python3 scripts/yao.py world-class-ledger . --submissions-dir {output_dir} --self",
+        "guard_claim": "python3 scripts/yao.py world-class-claim-guard . --self",
     }
 
 
@@ -438,7 +429,7 @@ def build_preflight(skill_dir: Path, generated_at: str, submissions_dir: Path | 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Render collection preflight checks for pending world-class evidence.")
-    parser.add_argument("skill_dir", nargs="?", default=".")
+    parser.add_argument("skill_dir")
     parser.add_argument("--submissions-dir")
     parser.add_argument("--output-json", default="reports/world_class_evidence_preflight.json")
     parser.add_argument("--output-md", default="reports/world_class_evidence_preflight.md")

@@ -1,15 +1,15 @@
 # World-Class Evidence Ledger
 
-Generated at: `2026-07-16`
+Generated at: `2026-08-17`
 
 ## Summary
 
 - decision: `evidence-pending`
 - ready to claim world-class: `false`
 - entries: `4`
-- source accepted: `1`
-- source checks: `12` pass / `19` total
-- source blocked: `7`
+- source accepted: `2`
+- source checks: `11` pass / `14` total
+- source blocked: `3`
 - accepted: `0`
 - pending: `4`
 - human pending: `1`
@@ -17,7 +17,7 @@ Generated at: `2026-07-16`
 - submitted entries: `0`
 - reviewer approved submissions: `0`
 - submitted but pending: `0`
-- source accepted without valid submission: `1`
+- source accepted without valid submission: `2`
 - invalid submissions: `0`
 - overclaim guard active: `true`
 
@@ -27,17 +27,17 @@ This ledger records the current evidence state. It requires both passing source 
 
 | Evidence | Status | Submission | Category | Current | Next action |
 | --- | --- | --- | --- | --- | --- |
-| `provider-holdout` | `pending` | `missing` | `external` | model-executed 10; token-observed 10 | Run provider-backed holdout cases with real credentials and commit only aggregate evidence. |
-| `human-adjudication` | `pending` | `missing` | `human` | 0/5 decisions; pending 5 | Record real A/B choices, reviewer metadata, and blind-review attestation, then regenerate adjudication. |
+| `provider-holdout` | `pending` | `missing` | `external` | phase1 model-executed 40/40; calls 40/40; status completed | Run evidence-build with DEEPSEEK_API_KEY and keep raw outputs in the isolated run directory. |
+| `human-adjudication` | `pending` | `missing` | `human` | phase1 reviewers 3/3; pairs 20/20; promotion eligible | Collect three controlled reviewer packets and adjudicate them against the private run answer key. |
 | `native-permission-enforcement` | `pending` | `missing` | `external` | native-enforced targets 0; installer-enforced targets 4 | Integrate a real target-client or external installer runtime guard before claiming native permission enforcement. |
-| `native-client-telemetry` | `pending` | `missing` | `external` | external source events 0; adoption samples 1 | Install a real client against the native host and import production metadata-only events. |
+| `native-client-telemetry` | `pending` | `missing` | `external` | external source events 0; adoption samples 0 | Install a real client against the native host and import production metadata-only events. |
 
 ## Provider Holdout
 
-- objective: Collect at least one provider-backed output-eval holdout run with model, timing, and token metadata.
+- objective: Complete the fixed 10-case DeepSeek Flash+Pro matrix with 40 real calls and governed budget evidence.
 - source status: `pass`
-- observed state: `{"model_executed_count": 10, "timing_observed_count": 10, "token_observed_count": 10, "accepted": true}`
-- source checks: `3` pass / `3` total
+- observed state: `{"contract_version": "phase1", "call_count": 40, "model_executed_count": 40, "failure_count": 0, "total_tokens": 40938, "accepted": true}`
+- source checks: `4` pass / `4` total
 - submission state: `{"status": "missing", "path": "evidence/world_class/submissions/provider-holdout.json", "artifact_ref_count": 0, "attested_real_evidence": false, "privacy_contract_satisfied": false, "ledger_reviewer_approved": false, "ledger_reviewer": "", "ledger_reviewed_at": "", "ledger_counts_as_completion": false}`
 
 ### Provenance Requirements
@@ -48,26 +48,28 @@ This ledger records the current evidence state. It requires both passing source 
 
 ### Source Runbook
 
-- Set one provider API key in the operator shell, such as OPENAI_API_KEY or DEEPSEEK_API_KEY; never commit or print the value.
-- For OpenAI Responses: python3 scripts/yao.py output-exec --provider-runner openai --provider-model ${YAO_OUTPUT_EVAL_MODEL:-gpt-4.1-mini} --timeout-seconds 60
-- For DeepSeek Chat Completions: python3 scripts/yao.py output-exec --provider-runner deepseek --provider-model deepseek-v4-flash --provider-api-format chat-completions --provider-thinking disabled --api-key-env DEEPSEEK_API_KEY --timeout-seconds 120
-- `python3 scripts/yao.py skill-os2-audit . --generated-at <YYYY-MM-DD>`
+- Set DEEPSEEK_API_KEY in the operator shell; never commit or print the value.
+- `python3 scripts/yao.py evidence-build . --run-id <PROVIDER_RUN_ID> --self`
+- Keep the generated private answer key and role-neutral review materials inside .yao/runs/<PROVIDER_RUN_ID>.
+- `python3 scripts/yao.py skill-os2-audit . --generated-at <YYYY-MM-DD> --self`
 - Copy evidence/world_class/templates/provider-holdout.intake.json to evidence/world_class/submissions/provider-holdout.json and fill only real evidence fields.
-- `python3 scripts/yao.py world-class-intake . --submissions-dir evidence/world_class/submissions`
+- `python3 scripts/yao.py world-class-intake . --submissions-dir evidence/world_class/submissions --self`
 
 ### Source Evidence Checks
 
 | Check | Current | Expected | Status |
 | --- | --- | --- | --- |
-| Provider model run | `10` | `>0` | `pass` |
-| Timing observed | `10` | `>0` | `pass` |
-| Token usage observed | `10` | `>0` | `pass` |
+| Provider calls | `40` | `==40` | `pass` |
+| Provider model runs | `40` | `==40` | `pass` |
+| Provider failures | `0` | `==0` | `pass` |
+| Token budget | `40938` | `<=250000` | `pass` |
 
 ### Completion Assertions
 
-- reports/output_execution_runs.json summary.model_executed_count > 0
-- reports/output_execution_runs.json summary.timing_observed_count > 0
-- reports/output_execution_runs.json summary.token_observed_count > 0
+- reports/provider_output_evaluation.json summary.call_count == 40
+- reports/provider_output_evaluation.json summary.model_executed_count == 40
+- reports/provider_output_evaluation.json summary.failure_count == 0
+- reports/provider_output_evaluation.json summary.total_tokens <= 250000
 - reports/skill_os2_audit.json item provider-holdout status becomes pass
 
 ### Privacy Contract
@@ -77,10 +79,10 @@ This ledger records the current evidence state. It requires both passing source 
 
 ## Human Adjudication
 
-- objective: Record real blind A/B reviewer decisions before claiming human output review completion.
-- source status: `human_required`
-- observed state: `{"pair_count": 5, "judgment_count": 0, "pending_count": 5, "invalid_decision_count": 0, "answer_revealed_count": 0, "reviewer_metadata_present": false, "reason_required": true, "blind_review_attested": false, "raw_content_excluded_attested": true, "reviewer_reason_required_attested": true, "ready_for_human_evidence": false, "raw_content_allowed": false, "raw_content_path_count": 0, "accepted": false}`
-- source checks: `5` pass / `10` total
+- objective: Collect three controlled, independent reviews of the same 20-pair provider blind pack.
+- source status: `pass`
+- observed state: `{"contract_version": "phase1", "reviewer_count": 3, "pair_count": 20, "failure_count": 0, "blind_pack_bound": true, "accepted": true}`
+- source checks: `4` pass / `4` total
 - submission state: `{"status": "missing", "path": "evidence/world_class/submissions/human-adjudication.json", "artifact_ref_count": 0, "attested_real_evidence": false, "privacy_contract_satisfied": false, "ledger_reviewer_approved": false, "ledger_reviewer": "", "ledger_reviewed_at": "", "ledger_counts_as_completion": false}`
 
 ### Provenance Requirements
@@ -91,51 +93,36 @@ This ledger records the current evidence state. It requires both passing source 
 
 ### Source Runbook
 
-- `python3 scripts/yao.py output-review-kit --write-template`
-- Open reports/output_review_kit.md and choose A or B for each pair without opening the answer key.
-- `python3 scripts/adjudicate_output_review.py --write-template`
-- Record reviewer choices in a separate JSON, JSONL, or CSV decision source with reviewer, reviewed_at, case_id, winner_variant, confidence, required reason, and truthful reviewer_attestation only.
-- `python3 scripts/yao.py output-review-import --input <reviewer-decisions.json> --blind-review-attested --run-adjudication`
-- `python3 scripts/yao.py output-review`
-- `python3 scripts/yao.py skill-os2-audit . --generated-at <YYYY-MM-DD>`
+- Give each registered reviewer an independent copy of the matching provider_review_reviewer-*.json template and the role-neutral blind pack.
+- Collect all 20 A/B choices, reasons, controlled submission ids, timestamps, and truthful independent-review attestations.
+- Export an access-controlled reviewer registry that binds each reviewer id to the exact packet SHA256.
+- `python3 scripts/yao.py evidence-finalize-review . --source-run <PROVIDER_RUN_ID> --decisions <reviewer-a.json> --decisions <reviewer-b.json> --decisions <reviewer-c.json> --reviewer-registry <registry.json> --run-id <FINAL_RUN_ID> --self`
+- `python3 scripts/yao.py skill-os2-audit . --generated-at <YYYY-MM-DD> --self`
 - Copy evidence/world_class/templates/human-adjudication.intake.json to evidence/world_class/submissions/human-adjudication.json and fill only real evidence fields.
-- `python3 scripts/yao.py world-class-intake . --submissions-dir evidence/world_class/submissions`
+- `python3 scripts/yao.py world-class-intake . --submissions-dir evidence/world_class/submissions --self`
 
 ### Source Evidence Checks
 
 | Check | Current | Expected | Status |
 | --- | --- | --- | --- |
-| Review pairs exist | `5` | `>0` | `pass` |
-| No pending decisions | `5` | `==0` | `blocked` |
-| Judgments complete | `0` | `==pair_count` | `blocked` |
-| No invalid decisions | `0` | `==0` | `pass` |
-| Reviewer metadata | `False` | `true` | `blocked` |
-| Reason required | `True` | `true` | `pass` |
-| Blind review attested | `False` | `true` | `blocked` |
-| Raw content attested | `True` | `true` | `pass` |
-| Raw content blocked | `False` | `false` | `pass` |
-| Human evidence ready | `False` | `true` | `blocked` |
+| Registered reviewers | `3` | `==3` | `pass` |
+| Blind pairs | `20` | `==20` | `pass` |
+| Review failures | `0` | `==0` | `pass` |
+| Blind pack binding | `True` | `true` | `pass` |
 
 ### Completion Assertions
 
-- reports/output_review_adjudication.json summary.pending_count == 0
-- reports/output_review_adjudication.json summary.judgment_count == summary.pair_count
-- reports/output_review_adjudication.json summary.invalid_decision_count == 0
-- reports/output_review_adjudication.json summary.reviewer_metadata_present is true
-- reports/output_review_adjudication.json summary.blind_review_attested is true
-- reports/output_review_adjudication.json review_integrity.blind_pack_sha256 exists and matches reports/output_review_decisions.json
-- reports/output_review_adjudication.json pairs and reviewer_checklist store prompt_sha256, not raw prompt text
-- reports/output_review_adjudication.json summary.ready_for_human_evidence is true
+- reports/provider_output_adjudication.json summary.reviewer_count == 3
+- reports/provider_output_adjudication.json summary.pair_count == 20
+- reports/provider_output_adjudication.json summary.failure_count == 0
+- reports/provider_output_adjudication.json evidence_binding.blind_pack_sha256 matches the source run
 - reports/skill_os2_audit.json item human-adjudication status becomes pass
 
 ### Privacy Contract
 
-- Reviewer decisions should not include raw user data or private customer detail.
-- Reviewer reasons must be rubric-based and must not include raw user data or private customer detail.
-- The decision importer rejects raw prompt, output, transcript, message, and answer-key fields.
-- The adjudication evidence stores prompt_sha256 instead of raw prompt text.
-- The decision and adjudication artifacts preserve blind_pack_sha256 so reviewers can audit exactly which pack was judged.
-- Keep the answer key separate until after decisions are recorded.
+- Reviewer packets contain choices, reasons, hashes, and controlled submission metadata without raw prompts or answer-key roles.
+- The private answer key remains under .yao/runs and is opened by the finalizer after all controlled packets are fixed.
+- The adjudication and lineage artifacts preserve blind_pack_sha256 and answer_key_sha256 commitments.
 
 ## Native Permission Enforcement
 
@@ -155,12 +142,12 @@ This ledger records the current evidence state. It requires both passing source 
 
 - Implement or connect a real target client or external installer runtime guard that blocks undeclared network, file_write, or subprocess capabilities.
 - Update the generated target adapter only when the guard is actually enforced by that target.
-- `python3 scripts/yao.py package . --platform openai --platform claude --platform generic --platform vscode --output-dir dist --zip`
-- `python3 scripts/yao.py install-simulate . --package-dir dist --install-root dist/install-simulation`
-- `python3 scripts/yao.py runtime-permissions . --package-dir dist`
-- `python3 scripts/yao.py skill-os2-audit . --generated-at <YYYY-MM-DD>`
+- `python3 scripts/yao.py package . --platform openai --platform claude --platform generic --platform vscode --output-dir dist --zip --self`
+- `python3 scripts/yao.py install-simulate . --package-dir dist --install-root dist/install-simulation --self`
+- `python3 scripts/yao.py runtime-permissions . --package-dir dist --self`
+- `python3 scripts/yao.py skill-os2-audit . --generated-at <YYYY-MM-DD> --self`
 - Copy evidence/world_class/templates/native-permission-enforcement.intake.json to evidence/world_class/submissions/native-permission-enforcement.json and fill only real evidence fields.
-- `python3 scripts/yao.py world-class-intake . --submissions-dir evidence/world_class/submissions`
+- `python3 scripts/yao.py world-class-intake . --submissions-dir evidence/world_class/submissions --self`
 
 ### Source Evidence Checks
 
@@ -186,8 +173,8 @@ This ledger records the current evidence state. It requires both passing source 
 
 - objective: Import production metadata-only events from a real external client into the local drift loop.
 - source status: `external_required`
-- observed state: `{"external_source_events": 0, "adoption_sample_count": 1, "raw_content_allowed": false, "risk_band": "low", "accepted": false}`
-- source checks: `2` pass / `3` total
+- observed state: `{"external_source_events": 0, "adoption_sample_count": 0, "raw_content_allowed": false, "risk_band": "no-data", "accepted": false}`
+- source checks: `1` pass / `3` total
 - submission state: `{"status": "missing", "path": "evidence/world_class/submissions/native-client-telemetry.json", "artifact_ref_count": 0, "attested_real_evidence": false, "privacy_contract_satisfied": false, "ledger_reviewer_approved": false, "ledger_reviewer": "", "ledger_reviewed_at": "", "ledger_counts_as_completion": false}`
 
 ### Provenance Requirements
@@ -200,18 +187,18 @@ This ledger records the current evidence state. It requires both passing source 
 
 - `python3 scripts/telemetry_native_host.py . --write-launcher /tmp/yao-telemetry-host.sh --write-manifest /tmp/yao-telemetry-host.json --allowed-origin chrome-extension://<extension-id>/`
 - Install the generated native messaging manifest for the real client and send at least one accepted skill_activation or skill_output event.
-- `python3 scripts/yao.py telemetry-import . --input-jsonl .yao/telemetry_spool/external_events.jsonl`
-- `python3 scripts/yao.py skill-atlas --workspace-root .`
-- `python3 scripts/yao.py skill-os2-audit . --generated-at <YYYY-MM-DD>`
+- `python3 scripts/yao.py telemetry-import . --input-jsonl .yao/telemetry_spool/external_events.jsonl --self`
+- `python3 scripts/yao.py skill-atlas --workspace-root . --self`
+- `python3 scripts/yao.py skill-os2-audit . --generated-at <YYYY-MM-DD> --self`
 - Copy evidence/world_class/templates/native-client-telemetry.intake.json to evidence/world_class/submissions/native-client-telemetry.json and fill only real evidence fields.
-- `python3 scripts/yao.py world-class-intake . --submissions-dir evidence/world_class/submissions`
+- `python3 scripts/yao.py world-class-intake . --submissions-dir evidence/world_class/submissions --self`
 
 ### Source Evidence Checks
 
 | Check | Current | Expected | Status |
 | --- | --- | --- | --- |
 | External events | `0` | `>0` | `blocked` |
-| Adoption sample | `1` | `>0` | `pass` |
+| Adoption sample | `0` | `>0` | `blocked` |
 | Raw content blocked | `False` | `false` | `pass` |
 
 ### Completion Assertions

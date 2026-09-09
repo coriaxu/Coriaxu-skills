@@ -76,7 +76,10 @@ def render_outputs(root):
 
     # 盲测文件头保持极简：不提生成来源、种子、映射表和 benchmark.md——
     # 隔离目前只靠 prompt 纪律，不给被测模型「答案文件就在旁边」的提示
-    width = max(2, len(str(len(cases))))
+    # 盲测号固定以 2 位为最小宽度：B-01…B-99，跨过 100 后自然变成 B-100。
+    # hard_metrics.batch_expected_ids() 和历史批次名都使用同一格式；如果按总数
+    # 把全部旧编号扩成 3 位，B-001 会与批次期望的 B-01 失配。
+    width = 2
     blind = [
         "# 盲测输入 | Blind Benchmark Input",
         "",

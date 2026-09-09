@@ -6,9 +6,15 @@ import sys
 import tempfile
 import zipfile
 from pathlib import Path
+from unittest.mock import patch
 
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / "scripts"))
+
+from cross_packager_sources import archive_source_paths  # noqa: E402
+
+
 TMP = ROOT / "tests" / "tmp_package_verification"
 PACKAGER = ROOT / "scripts" / "cross_packager.py"
 VERIFIER = ROOT / "scripts" / "verify_package.py"
@@ -90,20 +96,86 @@ def verify_source_entrypoint_scan() -> None:
         ]
 
 
+def verify_git_archive_source_boundary() -> None:
+    with tempfile.TemporaryDirectory(prefix="archive-source-boundary-") as temp_root:
+        root = Path(temp_root)
+        (root / "scripts").mkdir()
+        (root / "reports").mkdir()
+        (root / "evidence" / "world_class" / "submissions").mkdir(parents=True)
+        (root / "docs").mkdir()
+        (root / "SKILL.md").write_text("tracked\n", encoding="utf-8")
+        (root / "scripts" / "tracked.py").write_text("tracked = True\n", encoding="utf-8")
+        (root / ".gitignore").write_text("ignored-secret.txt\n", encoding="utf-8")
+        subprocess.run(["git", "init", "--quiet"], cwd=root, check=True)
+        subprocess.run(["git", "add", "SKILL.md", "scripts/tracked.py", ".gitignore"], cwd=root, check=True)
+        (root / "scripts" / "new_helper.py").write_text("new = True\n", encoding="utf-8")
+        (root / "docs" / "new-guide.md").write_text("guide\n", encoding="utf-8")
+        (root / "reports" / "private-research.md").write_text("private\n", encoding="utf-8")
+        (root / "evidence" / "world_class" / "submissions" / "reviewer.json").write_text("{}\n", encoding="utf-8")
+        (root / "ignored-secret.txt").write_text("secret\n", encoding="utf-8")
+
+        candidates = {path.relative_to(root) for path in archive_source_paths(root)}
+        assert Path("SKILL.md") in candidates, candidates
+        assert Path("scripts/tracked.py") in candidates, candidates
+        assert Path("scripts/new_helper.py") in candidates, candidates
+        assert Path("docs/new-guide.md") in candidates, candidates
+        assert Path("reports/private-research.md") not in candidates, candidates
+        assert Path("evidence/world_class/submissions/reviewer.json") not in candidates, candidates
+        assert Path("ignored-secret.txt") not in candidates, candidates
+
+        nested_skill = root / "skills" / "nested-demo"
+        (nested_skill / "scripts").mkdir(parents=True)
+        (nested_skill / "reports").mkdir()
+        (nested_skill / "SKILL.md").write_text("nested tracked\n", encoding="utf-8")
+        (nested_skill / "scripts" / "tracked.py").write_text("tracked = True\n", encoding="utf-8")
+        subprocess.run(
+            ["git", "add", "skills/nested-demo/SKILL.md", "skills/nested-demo/scripts/tracked.py"],
+            cwd=root,
+            check=True,
+        )
+        (nested_skill / "scripts" / "new_helper.py").write_text("new = True\n", encoding="utf-8")
+        (nested_skill / "reports" / "private-research.md").write_text("private\n", encoding="utf-8")
+
+        nested_candidates = {path.relative_to(nested_skill) for path in archive_source_paths(nested_skill)}
+        assert Path("SKILL.md") in nested_candidates, nested_candidates
+        assert Path("scripts/tracked.py") in nested_candidates, nested_candidates
+        assert Path("scripts/new_helper.py") in nested_candidates, nested_candidates
+        assert Path("reports/private-research.md") not in nested_candidates, nested_candidates
+
+        with patch("cross_packager_sources.subprocess.run", side_effect=FileNotFoundError("git")):
+            try:
+                archive_source_paths(nested_skill)
+            except ValueError as exc:
+                assert "git is unavailable" in str(exc), exc
+            else:
+                raise AssertionError("Git-backed packaging must fail closed when git is unavailable.")
+
+
 def source_skill_entries(root: Path) -> list[Path]:
     entries = []
     for path in root.rglob("SKILL.md"):
         relative = path.relative_to(root)
-        if relative.parts[0] in {".agents", ".git", "dist"}:
+        if relative.parts[0] in {".agents", ".git", ".yao", "dist"}:
             continue
         if len(relative.parts) >= 2 and relative.parts[0] == "tests" and relative.parts[1].startswith("tmp"):
             continue
+        if (root / ".git").exists():
+            ignored = subprocess.run(
+                ["git", "check-ignore", "--quiet", "--", str(relative)],
+                cwd=root,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+            if ignored.returncode == 0:
+                continue
         entries.append(relative)
     return sorted(entries)
 
 
 def main() -> None:
     verify_source_entrypoint_scan()
+    verify_git_archive_source_boundary()
     source_entries = source_skill_entries(ROOT)
     assert source_entries == [Path("SKILL.md")], source_entries
 
@@ -118,6 +190,10 @@ def main() -> None:
     payload = valid["payload"]
     assert valid["ok"], valid
     assert payload["ok"], payload
+    with zipfile.ZipFile(valid_dir / "yao-meta-skill.zip") as archive:
+        assert not any("/reports/release_snapshots/" in name for name in archive.namelist()), archive.namelist()
+        assert not any("/registry/packages/" in name for name in archive.namelist()), archive.namelist()
+        assert "yao-meta-skill/registry/index.json" not in archive.namelist(), archive.namelist()
     assert payload["summary"]["target_count"] == 4, payload
     assert payload["summary"]["adapter_count"] == 4, payload
     assert payload["summary"]["archive_present"], payload
@@ -126,15 +202,42 @@ def main() -> None:
     assert not payload["failures"], payload
     assert (TMP / "package_verification.md").exists(), TMP
     with zipfile.ZipFile(valid_dir / "yao-meta-skill.zip") as archive:
-        skill_entries = sorted(name for name in archive.namelist() if name.endswith("/SKILL.md"))
+        archive_names = archive.namelist()
+        skill_entries = sorted(name for name in archive_names if name.endswith("/SKILL.md"))
     assert skill_entries == ["yao-meta-skill/SKILL.md"], skill_entries
+    assert not [name for name in archive_names if "/geo-ranking-article-generator/" in name], archive_names
+    assert not [name for name in archive_names if "/.yao/" in name], "local .yao state leaked into package"
+    assert not [name for name in archive_names if "/evidence/world_class/submissions/" in name], "external submission draft leaked into package"
+    assert not [
+        name
+        for name in archive_names
+        if any(part in {".DS_Store", ".mypy_cache", ".pytest_cache", ".ruff_cache", "__pycache__"} for part in Path(name).parts)
+        or Path(name).suffix in {".pyc", ".pyo"}
+    ], "cache or platform noise leaked into package"
+    assert "yao-meta-skill/reports/.current-run.json" in archive_names, archive_names
+    assert "yao-meta-skill/reports/artifact-index.json" in archive_names, archive_names
+    with zipfile.ZipFile(valid_dir / "yao-meta-skill.zip") as archive:
+        portable_pointer = json.loads(archive.read("yao-meta-skill/reports/.current-run.json"))
+    assert portable_pointer["mode"] == "portable", portable_pointer
+
+    first_hash = payload["summary"]["archive_sha256"]
+    verification_report = ROOT / "reports" / "package_verification.json"
+    original_verification = verification_report.read_bytes()
+    try:
+        verification_report.write_text('{"archive_sha256":"excluded-consumer-change"}\n', encoding="utf-8")
+        rebuilt = build_package(valid_dir)
+        assert rebuilt["ok"], rebuilt
+        second_hash = __import__("hashlib").sha256((valid_dir / "yao-meta-skill.zip").read_bytes()).hexdigest()
+    finally:
+        verification_report.write_bytes(original_verification)
+    assert second_hash == first_hash, (first_hash, second_hash)
 
     with tempfile.TemporaryDirectory(prefix="renamed-package-root-") as temp_root:
         renamed_root = Path(temp_root) / "checkout-alias"
         shutil.copytree(
             ROOT,
             renamed_root,
-            ignore=shutil.ignore_patterns(".git", ".previews", "dist", "__pycache__", ".pytest_cache", "tmp*"),
+            ignore=shutil.ignore_patterns(".git", ".previews", ".yao", "dist", "__pycache__", ".pytest_cache", "tmp*"),
         )
         renamed_dir = TMP / "renamed-dist"
         renamed_build = build_package(renamed_dir, renamed_root)

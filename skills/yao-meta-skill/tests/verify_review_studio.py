@@ -4,7 +4,7 @@ import re
 import sys
 
 
-from review_studio_helpers import ROOT, prepare_tmp_root, render_review_studio_fixture
+from review_studio_helpers import ROOT, prepare_tmp_root, render_review_studio_fixture, restore_review_studio_inputs
 from review_studio_world_class_assertions import assert_world_class_action
 
 sys.path.insert(0, str(ROOT / "scripts"))
@@ -15,6 +15,20 @@ import review_studio_layout as review_layout  # noqa: E402
 
 
 def main() -> None:
+    assert review_gates.clarification_review_status(
+        {"gate_passed": True, "authoring_ready": True, "clarification_plan": {"decision": "proceed"}, "assumptions": []}
+    ) == "pass"
+    assert review_gates.clarification_review_status(
+        {
+            "gate_passed": False,
+            "authoring_ready": True,
+            "clarification_plan": {"decision": "infer"},
+            "assumptions": [{"slot": "primary_output"}],
+        }
+    ) == "warn"
+    assert review_gates.clarification_review_status(
+        {"gate_passed": False, "authoring_ready": False, "clarification_plan": {"decision": "ask"}, "assumptions": []}
+    ) == "block"
     tmp_root = prepare_tmp_root()
     output_html, output_json, proc = render_review_studio_fixture(tmp_root)
     payload = json.loads(proc.stdout)
@@ -75,6 +89,9 @@ def main() -> None:
     assert "model 10" in output_gate["detail"], output_gate
     assert "reviewed 0/5" in output_gate["detail"], output_gate
     assert "review pending 5" in output_gate["detail"], output_gate
+    assert "provider matrix completed" in output_gate["detail"], output_gate
+    assert "phase1 review 3/3" in output_gate["detail"], output_gate
+    assert "promotion eligible" in output_gate["detail"], output_gate
     context_gate = next(item for item in payload["gates"] if item["key"] == "context-budget")
     assert context_gate["status"] == "pass", context_gate
     initial_load = re.search(r"initial load (\d+)/1000", context_gate["detail"])
@@ -86,7 +103,7 @@ def main() -> None:
     assert "resource governance governed" in context_gate["detail"], context_gate
     assert "quality density" in context_gate["detail"], context_gate
     release_gate = next(item for item in payload["gates"] if item["key"] == "release-notes")
-    assert "upgrade minor declared / minor recommended" in release_gate["detail"], release_gate
+    assert "upgrade major declared / minor recommended" in release_gate["detail"], release_gate
     assert "reports/upgrade_check.json" in release_gate["evidence"], release_gate
     registry_gate = next(item for item in payload["gates"] if item["key"] == "registry-audit")
     assert "install pass" in registry_gate["detail"], registry_gate
@@ -121,6 +138,7 @@ def main() -> None:
     intent_gate = next(item for item in payload["gates"] if item["key"] == "intent-canvas")
     assert intent_gate["status"] == "pass", intent_gate
     assert "intent confidence 100/100" in intent_gate["detail"], intent_gate
+    assert "clarification proceed" in intent_gate["detail"], intent_gate
     atlas_gate = next(item for item in payload["gates"] if item["key"] == "skill-atlas")
     assert atlas_gate["status"] == "pass", atlas_gate
     assert "actionable route collisions" in atlas_gate["detail"], atlas_gate
@@ -155,6 +173,9 @@ def main() -> None:
     assert world_class_gate["evidence"] == "reports/world_class_evidence_ledger.json", world_class_gate
     assert output_html.exists(), output_html
     assert output_json.exists(), output_json
+    output_html_text = output_html.read_text(encoding="utf-8")
+    assert "追问决策" in output_html_text, output_html_text[:10000]
+    assert "结构化假设" in output_html_text, output_html_text[:10000]
     full_payload = json.loads(output_json.read_text(encoding="utf-8"))
     assert full_payload["evidence_paths"]["skill_ir"] == "skill-ir/examples/yao-meta-skill.json", full_payload[
         "evidence_paths"
@@ -236,12 +257,13 @@ def main() -> None:
     assert benchmark_summary["public_claim_blocker_count"] >= 3, benchmark_summary
     public_claim = full_payload["data"]["benchmark_reproducibility"]["public_claim"]
     assert public_claim["ready"] is False, public_claim
-    assert not any("provider-backed model holdout evidence is incomplete" in item for item in public_claim["blockers"]), public_claim
+    assert not any("phase-one provider matrix is incomplete" in item for item in public_claim["blockers"]), public_claim
+    assert not any("phase-one three-reviewer adjudication is incomplete" in item for item in public_claim["blockers"]), public_claim
     assert any("human blind-review adjudication is incomplete" in item for item in public_claim["blockers"]), public_claim
     output_review_checklist = full_payload["data"]["output_review_adjudication"]["reviewer_checklist"]
     assert len(output_review_checklist) == 5, output_review_checklist
     assert all(not item["answer_key_visible"] for item in output_review_checklist), output_review_checklist
-    assert output_review_checklist[0]["commands"]["adjudicate"] == "python3 scripts/yao.py output-review", output_review_checklist[0]
+    assert output_review_checklist[0]["commands"]["adjudicate"] == "python3 scripts/yao.py output-review --self", output_review_checklist[0]
     assert full_payload["data"]["review_annotations"]["summary"]["annotation_count"] == 0, full_payload["data"]["review_annotations"]
     daily_skillops_summary = full_payload["data"]["daily_skillops"]["summary"]
     assert daily_skillops_summary["writes_source_files"] is False, daily_skillops_summary
@@ -313,10 +335,12 @@ def main() -> None:
     }, world_class_entries
     provider_entry = next(item for item in world_class_entries if item["key"] == "provider-holdout")
     assert provider_entry["status"] == "pending", provider_entry
-    assert "reports/output_execution_runs.json summary.model_executed_count > 0" in provider_entry["success_checks"], provider_entry
-    assert any("output-exec --provider-runner openai" in step for step in provider_entry["runbook"]), provider_entry
-    assert provider_entry["observed_state"]["model_executed_count"] == 10, provider_entry
-    assert provider_entry["observed_state"]["token_observed_count"] == 10, provider_entry
+    assert "reports/provider_output_evaluation.json summary.model_executed_count == 40" in provider_entry["success_checks"], provider_entry
+    assert any("evidence-build . --run-id <PROVIDER_RUN_ID>" in step for step in provider_entry["runbook"]), provider_entry
+    assert provider_entry["observed_state"]["contract_version"] == "phase1", provider_entry
+    assert provider_entry["observed_state"]["model_executed_count"] == 40, provider_entry
+    assert provider_entry["observed_state"]["call_count"] == 40, provider_entry
+    assert provider_entry["source_accepted"] is True, provider_entry
     provider_submission_status = provider_entry["submission_state"]["status"]
     assert provider_submission_status in {"invalid-contract", "missing"}, provider_entry
     if provider_submission_status == "invalid-contract":
@@ -441,17 +465,17 @@ def main() -> None:
     assert "完成定义" in html, html
     assert "证据来源" in html, html
     assert "隐私约束" in html, html
-    assert "reports/output_execution_runs.json summary.model_executed_count &gt; 0" in html, html
+    assert "reports/provider_output_evaluation.json summary.model_executed_count == 40" in html, html
     assert "计划、metadata fallback、待评审和本地命令不会被当成完成证据" in html, html
     assert "执行步骤" in html, html
-    assert "output-exec --provider-runner openai" in html, html
+    assert "evidence-build . --run-id &lt;PROVIDER_RUN_ID&gt;" in html, html
     assert "&lt;redacted&gt;" not in html and "<redacted>" not in html, html
     assert "world-runbook-panel" in html, html
     assert "源证据检查" in html, html
     assert "world-source-checks" in html, html
-    assert "Provider model run" in html, html
-    assert "model_executed_count: 10 / &gt;0" in html, html
-    assert "Token usage observed" in html, html
+    assert "Provider calls" in html, html
+    assert "call_count: 40 / ==40" in html, html
+    assert "Provider model runs" in html, html
     assert "蓝图覆盖" in html, html
     assert "Extension Track Count" in html, html
     assert "Adaptive Extension Ready" in html, html
@@ -464,7 +488,8 @@ def main() -> None:
     assert "公开声明" in html, html
     assert "声明阻断" in html, html
     assert "可公开声明" in html, html
-    assert "provider-backed model holdout evidence is incomplete" not in html, html
+    assert "phase-one provider matrix is incomplete" not in html, html
+    assert "phase-one three-reviewer adjudication is incomplete" not in html, html
     assert "human blind-review adjudication is incomplete" in html, html
     assert "审查批注" in html, html[:9000]
     assert "当前没有 reviewer 批注" in html, html[:9000]
@@ -520,7 +545,7 @@ def main() -> None:
     assert "&#x27;case_count&#x27;" not in html, html
     assert "&#x27;name&#x27;" not in html, html
     assert "reports/review_waivers.md" in output_json.read_text(encoding="utf-8"), output_json
-    assert "upgrade minor declared / minor recommended" in html, html[:8000]
+    assert "upgrade major declared / minor recommended" in html, html[:8000]
     assert str(ROOT) not in output_json.read_text(encoding="utf-8"), output_json
     formatted = review_formatting.render_kv_grid(
         {"case_count": 5, "package_sha256": "abc123"},
@@ -550,6 +575,7 @@ def main() -> None:
     assert "期望 Gate" in html, html[:9000]
     assert "实际 Gate" in html, html[:9000]
     assert review_layout.render_review_nav([]) == ""
+    restore_review_studio_inputs()
     print(json.dumps({"ok": True}, ensure_ascii=False, indent=2))
 
 

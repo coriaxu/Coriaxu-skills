@@ -38,6 +38,8 @@ def main() -> None:
     init_skill_ir = init_result["payload"]["skill_ir"]
     assert init_skill_ir["name"] == "cli-demo-skill", init_skill_ir
     assert init_skill_ir["trigger_samples"] >= 1, init_skill_ir
+    created_manifest = json.loads((created / "manifest.json").read_text(encoding="utf-8"))
+    assert created_manifest["skill_ir_source"] == "reports/skill-ir.json", created_manifest
 
     telemetry_log = tmp_root / "cli-telemetry-events.jsonl"
     telemetry_env = {
@@ -146,11 +148,7 @@ def main() -> None:
         input_text=(
             "quickstart-skill\n"
             "Turn messy release notes into a reusable release brief skill.\n"
-            "release notes, changelog snippets\n"
             "A reusable markdown release brief.\n"
-            "looks right\n"
-            "It should not publish blog posts or send email.\n"
-            "consistency, portability\n"
             "production\n"
             "production\n"
             "\n"
@@ -169,7 +167,13 @@ def main() -> None:
     assert quickstart_result["payload"]["archetype"] == "production", quickstart_result
     assert quickstart_result["payload"]["guidance"]["experience_note"], quickstart_result
     assert quickstart_result["payload"]["guidance"]["problem_diagnosis"]["candidates"], quickstart_result
-    assert quickstart_result["payload"]["intent_confidence"]["score"] >= 70, quickstart_result
+    assert quickstart_result["payload"]["intent_confidence"]["authoring_ready"], quickstart_result
+    assert "I understand this should handle" in quickstart_result["stderr"], quickstart_result["stderr"]
+    quickstart_intent_context = json.loads((quickstart_root / "reports" / "intent-context.json").read_text(encoding="utf-8"))
+    assert quickstart_intent_context["primary_output"] == "A reusable markdown release brief.", quickstart_intent_context
+    assert quickstart_intent_context["clarification_state"]["rounds_used"] == 1, quickstart_intent_context
+    quickstart_skill_text = (quickstart_root / "SKILL.md").read_text(encoding="utf-8")
+    assert "A reusable markdown release brief." in quickstart_skill_text, quickstart_skill_text
     assert quickstart_result["payload"]["recommendation"]["summary"], quickstart_result
     assert quickstart_result["payload"]["reference_mode"]["mode"] == "silent", quickstart_result
     quickstart_report_view = quickstart_result["payload"]["report_view"]
@@ -207,11 +211,7 @@ def main() -> None:
         input_text=(
             "quickstart-conflict-skill\n"
             "Turn repeated release notes into a governed release command skill.\n"
-            "release notes, changelog snippets\n"
             "A governed release packet.\n"
-            "looks right\n"
-            "It should not publish blog posts or send email.\n"
-            "auditability, portability\n"
             "governed\n"
             "governed\n"
             "Minimal vibe helper::taste::Keep the first pass fast, minimal, and lightweight.::Do not add review, governance, or approval steps.\n"

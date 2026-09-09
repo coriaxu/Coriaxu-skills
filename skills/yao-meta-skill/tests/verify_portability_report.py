@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import json
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -19,34 +20,31 @@ def main() -> None:
         ir_dir = tmp_root / "skill-ir" / "examples"
         ir_dir.mkdir(parents=True)
         ir_path = ir_dir / "yao-meta-skill.json"
-        ir_path.write_text(
-            json.dumps({"schema_version": "2.0.0", "job_to_be_done": "test renamed checkout"}),
-            encoding="utf-8",
-        )
+        shutil.copy2(ROOT / "SKILL.md", tmp_root / "SKILL.md")
+        shutil.copy2(ROOT / "manifest.json", tmp_root / "manifest.json")
+        shutil.copy2(ROOT / "skill-ir" / "examples" / "yao-meta-skill.json", ir_path)
         ir_payload, ir_source = find_ir(tmp_root)
         assert ir_payload["schema_version"] == "2.0.0", ir_payload
         assert ir_source == "skill-ir/examples/yao-meta-skill.json", ir_source
 
-    payload = None
-    for args in ([], [str(ROOT)]):
-        proc = subprocess.run(
-            [sys.executable, str(SCRIPT), *args],
-            cwd=ROOT,
-            capture_output=True,
-            text=True,
-        )
-        if proc.returncode != 0:
-            print(proc.stdout)
-            print(proc.stderr)
-            raise SystemExit(proc.returncode)
-        current_payload = json.loads(proc.stdout)
-        if payload is None:
-            payload = current_payload
-        elif current_payload != payload:
-            print(json.dumps({"default": payload, "explicit": current_payload}, ensure_ascii=False, indent=2))
-            raise SystemExit(2)
-
-    assert payload is not None
+    missing_target = subprocess.run(
+        [sys.executable, str(SCRIPT)],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+    )
+    assert missing_target.returncode == 2, missing_target
+    proc = subprocess.run(
+        [sys.executable, str(SCRIPT), str(ROOT)],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+    )
+    if proc.returncode != 0:
+        print(proc.stdout)
+        print(proc.stderr)
+        raise SystemExit(proc.returncode)
+    payload = json.loads(proc.stdout)
     failures = []
     if payload.get("score", 0) < 95:
         failures.append(f"portability score too low: {payload.get('score')}")

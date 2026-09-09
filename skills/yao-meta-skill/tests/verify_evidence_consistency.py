@@ -39,10 +39,8 @@ REPORT_FILES = [
     "scripts/ci_test.py",
 ]
 
-
 def run(cmd: list[str], *, check: bool = False) -> subprocess.CompletedProcess[str]:
     return subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True, check=check)
-
 
 def copy_reports(dst: Path) -> None:
     for relative in REPORT_FILES:
@@ -50,7 +48,6 @@ def copy_reports(dst: Path) -> None:
         target = dst / relative
         target.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy2(source, target)
-
 
 def refresh_embedded_reports() -> None:
     script_names = [
@@ -167,6 +164,9 @@ def main() -> None:
     assert checks["skill-ir-evidence-path-contract"]["status"] == "pass", checks[
         "skill-ir-evidence-path-contract"
     ]
+    assert checks["release-archive-hash-lockstep"]["status"] in {"pass", "warn"}, checks[
+        "release-archive-hash-lockstep"
+    ]
     assert checks["skill-ir-evidence-path-contract"]["actual"]["review_studio_evidence_path"] == (
         "skill-ir/examples/yao-meta-skill.json"
     ), checks["skill-ir-evidence-path-contract"]
@@ -174,11 +174,11 @@ def main() -> None:
         "review-studio-gate-action-mirror"
     ]
     gate_action_mirror = checks["review-studio-gate-action-mirror"]["actual"]
-    assert gate_action_mirror["non_pass_gate_keys"] == [
-        "output-lab",
-        "review-waivers",
-        "world-class-evidence",
-    ], gate_action_mirror
+    expected_non_pass = {"output-lab", "review-waivers", "world-class-evidence"}
+    expected_non_pass.update(["operations-loop"] if not json.loads((ROOT / "reports" / "adoption_drift_report.json").read_text(encoding="utf-8"))["summary"].get("event_count") else [])
+    atlas_summary = json.loads((ROOT / "reports" / "skill_atlas.json").read_text(encoding="utf-8"))["summary"]
+    expected_non_pass.update(["skill-atlas"] if any(int(atlas_summary.get(key, 0) or 0) for key in {"actionable_route_collision_count", "actionable_owner_gap_count", "actionable_stale_count", "actionable_drift_signal_count"}) else [])
+    assert gate_action_mirror["non_pass_gate_keys"] == sorted(expected_non_pass), gate_action_mirror
     assert gate_action_mirror["action_gate_keys"] == gate_action_mirror["non_pass_gate_keys"], gate_action_mirror
     assert gate_action_mirror["pass_gate_action_ids_empty"] is True, gate_action_mirror
     assert gate_action_mirror["gate_action_mirrors"]["world-class-evidence"]["source_ref_present"] is True, (
@@ -223,7 +223,7 @@ def main() -> None:
     ]
     phase_queue_actual = checks["world-class-phase-queue-consistency"]["actual"]
     assert phase_queue_actual["summary"]["phase_queue_count"] == 2, phase_queue_actual
-    assert phase_queue_actual["summary"]["phase_queue_row_count"] >= 11, phase_queue_actual
+    assert phase_queue_actual["summary"]["phase_queue_row_count"] == sum(item["row_count"] for item in phase_queue_actual["top_level_phase_queue"]), phase_queue_actual
     assert phase_queue_actual["summary"] == phase_queue_actual["operator_runbook_summary"], phase_queue_actual
     assert phase_queue_actual["top_level_phase_queue"] == phase_queue_actual[
         "operator_runbook_top_level_phase_queue"

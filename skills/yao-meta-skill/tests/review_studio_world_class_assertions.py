@@ -49,6 +49,7 @@ def assert_world_class_action(full_payload: dict) -> None:
     assert provider_readiness in {"fix-submission", "awaiting-submission"}, provider_action_step
     assert provider_action_step["submission_path"] == "evidence/world_class/submissions/provider-holdout.json", provider_action_step
     assert provider_action_step["template_path"] == "evidence/world_class/templates/provider-holdout.intake.json", provider_action_step
+    assert provider_action_step["source_pass_count"] == 4, provider_action_step
     assert provider_action_step["source_blocked_count"] == 0, provider_action_step
     assert provider_action_step["repair_blocked_count"] == 1, provider_action_step
     assert provider_action_step["repair_counts_as_completion"] is False, provider_action_step
@@ -70,11 +71,11 @@ def assert_world_class_action(full_payload: dict) -> None:
     assert all(item["counts_as_completion"] is False for item in provider_action_step["repair_rows"]), provider_action_step
     assert any("world-class-intake" in item["command"] for item in provider_action_step["commands"]), provider_action_step
     assert any("world-class-ledger" in item["command"] for item in provider_action_step["commands"]), provider_action_step
-    assert any("output-exec --provider-runner openai" in item for item in provider_action_step["runbook"]), provider_action_step
+    assert any("evidence-build . --run-id <PROVIDER_RUN_ID>" in item for item in provider_action_step["runbook"]), provider_action_step
     assert not any("<redacted>" in item or "OPENAI_API_KEY=" in item for item in provider_action_step["runbook"]), provider_action_step
     assert "provider-backed model run" in provider_action_step["provenance_requirements"], provider_action_step
-    assert "reports/output_execution_runs.json summary.model_executed_count > 0" in provider_action_step["success_checks"], provider_action_step
-    assert "reports/output_execution_runs.json" in provider_action_step["evidence_artifacts"], provider_action_step
+    assert "reports/provider_output_evaluation.json summary.model_executed_count == 40" in provider_action_step["success_checks"], provider_action_step
+    assert "reports/provider_output_evaluation.json" in provider_action_step["evidence_artifacts"], provider_action_step
     provider_role_contract = provider_action_step["artifact_role_contract"]
     assert provider_role_contract["role_source"] == "world-class-submission-kit", provider_role_contract
     assert provider_role_contract["counts_as_evidence"] is False, provider_role_contract
@@ -89,15 +90,16 @@ def assert_world_class_action(full_payload: dict) -> None:
     human_action_step = next(
         item for item in world_class_action["evidence_steps"] if item["key"] == "human-adjudication"
     )
-    assert human_action_step["repair_blocked_count"] >= 2, human_action_step
-    assert human_action_step["phase_queue_blocked_count"] == 2, human_action_step
+    assert human_action_step["source_pass_count"] == 4, human_action_step
+    assert human_action_step["source_blocked_count"] == 0, human_action_step
+    assert human_action_step["repair_blocked_count"] == 1, human_action_step
+    assert human_action_step["phase_queue_blocked_count"] == 1, human_action_step
     human_repair_rows = {item["target"]: item for item in human_action_step["repair_rows"]}
     assert human_repair_rows["human-reviewer"]["repair_type"] == "precheck", human_repair_rows
     assert human_repair_rows["human-reviewer"]["owner"] == "human reviewer", human_repair_rows
-    assert human_repair_rows["pending_count"]["repair_type"] == "source-check", human_repair_rows
-    assert "output-review" in human_repair_rows["pending_count"]["verification_command"], human_repair_rows
-    assert "prompt_sha256" in " ".join(human_action_step["success_checks"]), human_action_step
-    assert "prompt_sha256" in " ".join(human_action_step["privacy_contract"]), human_action_step
+    assert set(human_repair_rows) == {"human-reviewer"}, human_repair_rows
+    assert "blind_pack_sha256" in " ".join(human_action_step["success_checks"]), human_action_step
+    assert "blind_pack_sha256" in " ".join(human_action_step["privacy_contract"]), human_action_step
 
     expected_awaiting_count = 3 if provider_readiness == "fix-submission" else 4
     expected_invalid_count = 1 if provider_readiness == "fix-submission" else 0
@@ -110,13 +112,17 @@ def assert_world_class_action(full_payload: dict) -> None:
     assert submission_review["summary"]["review_counts_submission_as_completion"] is False, submission_review
     assert submission_review["summary"]["awaiting_submission_count"] == expected_awaiting_count, submission_review
     assert submission_review["summary"]["invalid_submission_count"] == expected_invalid_count, submission_review
-    assert submission_review["summary"]["source_check_count"] >= 13, submission_review
-    assert submission_review["summary"]["source_blocked_count"] >= 6, submission_review
+    assert submission_review["summary"]["source_check_count"] == 14, submission_review
+    assert submission_review["summary"]["source_blocked_count"] == sum(
+        item["source_blocked_count"] for item in submission_review["items"]
+    ), submission_review
     human_review_item = next(item for item in submission_review["items"] if item["evidence_key"] == "human-adjudication")
     human_review_source = {item["field"]: item for item in human_review_item["source_checklist"]}
-    assert human_review_item["observed_state"]["raw_content_allowed"] is False, human_review_item
-    assert human_review_item["observed_state"]["raw_content_path_count"] == 0, human_review_item
-    assert human_review_source["raw_content_allowed"]["status"] == "pass", human_review_source
+    assert human_review_item["observed_state"]["contract_version"] == "phase1", human_review_item
+    assert human_review_item["observed_state"]["reviewer_count"] == 3, human_review_item
+    assert human_review_item["observed_state"]["pair_count"] == 20, human_review_item
+    assert human_review_source["failure_count"]["status"] == "pass", human_review_source
+    assert human_review_source["blind_pack_bound"]["status"] == "pass", human_review_source
 
     runbook = full_payload["data"]["world_class_operator_runbook"]
     assert runbook["summary"]["decision"] == "collect-evidence", runbook
@@ -136,12 +142,13 @@ def assert_world_class_action(full_payload: dict) -> None:
         assert provider_checklist["submission_status"] in {"missing", "not-found", "not-submitted"}, provider_checklist
     assert provider_checklist["source_accepted"] is True, provider_checklist
     assert provider_checklist["submission_path"] == "evidence/world_class/submissions/provider-holdout.json", provider_checklist
-    assert provider_checklist["commands"]["validate_intake"] == "python3 scripts/yao.py world-class-intake . --submissions-dir evidence/world_class/submissions", provider_checklist
-    assert provider_checklist["commands"]["submission_review"] == "python3 scripts/yao.py world-class-submission-review . --submissions-dir evidence/world_class/submissions", provider_checklist
-    assert provider_checklist["commands"]["refresh_ledger"] == "python3 scripts/yao.py world-class-ledger . --submissions-dir evidence/world_class/submissions", provider_checklist
+    assert provider_checklist["commands"]["validate_intake"] == "python3 scripts/yao.py world-class-intake . --submissions-dir evidence/world_class/submissions --self", provider_checklist
+    assert provider_checklist["commands"]["submission_review"] == "python3 scripts/yao.py world-class-submission-review . --submissions-dir evidence/world_class/submissions --self", provider_checklist
+    assert provider_checklist["commands"]["refresh_ledger"] == "python3 scripts/yao.py world-class-ledger . --submissions-dir evidence/world_class/submissions --self", provider_checklist
     assert "provider-backed model run" in provider_checklist["must_collect"]["provenance_requirements"], provider_checklist
     assert any(
-        "output-exec --provider-runner openai" in step for step in provider_checklist["must_collect"]["runbook"]
+        "evidence-build . --run-id <PROVIDER_RUN_ID>" in step
+        for step in provider_checklist["must_collect"]["runbook"]
     ), provider_checklist
     assert full_payload["data"]["world_class_claim_guard"]["summary"]["decision"] == "claim-guard-pass-evidence-pending"
     assert full_payload["data"]["world_class_claim_guard"]["summary"]["violation_count"] == 0

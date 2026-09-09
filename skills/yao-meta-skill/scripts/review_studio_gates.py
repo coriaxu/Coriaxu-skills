@@ -4,6 +4,7 @@
 from pathlib import Path
 from typing import Any
 
+from intent_clarification import clarification_review_status
 from review_studio_gate_contract import (
     GATE_WEIGHTS,
     REVIEW_STUDIO_GATE_KEYS,
@@ -36,13 +37,19 @@ def build_gates(skill_dir: Path, output_html: Path, data: dict[str, dict[str, An
 
     intent = data["intent_confidence"]
     intent_score = int(intent.get("score", 0) or 0)
-    intent_status = "pass" if intent.get("gate_passed") or intent_score >= 75 else "warn"
+    intent_status = clarification_review_status(intent)
+    clarification = intent.get("clarification_plan", {}) if isinstance(intent, dict) else {}
+    assumption_count = len(intent.get("assumptions", []) or [])
     gates.append(
         gate(
             "intent-canvas",
             "意图画布",
             intent_status,
-            f"intent confidence {intent_score}/100; {intent.get('recommended_action', 'review current intent frame')}",
+            (
+                f"intent confidence {intent_score}/100; clarification {clarification.get('decision', 'legacy')}; "
+                f"assumptions {assumption_count}; stop {clarification.get('stop_reason', 'n/a')}; "
+                f"{intent.get('recommended_action', 'review current intent frame')}"
+            ),
             "reports/intent-confidence.json",
             report_link(output_html, skill_dir, "reports/intent-confidence.md"),
         )
@@ -52,20 +59,37 @@ def build_gates(skill_dir: Path, output_html: Path, data: dict[str, dict[str, An
     route_summary = route.get("summary", {})
     misroutes = int(route_summary.get("misroute_count", len(route.get("misroutes", []))) or 0)
     ambiguous = int(route_summary.get("ambiguous_case_count", len(route.get("ambiguous_cases", []))) or 0)
+    phase1_trigger = data.get("phase1_trigger_holdout", {})
+    phase1_summary = phase1_trigger.get("summary", {})
     if not route:
         route_status = "warn"
         route_detail = "route scorecard is missing; run route-scorecard before release review"
     else:
         route_status = "block" if misroutes else ("warn" if ambiguous else "pass")
         route_detail = f"{route_summary.get('total_cases', 0)} trigger cases; {misroutes} misroutes; {ambiguous} ambiguous"
+        if phase1_trigger:
+            if not phase1_trigger.get("ok"):
+                route_status = "block"
+            route_detail += (
+                f"; frozen 30 P={phase1_summary.get('precision', 0)} R={phase1_summary.get('recall', 0)}; "
+                f"hard-negative FP {phase1_summary.get('hard_negative_false_positives', 0)}"
+            )
     gates.append(
         gate(
             "trigger-lab",
             "触发实验",
             route_status,
             route_detail,
-            "reports/route_scorecard.json",
-            report_link(output_html, skill_dir, "reports/route_scorecard.md"),
+            (
+                "reports/route_scorecard.json + reports/phase1_trigger_holdout.json"
+                if phase1_trigger
+                else "reports/route_scorecard.json"
+            ),
+            report_link(
+                output_html,
+                skill_dir,
+                "reports/phase1_trigger_holdout.md" if phase1_trigger else "reports/route_scorecard.md",
+            ),
         )
     )
 
@@ -78,6 +102,8 @@ def build_gates(skill_dir: Path, output_html: Path, data: dict[str, dict[str, An
             data["output_execution"],
             data["output_blind_review"],
             data["output_review_adjudication"],
+            data.get("provider_output_evaluation", {}),
+            data.get("provider_output_adjudication", {}),
         )
     )
 

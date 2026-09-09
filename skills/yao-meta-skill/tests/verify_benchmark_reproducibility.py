@@ -166,11 +166,15 @@ def main() -> None:
     assert payload["evidence_bundle"]["missing_count"] == 0, payload
     assert payload["evidence_bundle"]["missing_paths"] == [], payload
     assert payload["summary"]["provider_evidence_complete"] is True, payload
+    assert payload["summary"]["phase1_provider_matrix_complete"] is True, payload
+    assert payload["summary"]["phase1_human_review_complete"] is True, payload
+    assert payload["summary"]["phase1_quality_promotion_complete"] is True, payload
+    assert payload["summary"]["phase1_completion_ready"] is True, payload
     assert payload["summary"]["human_review_complete"] is False, payload
     assert payload["summary"]["world_class_ready"] is False, payload
     assert payload["summary"]["world_class_source_check_count"] >= 13, payload
-    assert payload["summary"]["world_class_source_pass_count"] >= 6, payload
-    assert payload["summary"]["world_class_source_blocked_count"] >= 6, payload
+    assert payload["summary"]["world_class_source_pass_count"] >= 11, payload
+    assert payload["summary"]["world_class_source_blocked_count"] >= 3, payload
     assert (
         payload["summary"]["world_class_source_pass_count"]
         + payload["summary"]["world_class_source_blocked_count"]
@@ -249,7 +253,8 @@ def main() -> None:
         assert not any("release lock" in item for item in payload["public_claim"]["blockers"]), payload["public_claim"]
     else:
         assert any("release lock" in item for item in payload["public_claim"]["blockers"]), payload["public_claim"]
-    assert not any("provider-backed model holdout evidence is incomplete" in item for item in payload["public_claim"]["blockers"]), payload["public_claim"]
+    assert not any("phase-one provider matrix" in item for item in payload["public_claim"]["blockers"]), payload["public_claim"]
+    assert not any("phase-one three-reviewer" in item for item in payload["public_claim"]["blockers"]), payload["public_claim"]
     assert any("human blind-review" in item for item in payload["public_claim"]["blockers"]), payload["public_claim"]
     assert any("world-class evidence" in item for item in payload["public_claim"]["blockers"]), payload["public_claim"]
     assert any("world-class source checks" in item for item in payload["public_claim"]["blockers"]), payload["public_claim"]
@@ -271,14 +276,14 @@ def main() -> None:
     assert artifacts["reports/world_class_claim_guard.json"]["exists"], artifacts
     assert artifacts["reports/python_compatibility.json"]["exists"], artifacts
     assert any(command["command"] == "make ci-test" for command in payload["reproduction_commands"]), payload
-    assert any(command["command"] == "python3 scripts/yao.py world-class-ledger . --submissions-dir evidence/world_class/submissions" for command in payload["reproduction_commands"]), payload
-    assert any(command["command"] == "python3 scripts/yao.py world-class-intake . --submissions-dir evidence/world_class/submissions" for command in payload["reproduction_commands"]), payload
-    assert any(command["command"] == "python3 scripts/yao.py world-class-preflight . --submissions-dir evidence/world_class/submissions" for command in payload["reproduction_commands"]), payload
-    assert any(command["command"] == "python3 scripts/yao.py world-class-submission-review . --submissions-dir evidence/world_class/submissions" for command in payload["reproduction_commands"]), payload
-    assert any(command["command"] == "python3 scripts/yao.py world-class-runbook . --submissions-dir evidence/world_class/submissions" for command in payload["reproduction_commands"]), payload
-    assert any(command["command"] == "python3 scripts/yao.py world-class-claim-guard ." for command in payload["reproduction_commands"]), payload
-    assert any(command["command"] == "python3 scripts/yao.py python-compat ." for command in payload["reproduction_commands"]), payload
-    assert any(command["command"] == "python3 scripts/yao.py evidence-consistency ." for command in payload["reproduction_commands"]), payload
+    assert any(command["command"] == "python3 scripts/yao.py world-class-ledger . --submissions-dir evidence/world_class/submissions --self" for command in payload["reproduction_commands"]), payload
+    assert any(command["command"] == "python3 scripts/yao.py world-class-intake . --submissions-dir evidence/world_class/submissions --self" for command in payload["reproduction_commands"]), payload
+    assert any(command["command"] == "python3 scripts/yao.py world-class-preflight . --submissions-dir evidence/world_class/submissions --self" for command in payload["reproduction_commands"]), payload
+    assert any(command["command"] == "python3 scripts/yao.py world-class-submission-review . --submissions-dir evidence/world_class/submissions --self" for command in payload["reproduction_commands"]), payload
+    assert any(command["command"] == "python3 scripts/yao.py world-class-runbook . --submissions-dir evidence/world_class/submissions --self" for command in payload["reproduction_commands"]), payload
+    assert any(command["command"] == "python3 scripts/yao.py world-class-claim-guard . --self" for command in payload["reproduction_commands"]), payload
+    assert any(command["command"] == "python3 scripts/yao.py python-compat . --self" for command in payload["reproduction_commands"]), payload
+    assert any(command["command"] == "python3 scripts/yao.py evidence-consistency . --self" for command in payload["reproduction_commands"]), payload
     assert any("Provider-backed model holdout source evidence is complete" in item for item in payload["limitations"]), payload["limitations"]
     markdown = output_md.read_text(encoding="utf-8")
     assert "Benchmark Reproducibility" in markdown, markdown
@@ -295,7 +300,8 @@ def main() -> None:
     assert "do not claim world-class" in markdown, markdown
     assert "public claim ready: `false`" in markdown, markdown
     assert "## Public Claim Boundary" in markdown, markdown
-    assert "provider-backed model holdout evidence is incomplete" not in markdown, markdown
+    assert "phase-one provider matrix" in markdown, markdown
+    assert "phase-one three-reviewer" in markdown, markdown
     assert "Provider-backed model holdout source evidence is complete" in markdown, markdown
     assert "world-class source checks are not all accepted" in markdown, markdown
     assert "## Release Lock" in markdown, markdown
@@ -303,9 +309,9 @@ def main() -> None:
     assert "reports/benchmark_methodology.md" in markdown, markdown
     assert "reports/world_class_evidence_preflight.json" in markdown, markdown
     assert "reports/world_class_operator_runbook.html" in markdown, markdown
-    assert "python3 scripts/yao.py world-class-preflight . --submissions-dir evidence/world_class/submissions" in markdown, markdown
-    assert "python3 scripts/yao.py world-class-runbook . --submissions-dir evidence/world_class/submissions" in markdown, markdown
-    assert "python3 scripts/yao.py evidence-consistency ." in markdown, markdown
+    assert "python3 scripts/yao.py world-class-preflight . --submissions-dir evidence/world_class/submissions --self" in markdown, markdown
+    assert "python3 scripts/yao.py world-class-runbook . --submissions-dir evidence/world_class/submissions --self" in markdown, markdown
+    assert "python3 scripts/yao.py evidence-consistency . --self" in markdown, markdown
     assert "make ci-test" in markdown, markdown
     print(json.dumps({"ok": True}, ensure_ascii=False, indent=2))
 

@@ -1,15 +1,15 @@
 # World-Class Claim Guard
 
-Generated at: `2026-07-16`
+Generated at: `2026-08-17`
 
 ## Summary
 
 - decision: `claim-guard-pass-evidence-pending`
 - ledger ready to claim world-class: `false`
 - ledger pending evidence: `4`
-- claim surfaces scanned: `205`
-- JSON claim surfaces scanned: `99`
-- metadata claim surfaces scanned: `100`
+- claim surfaces scanned: `232`
+- JSON claim surfaces scanned: `114`
+- metadata claim surfaces scanned: `115`
 - package/runtime claim surfaces scanned: `17`
 - violations: `0`
 - overclaim guard active: `true`
