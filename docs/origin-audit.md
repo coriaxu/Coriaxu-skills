@@ -65,7 +65,7 @@
 | luban-skill | LearnPrompt | MIT | `LICENSE:3 Copyright (c) 2026 LearnPrompt` | https://github.com/LearnPrompt/luban-skill |
 | 三级笔记 | 小能熊老师 | 待确认（仓内无 LICENSE） | 徐老师确认作者是小能熊老师，扫描时误判为徐浩原创 | 待徐老师补链接 |
 | agent-review | akira82-ai | MIT | `LICENSE:3 Copyright (c) 2026 akira82-ai` | 待补充 |
-| shuorenhua | MrGeDiao | MIT | `LICENSE:2 Copyright (c) 2026 MrGeDiao` | https://github.com/MrGeDiao/shuorenhua |
+| shuorenhua | MrGeDiao | MIT；HUMAN 语料按各自 Public Domain / CC BY / CC BY-SA 标注 | `LICENSE:2 Copyright (c) 2026 MrGeDiao` | https://github.com/MrGeDiao/shuorenhua |
 | web-access | 一泽 Eze | MIT | `SKILL.md` frontmatter: `license: MIT`, `github: https://github.com/eze-is/web-access` | https://github.com/eze-is/web-access |
 | claude-to-im | op7418 | MIT | `LICENSE:3 Copyright (c) 2024-2025 op7418` | 独立 GitHub 仓（有 `.git` 目录） |
 | aihot | 卡兹克 | MIT | 原始 skill 页面 https://aihot.virxact.com/aihot-skill/ | https://aihot.virxact.com/aihot-skill/ |

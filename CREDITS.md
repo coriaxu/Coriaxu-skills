@@ -37,7 +37,7 @@
 ### MrGeDiao — `shuorenhua`
 
 - 目录：`skills/shuorenhua/`
-- 协议：MIT (Copyright © 2026 MrGeDiao)
+- 协议：MIT (Copyright © 2026 MrGeDiao)；HUMAN 语料另按各自标注的 Public Domain、CC BY 2.5 或 CC BY-SA 4.0 处理，不适用根目录 MIT
 - 功能：去 AI 味 — 检查和清理中英文文本里的 AI 套路
 - 原仓：https://github.com/MrGeDiao/shuorenhua
 
