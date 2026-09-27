@@ -61,7 +61,7 @@
 |-------|--------|------|------|---------------|
 | yao-meta-skill | 姚金刚 Yao Jingang（Yao Team） | MIT | `LICENSE:2 Copyright (c) 2026 Yao Team`（徐老师确认作者是姚金刚） | https://github.com/yaojingang/yao-meta-skill |
 | nuwa-skill | 花叔 Huashu | MIT | `LICENSE:3 Copyright (c) 2026 Huashu (花叔)` | https://github.com/alchaincyf/nuwa-skill |
-| darwin-skill | 花叔 Huashu | 待确认（仓内无 LICENSE，README 标 MIT） | 徐老师确认作者是花叔，扫描时误判为徐浩原创 | https://github.com/alchaincyf/darwin-skill |
+| darwin-skill | 花叔 Huashu | MIT（见目录内 LICENSE） | LICENSE 标注 Copyright (c) 2026 alchaincyf (花叔) | https://github.com/alchaincyf/darwin-skill |
 | luban-skill | LearnPrompt | MIT | `LICENSE:3 Copyright (c) 2026 LearnPrompt` | https://github.com/LearnPrompt/luban-skill |
 | 三级笔记 | 小能熊老师 | 待确认（仓内无 LICENSE） | 徐老师确认作者是小能熊老师，扫描时误判为徐浩原创 | 待徐老师补链接 |
 | agent-review | akira82-ai | MIT | `LICENSE:3 Copyright (c) 2026 akira82-ai` | 待补充 |

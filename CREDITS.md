@@ -30,7 +30,7 @@
 
 **darwin-skill**
 - 目录：`skills/darwin-skill/`
-- 协议：_待确认（仓内无 LICENSE 文件，按 MIT 处理）_
+- 协议：MIT（见目录内 LICENSE；Copyright © 2026 alchaincyf / 花叔）
 - 功能：达尔文 — 借鉴 Karpathy autoresearch 的自主实验循环，自动评估并优化 skill
 - 原仓：https://github.com/alchaincyf/darwin-skill
 
