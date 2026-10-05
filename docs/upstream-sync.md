@@ -11,7 +11,7 @@ Last checked: 2026-10-05
 | Local skill | Upstream | Ref used | Status / notes |
 |---|---|---|---|
 | `aihot` | https://aihot.virxact.com/aihot-skill/ | fetched 2026-09-14, sha256 `d063d465` | Found upstream update: sha256 `1fe3b86d` (v2.0.0; previously `e15bd52f` / v1.7.2). NOT synced or installed: installed `SKILL.md` retains a locally customized description; fixed SKILL.md-only mapping remains unchanged |
-| `darwin-skill` | https://github.com/alchaincyf/darwin-skill | `55395164` | Upstream still at `8a8b6625` (pending since earlier checks). NOT synced or installed: installed `SKILL.md` retains the locally rewritten Astra edition |
+| `darwin-skill` | https://github.com/alchaincyf/darwin-skill | `8a8b6625` | Updated from `55395164` and installed after the user explicitly requested the latest upstream version. Runtime scan now requires context review to exclude false positives. Previous local Astra rewrite was backed up outside the Skill hub |
 | `dbs` | https://github.com/dontbesilent2025/dbskill | `8b8e33f1` | Found upstream update: `a0e6fa35` (v2.18.45; previous pending `a97797b9`), adds routing distinctions for related content skills. NOT synced or installed: installed `SKILL.md`, `references/composition-contract.md`, and `references/official-skill-names.txt` contain local customizations |
 | `dbs-content` | https://github.com/dontbesilent2025/dbskill | `a0e6fa35` | Upstream advanced from `a97797b9`; managed content unchanged; no installation needed; CC BY-NC 4.0 and attribution retained |
 | `dbs-diagnosis` | https://github.com/dontbesilent2025/dbskill | `a0e6fa35` | Upstream advanced from `a97797b9`; managed content unchanged; no installation needed; CC BY-NC 4.0 and attribution retained |
@@ -44,3 +44,9 @@ Still missing a verified upstream URL: `guizang-html-ppt`, `guizang-social-card-
 - Synced and installed only `shuorenhua`; its three runtime rule files are unchanged. Backups are in `/tmp/coriaxu-upstreams-20261005/backup`. The local customizations in `aihot`, `darwin-skill`, and `dbs` remain untouched.
 - `git diff --check`, updated Skill frontmatter, targeted `./install.sh --dry-run shuorenhua`, actual install, checksum-aware repository-to-hub comparison, and all three shared entry readbacks passed.
 - Repository started on `main`, even with fetched `origin/main` at `96c7181e8b20349b489ee40376e8320786677401`; unrelated working-tree changes were left untouched. No attribution or license changes were needed; dbskill CC BY-NC 4.0 boundaries remain intact.
+
+## 2026-10-05 darwin follow-up
+
+- On explicit user request, synced `darwin-skill` from official `55395164` to `8a8b6625` and installed it to the shared hub. Only upstream `SKILL.md` and `references/runtime-neutrality.md` changed; no other managed skills were reinstalled.
+- The installed Astra rewrite of `SKILL.md` was saved byte-for-byte at `/Users/surfin/.codex/automations/coriaxu-skills/backups/darwin-skill-astra-20261005/SKILL.md` before replacement. The earlier weekly-run note above records its status at that time.
+- `git diff --check`, updated Skill frontmatter, targeted install dry run, actual install, official changed-file equality, checksum-aware repository-to-hub equality, and three shared entry readbacks passed. No broader runtime evaluation was run.
