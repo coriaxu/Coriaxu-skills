@@ -10,11 +10,11 @@ Last checked: 2026-10-12
 
 | Local skill | Upstream | Ref used | Status / notes |
 |---|---|---|---|
-| `aihot` | https://aihot.virxact.com/aihot-skill/ | fetched 2026-09-14, sha256 `d063d465` | Found upstream update: sha256 `1fe3b86d` (v2.0.0, unchanged since the previous check). NOT synced or installed: installed `SKILL.md` has a local description rewrite |
+| `aihot` | https://aihot.virxact.com/aihot-skill/ | fetched 2026-10-12, sha256 `1fe3b86d` | Updated from `d063d465` to v2.0.0 and installed on explicit user request. The previous local description is backed up; the fixed SKILL.md-only mapping is unchanged |
 | `darwin-skill` | https://github.com/alchaincyf/darwin-skill | `8a8b6625` | Updated from `55395164` and installed after the user explicitly requested the latest upstream version. Runtime scan now requires context review to exclude false positives. Previous local Astra rewrite was backed up outside the Skill hub |
-| `dbs` | https://github.com/dontbesilent2025/dbskill | `8b8e33f1` | Found upstream update: `f24ea08a` (v2.18.50; previous pending `a0e6fa35`). NOT synced or installed: repository and installed files contain local changes in overlapping paths; CC BY-NC 4.0 boundary retained |
-| `dbs-content` | https://github.com/dontbesilent2025/dbskill | `a0e6fa35` | Found upstream update at `f24ea08a` in `SKILL.md` and `agents/openai.yaml`. NOT synced or installed: installed copies differ from the prior official snapshot; CC BY-NC 4.0 boundary retained |
-| `dbs-diagnosis` | https://github.com/dontbesilent2025/dbskill | `a0e6fa35` | Found upstream update at `f24ea08a` in `agents/openai.yaml`. NOT synced or installed: installed copy differs from the prior official snapshot; CC BY-NC 4.0 boundary retained |
+| `dbs` | https://github.com/dontbesilent2025/dbskill | `f24ea08a` | Updated from `8b8e33f1` to v2.18.50 and installed. Current-conversation composition and official numbered-prompt helpers added; prior repository and installed customizations backed up; CC BY-NC 4.0 README/LICENSE retained |
+| `dbs-content` | https://github.com/dontbesilent2025/dbskill | `f24ea08a` | Updated from `a0e6fa35` and installed; SKILL and agent metadata refreshed. Prior installed customizations backed up; CC BY-NC 4.0 README/LICENSE retained |
+| `dbs-diagnosis` | https://github.com/dontbesilent2025/dbskill | `f24ea08a` | Updated from `a0e6fa35` and installed; agent metadata refreshed. Prior installed customization backed up; CC BY-NC 4.0 README/LICENSE retained |
 | `dbskill-knowledge` | https://github.com/dontbesilent2025/dbskill | `f24ea08a` | Upstream advanced from `a0e6fa35`; managed knowledge content unchanged; no installation needed; README/LICENSE/SKILL wrappers and CC BY-NC 4.0 retained |
 | `luban-skill` | https://github.com/LearnPrompt/luban-skill | `cea2da33` | Checked; no upstream change; existing attribution and license boundaries retained |
 | `nuwa-skill` | https://github.com/alchaincyf/nuwa-skill | `fe037468` | Checked; no upstream change; existing attribution and license boundaries retained |
@@ -22,7 +22,7 @@ Last checked: 2026-10-12
 | `obsidian-markdown` | https://github.com/kepano/obsidian-skills | `3ccff533` | Checked; no upstream change; no installation needed |
 | `qiaomu-epub-book-generator` | https://github.com/joeseesun/qiaomu-epub-book-generator | `c558598b` | Checked; no upstream change; existing attribution and license boundaries retained |
 | `shuorenhua` | https://github.com/MrGeDiao/shuorenhua | `e7c2b867` | Updated from `9e6400d5` to v2.5.1 and installed to the shared hub. Twelve managed metadata/docs files changed; three runtime rule files remain unchanged. `.github` is excluded |
-| `web-access` | https://github.com/eze-is/web-access | `33eef84a` | Found upstream update: `2c8bf0e1` (shared CDP connection lifecycle and portable maintenance). NOT synced or installed: installed `SKILL.md` is locally rewritten and `config.env` is local-only |
+| `web-access` | https://github.com/eze-is/web-access | `2c8bf0e1` | Updated from `33eef84a` and installed; shared CDP connection lifecycle and portable maintenance added. Prior local SKILL backed up; local-only `config.env` preserved in place |
 | `yao-meta-skill` | https://github.com/yaojingang/yao-meta-skill | `f5d8f681` | Checked; no upstream change; existing attribution and license boundaries retained |
 
 Still missing a verified upstream URL: `guizang-html-ppt`, `guizang-social-card-skill`, `huashu-design`, `yao-expert-skill`, `yao-gametheory-skill`, `yao-tutorial-skill`, `agent-review`, `devils-advocate`, `dws`, `fund-investment-strategy`, `getnote`, `hv-analysis`, `khazix-writer`, `xray-book`, `naval-perspective`, `taleb-perspective`, `x-mastery-mentor`.
@@ -57,3 +57,11 @@ Still missing a verified upstream URL: `guizang-html-ppt`, `guizang-social-card-
 - New first-party refs: dbskill `a0e6fa35` -> `f24ea08a` (v2.18.50), with managed changes in `dbs`, `dbs-content`, and `dbs-diagnosis`; web-access `33eef84a` -> `2c8bf0e1`. The aihot page remains at pending sha256 `1fe3b86d` (v2.0.0). Other first-party refs are unchanged; dbskill-knowledge managed content is unchanged.
 - No Skill content was synced or installed. The installed aihot, dbs, dbs-content, dbs-diagnosis, and web-access targets differ from the prior official snapshots or repository copies. The repository dbs also has local changes on upstream-overlapping paths. The installed web-access directory contains a local-only `config.env`, which the current installer would remove. All were protected from overwrite.
 - The repository started on `main` even with fetched `origin/main` at `efa899acfa0b200d3886d72de2037da1f18d1c14`. Existing out-of-scope working-tree edits were untouched. No attribution or license change was required.
+
+## 2026-10-12 user-requested follow-up
+
+- On explicit user request after the weekly check, refreshed `aihot`, `dbs`, `dbs-content`, `dbs-diagnosis`, and `web-access` from the confirmed first-party versions above. No new Skill was added to the weekly managed list.
+- Before writing, backed up the old repository and installed trees plus this ledger to `/Users/surfin/.codex/automations/coriaxu-skills/backups/20261012-requested-sync/`; verified every backup against its source. The previous custom files remain recoverable there.
+- Preserved the dbskill README/LICENSE attribution wrappers and their CC BY-NC 4.0 boundary. The repository and installed managed files match. The installed web-access `config.env` remains byte-for-byte unchanged and outside the public repository.
+- `git diff --check`, all five SKILL frontmatter checks, targeted `./install.sh --dry-run`, and installation of four targets through `./install.sh` passed. `web-access` was installed with an equivalent targeted rsync excluding `config.env`, because the installer would delete that user configuration. All five managed installed trees match the repository; all three existing shared entries are readable.
+- Updated dbs helper Python files passed syntax checks. The web-access loopback unit tests passed all 135 cases when run with localhost access; the initial sandbox-only run could not bind `127.0.0.1`. No live browser session was started.
