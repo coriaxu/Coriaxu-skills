@@ -21,7 +21,9 @@ async function fixture(t) {
   const scripts = path.join(root, 'scripts');
   const eventsPath = path.join(root, 'events.jsonl');
   await fs.mkdir(scripts);
-  await fs.copyFile(path.join(SCRIPTS, 'proxy-maintenance.mjs'), path.join(scripts, 'proxy-maintenance.mjs'));
+  for (const name of ['proxy-maintenance.mjs', 'browser-discovery.mjs', 'user-data.mjs']) {
+    await fs.copyFile(path.join(SCRIPTS, name), path.join(scripts, name));
+  }
   await fs.writeFile(path.join(scripts, 'fake-proxy.mjs'), `
 import fs from 'node:fs';
 import http from 'node:http';
@@ -49,11 +51,13 @@ server.listen(Number(process.env.CDP_PROXY_PORT), '127.0.0.1', () => record({ ac
 import fs from 'node:fs';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { resolveBrowser } from './browser-discovery.mjs';
 const record = event => fs.appendFileSync(process.env.TEST_EVENTS_PATH, JSON.stringify(event) + '\\n');
 record({ action: 'startup', args: process.argv.slice(2) });
 if (process.env.TEST_START_MODE === 'absent') process.exit(1);
 const browserFlag = process.argv.indexOf('--browser');
-const browserId = browserFlag === -1 ? 'edge' : process.argv[browserFlag + 1];
+// 与真实 Proxy 一样报告规范化后的数据目录（旧值 edge → 标准路径）
+const browserId = resolveBrowser(browserFlag === -1 ? 'edge' : process.argv[browserFlag + 1]).id;
 const child = spawn(process.execPath, [fileURLToPath(new URL('./fake-proxy.mjs', import.meta.url))], {
   detached: true, stdio: 'ignore', windowsHide: true,
   env: { ...process.env, TEST_BOOT_BROWSER: browserId },
@@ -73,10 +77,25 @@ for (let i = 0; i < 100; i++) {
 }
 process.exit(1);
 `);
+  // 只压缩轮询间隔（< 1s），不压缩单个请求的总时限（1s）：
+  // 后者被压到 40ms 时，机器负载高会让超时抢在 ECONNREFUSED 之前触发，把「没有服务」误报成「请求超时」。
   const preload = path.join(root, 'fast-timers.mjs');
   await fs.writeFile(preload, `
 const original = globalThis.setTimeout;
-globalThis.setTimeout = (callback, delay, ...args) => original(callback, Math.min(delay, 40), ...args);
+globalThis.setTimeout = (callback, delay, ...args) => original(callback, delay >= 1000 ? delay : Math.min(delay, 40), ...args);
+// TEST_EPIPE_HEALTH=n：第 n 次 /health 请求在写出时以 EPIPE 失败（模拟对端进程正在退出）
+if (process.env.TEST_EPIPE_HEALTH) {
+  const http = (await import('node:http')).default;
+  const originalRequest = http.request;
+  let healthCount = 0;
+  http.request = (options, ...rest) => {
+    const req = originalRequest(options, ...rest);
+    if (options.path === '/health' && ++healthCount === Number(process.env.TEST_EPIPE_HEALTH)) {
+      req.once('socket', () => req.destroy(Object.assign(new Error('write EPIPE'), { code: 'EPIPE' })));
+    }
+    return req;
+  };
+}
 `);
   const events = async () => {
     try { return (await fs.readFile(eventsPath, 'utf8')).split('\n').filter(Boolean).map(line => JSON.parse(line)); }
@@ -93,9 +112,12 @@ globalThis.setTimeout = (callback, delay, ...args) => original(callback, Math.mi
   });
   return {
     events,
-    async run(port, args = [], startMode = 'connected') {
+    async run(port, args = [], startMode = 'connected', extraEnv = {}) {
       const child = spawn(process.execPath, ['--import', preload, path.join(scripts, 'proxy-maintenance.mjs'), ...args], {
-        env: { ...process.env, CDP_PROXY_PORT: String(port), TEST_EVENTS_PATH: eventsPath, TEST_START_MODE: startMode },
+        env: {
+          ...process.env, ...extraEnv, CDP_PROXY_PORT: String(port), TEST_EVENTS_PATH: eventsPath, TEST_START_MODE: startMode,
+          HOME: root, USERPROFILE: root, LOCALAPPDATA: path.join(root, 'AppData', 'Local'),
+        },
         stdio: ['ignore', 'pipe', 'pipe'], windowsHide: true,
       });
       let stdout = '';
@@ -115,15 +137,18 @@ globalThis.setTimeout = (callback, delay, ...args) => original(callback, Math.mi
   };
 }
 
-async function fakeProxy(t, { health = oldHealth, shutdown, healthResponse, statusCode = 200 } = {}) {
+async function fakeProxy(t, { health = oldHealth, shutdown, healthResponse, statusCode = 200, onRequest } = {}) {
   const requests = [];
+  const sockets = new Map(); // socket -> 连接序号，用于断言维护请求是否复用连接
   let current = { ...health };
   const server = http.createServer((req, res) => {
+    if (onRequest?.({ req, res, server, requests })) return;
+    if (!sockets.has(req.socket)) sockets.set(req.socket, sockets.size);
     (async () => {
       let text = '';
       for await (const chunk of req) text += chunk;
       const body = text ? JSON.parse(text) : null;
-      requests.push({ method: req.method, path: req.url, body, origin: req.headers.origin });
+      requests.push({ method: req.method, path: req.url, body, origin: req.headers.origin, connection: sockets.get(req.socket) });
       res.setHeader('content-type', 'application/json');
       if (req.url === '/health') {
         res.statusCode = statusCode;
@@ -403,7 +428,9 @@ test('收到停止确认但服务不退出时有界失败，不执行启动器',
   });
   const result = await f.run(proxy.port, ['restart']);
   assert.equal(result.code, 1, result.stderr);
-  assert.match(result.output.message, /15 秒内未退出/);
+  // 文案报告实际观察时长（测试加速了轮询间隔，远少于 15 秒），不再固定写「15 秒」
+  const seconds = Number(result.output.message.match(/在 ([\d.]+) 秒内未退出/)?.[1]);
+  assert.ok(seconds >= 0 && seconds < 15, result.output.message);
   assert.deepEqual(await f.events(), []);
 });
 
@@ -468,4 +495,186 @@ test('参数与端口校验发生在任何 HTTP 或启动动作之前', async t 
   assert.equal((await f.run('bad-port', ['restart'])).code, 2);
   assert.deepEqual(proxy.requests, []);
   assert.deepEqual(await f.events(), []);
+});
+
+// 真实 Proxy 在 202 之后立即 process.exit：若客户端复用 keep-alive 连接或把退出期间的连接重置当作失败，
+// stop 会报 ECONNRESET、restart 停掉旧服务却不拉起新服务（审计 5.1）。以下两例用确定的时序复现这两种情况。
+test('维护请求不复用连接：/shutdown 之后的健康检查走新连接', async t => {
+  const f = await fixture(t);
+  const proxy = await fakeProxy(t, {
+    shutdown({ res, server }) {
+      res.statusCode = 202;
+      res.end(JSON.stringify({ status: 'stopping', instanceId: oldHealth.instanceId }));
+      // 模拟进程退出：之后不再响应，已有连接全部断开
+      res.once('finish', () => { server.close(); server.closeAllConnections(); });
+    },
+  });
+  const result = await f.run(proxy.port, ['stop']);
+  assert.equal(result.code, 0, `${result.stdout}\n${result.stderr}`);
+  assert.equal(result.output.status, 'stopped');
+  const connections = proxy.requests.map(request => request.connection);
+  assert.equal(new Set(connections).size, connections.length, JSON.stringify(proxy.requests));
+});
+
+for (const action of ['stop', 'restart']) {
+  test(`${action}：退出期间新连接被重置（ECONNRESET）时继续观察，确认退出后${action === 'restart' ? '拉起新服务并保留原浏览器' : '报告 stopped'}`, async t => {
+    const f = await fixture(t);
+    let accepted = false;
+    let resets = 0;
+    const proxy = await fakeProxy(t, {
+      health: { ...oldHealth, browser: { id: 'edge', label: 'Microsoft Edge' } },
+      onRequest({ req, server }) {
+        if (!accepted) return false;
+        // 退出中的进程：监听 socket 仍接入连接，随后重置；第 3 次之后端口释放
+        req.socket.destroy();
+        if (++resets === 3) { server.close(); server.closeAllConnections(); }
+        return true;
+      },
+      shutdown({ res }) {
+        res.statusCode = 202;
+        res.end(JSON.stringify({ status: 'stopping', instanceId: oldHealth.instanceId }));
+        accepted = true;
+      },
+    });
+    const result = await f.run(proxy.port, [action]);
+    assert.equal(result.code, 0, `${result.stdout}\n${result.stderr}`);
+    assert.equal(resets, 3);
+    if (action === 'stop') {
+      assert.equal(result.output.status, 'stopped');
+      assert.deepEqual(await f.events(), []);
+      return;
+    }
+    assert.equal(result.output.status, 'ready');
+    assert.equal(result.output.reused, false);
+    assert.equal(result.output.health.instanceId, 'new-instance');
+    assert.deepEqual((await f.events()).filter(event => event.action === 'startup'), [{ action: 'startup', args: ['--browser', 'edge'] }]);
+  });
+}
+
+test('restart 升级前实例报告旧值、新实例报告标准路径时视为同一浏览器', async t => {
+  const f = await fixture(t);
+  const proxy = await fakeProxy(t, { health: { ...oldHealth, browser: { id: 'chrome', label: 'Chrome' } } });
+  const result = await f.run(proxy.port, ['restart']);
+  assert.equal(result.code, 0, `${result.stdout}\n${result.stderr}`);
+  assert.equal(result.output.status, 'ready');
+  assert.notEqual(result.output.health.browser.id, 'chrome');
+  assert.ok(path.isAbsolute(result.output.health.browser.id));
+  assert.deepEqual((await f.events()).filter(event => event.action === 'startup'), [{ action: 'startup', args: ['--browser', 'chrome'] }]);
+});
+
+test('restart 保留路径形式的原浏览器选择，数据目录不同则 conflict', async t => {
+  const f = await fixture(t);
+  const dia = path.join(os.tmpdir(), 'Dia', 'User Data');
+  const proxy = await fakeProxy(t, { health: { ...oldHealth, browser: { id: dia, label: 'Dia' } } });
+  const result = await f.run(proxy.port, ['restart']);
+  assert.equal(result.code, 0, `${result.stdout}\n${result.stderr}`);
+  assert.equal(result.output.health.browser.id, dia);
+  assert.deepEqual((await f.events()).filter(event => event.action === 'startup'), [{ action: 'startup', args: ['--browser', dia] }]);
+
+  const g = await fixture(t);
+  const other = await fakeProxy(t, { health: { ...oldHealth, browser: { id: dia, label: 'Dia' } } });
+  const conflict = await g.run(other.port, ['restart'], 'different-browser');
+  assert.equal(conflict.code, 2, `${conflict.stdout}\n${conflict.stderr}`);
+  assert.equal(conflict.output.status, 'conflict');
+  assert.equal(conflict.output.expectedBrowserId, dia);
+});
+
+// 两个维护者同时停止同一实例时，后到的 /shutdown 可能落在退出中的进程上被重置；
+// 这同样说明实例正在退出，应继续按旧身份观察，而不是报错退出（restart 也就不会漏掉启动）。
+for (const action of ['stop', 'restart']) {
+  test(`${action}：/shutdown 请求被退出中的实例重置时继续观察，不报 ECONNRESET`, async t => {
+    const f = await fixture(t);
+    let reset = false;
+    const proxy = await fakeProxy(t, {
+      onRequest({ req, server }) {
+        if (req.url !== '/shutdown') return false;
+        reset = true;
+        req.socket.destroy();
+        server.close();
+        server.closeAllConnections();
+        return true;
+      },
+    });
+    const result = await f.run(proxy.port, [action]);
+    assert.equal(result.code, 0, `${result.stdout}\n${result.stderr}`);
+    assert.ok(reset);
+    assert.equal(result.output.status, action === 'stop' ? 'stopped' : 'ready');
+    const starts = (await f.events()).filter(event => event.action === 'startup');
+    assert.equal(starts.length, action === 'stop' ? 0 : 1);
+  });
+}
+
+// 审查建议-7：/shutdown 被重置但服务并未接受停止（仍可读且未进入维护）时立即如实失败，不空等退出。
+for (const action of ['stop', 'restart']) {
+  test(`${action}：/shutdown 被重置而服务未进入维护时立即报告停止未生效，不启动、不强停`, async t => {
+    const f = await fixture(t);
+    let resets = 0;
+    const proxy = await fakeProxy(t, {
+      onRequest({ req }) {
+        if (req.url !== '/shutdown') return false;
+        resets++;
+        req.socket.destroy();
+        return true;
+      },
+    });
+    const result = await f.run(proxy.port, [action]);
+    assert.equal(result.code, 1, `${result.stdout}\n${result.stderr}`);
+    assert.match(result.output.message, /停止未生效/);
+    assert.equal(result.output.health.instanceId, oldHealth.instanceId);
+    assert.equal(resets, 1);
+    assert.equal(proxy.requests.filter(request => request.path === '/health').length, 2);
+    assert.deepEqual(await f.events(), []);
+  });
+}
+
+test('退出观察期间连续多次连接重置不占观察次数，端口释放后报告 stopped', async t => {
+  const f = await fixture(t);
+  let accepted = false;
+  let resets = 0;
+  const proxy = await fakeProxy(t, {
+    onRequest({ req, server }) {
+      if (!accepted) return false;
+      req.socket.destroy();
+      if (++resets === 40) { server.close(); server.closeAllConnections(); }
+      return true;
+    },
+    shutdown({ res }) {
+      res.statusCode = 202;
+      res.end(JSON.stringify({ status: 'stopping', instanceId: oldHealth.instanceId }));
+      accepted = true;
+    },
+  });
+  const result = await f.run(proxy.port, ['stop']);
+  assert.equal(result.code, 0, `${result.stdout}\n${result.stderr}`);
+  assert.equal(result.output.status, 'stopped');
+  assert.equal(resets, 40);
+});
+
+// 审查建议-9：另一维护者正在停止实例时，入口读取的连接可能被重置；短暂重试到得到明确结果，而不是报错退出。
+for (const action of ['status', 'stop']) {
+  test(`${action}：入口健康检查的连接被短暂重置时重试，不报 ECONNRESET`, async t => {
+    const f = await fixture(t);
+    let resets = 0;
+    const proxy = await fakeProxy(t, {
+      onRequest({ req }) {
+        if (req.url !== '/health' || resets >= 2) return false;
+        resets++;
+        req.socket.destroy();
+        return true;
+      },
+    });
+    const result = await f.run(proxy.port, [action]);
+    assert.equal(result.code, 0, `${result.stdout}\n${result.stderr}`);
+    assert.equal(resets, 2);
+    assert.equal(result.output.status, action === 'status' ? 'running' : 'stopped');
+  });
+}
+
+// 冒烟中出现过的 write EPIPE：退出观察时写请求，对端进程已关闭连接。与 ECONNRESET 一样继续观察，而不是报错。
+test('stop：退出观察期间请求以 EPIPE 失败时继续观察，确认退出后报告 stopped', async t => {
+  const f = await fixture(t);
+  const proxy = await fakeProxy(t);
+  const result = await f.run(proxy.port, ['stop'], 'connected', { TEST_EPIPE_HEALTH: '2' });
+  assert.equal(result.code, 0, `${result.stdout}\n${result.stderr}`);
+  assert.equal(result.output.status, 'stopped');
 });

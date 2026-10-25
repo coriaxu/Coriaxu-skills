@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-// CDP Proxy - 通过 HTTP API 操控用户日常浏览器（Chrome / Edge / Chromium 等）
-// 要求：浏览器已开启 remote debugging（chrome://inspect#remote-debugging toggle）
+// CDP Proxy - 通过 HTTP API 操控用户日常浏览器（任意 Chromium 内核浏览器，按数据目录选定）
+// 要求：浏览器已开启 remote debugging（chrome://inspect/#remote-debugging toggle，Edge 为 edge://）
 // Node.js 22+（使用原生 WebSocket）
 
 import http from 'node:http';
@@ -10,7 +10,8 @@ import path from 'node:path';
 import os from 'node:os';
 import { createHash, randomUUID } from 'node:crypto';
 import { createCdpConnection } from './cdp-connection.mjs';
-import { selectBrowser, findFallbackPort } from './browser-discovery.mjs';
+import { selectBrowser, explainUnavailable } from './browser-discovery.mjs';
+import { createPageFrames, FrameError } from './page-frames.mjs';
 
 // --- 解析命令行 --browser 参数（本次启动用哪个浏览器）---
 function parseBrowserArg() {
@@ -59,65 +60,36 @@ if (typeof globalThis.WebSocket !== 'undefined') {
   }
 }
 
-// proxy 启动时连接到的浏览器（用于 /health 暴露给 check-deps 比较）
-let connectedBrowser = null; // { id, label, source }
+// proxy 启动时连接到的浏览器（用于 /health 暴露给 check-deps 与维护命令比较）
+let connectedBrowser = null; // { id: 数据目录路径, label: 显示名, source }
 
-// pin 首次成功连接的浏览器 id。重连时只接受同一 id，避免悄悄降级到别的浏览器。
-let pinnedBrowserId = null;
+// pin 首次成功连接的浏览器身份（数据目录）。重连时只接受同一身份，避免悄悄换到别的浏览器。
+let pinnedBrowser = null; // { id, label }
 
-// --- 自动发现浏览器调试端口 ---
-// 决策完全委派给 browser-discovery.selectBrowser；此处只做日志和返回结构包装。
+// --- 发现浏览器调试端口 ---
+// 决策完全委派给 browser-discovery.selectBrowser；此处只做 pin 校验、日志和返回结构包装。
+// 不可用一律抛错（由下一次请求重试），不扫描固定端口、不换浏览器。
 async function discoverChromePort() {
   const result = await selectBrowser(BROWSER_OVERRIDE);
   if (result.kind === 'config-error') throw new Error(result.message);
-  if (result.kind === 'ok') {
-    if (pinnedBrowserId && pinnedBrowserId !== result.browser.id) {
-      throw new Error(
-        `本次连接的浏览器已经是 ${pinnedBrowserId}，不会自动切到 ${result.browser.id}。` +
-        `如果想换成 ${result.browser.id}，请等共享任务完成，通过 proxy-maintenance.mjs stop 停止后再指定 --browser。`
-      );
-    }
-    connectedBrowser = { id: result.browser.id, label: result.browser.label, source: result.source };
-    const tag = result.source === 'override' ? '[--browser 指定]' : '[config.env 偏好]';
-    console.log(`[CDP Proxy] 选用 ${result.browser.label} (端口 ${result.browser.port}${result.browser.wsPath ? '，带 wsPath' : ''}) ${tag}`);
-    return { port: result.browser.port, wsPath: result.browser.wsPath };
+  if (result.kind === 'unset') {
+    throw new Error('尚未设置浏览器。请先运行 node scripts/check-deps.mjs 完成首次配置（写入 WEB_ACCESS_BROWSER），或启动时指定 --browser <数据目录路径>。');
   }
-  // mismatch：有显式偏好但未检测到 —— 硬错，绝不降级
-  if (result.kind === 'mismatch') {
-    const expected = result.override || result.configured;
-    const denied = result.inaccessible?.find(browser => browser.id === expected);
-    if (denied) {
-      throw new Error(`无法读取 ${denied.label} 的调试端口文件（${denied.code}）。` +
-        '请允许文件访问，或在 config.env 为 WEB_ACCESS_BROWSER 设置已核对的 WEB_ACCESS_CDP_PORT；不会猜测端口或切换浏览器。');
-    }
-    const src = result.source === 'override' ? '本次指定' : '默认偏好';
+  if (result.kind === 'unavailable') {
+    const steps = explainUnavailable(result).join(' ');
+    const switchHint = pinnedBrowser ? '若想换成其他浏览器，请等共享任务完成，通过 proxy-maintenance.mjs stop 停止后再指定 --browser。' : '';
+    throw new Error(`${steps} ${switchHint}`.trim());
+  }
+  if (pinnedBrowser && pinnedBrowser.id !== result.browser.id) {
     throw new Error(
-      `${src}的浏览器是 "${expected}"，但没连上。Agent 处理顺序：` +
-      `(1) 先用系统命令打开 ${expected}（按平台选择，如 macOS 的 open -a），稍等后重试请求；` +
-      `(2) 若仍失败，说明远程调试开关没启用 —— 告知用户在地址栏访问 ${expected}://inspect/#remote-debugging 勾选 "Allow remote debugging for this browser instance"。`
+      `本次连接的浏览器已经是 ${pinnedBrowser.label}（${pinnedBrowser.id}），不会自动切到 ${result.browser.label}（${result.browser.id}）。` +
+      `如果想换浏览器，请等共享任务完成，通过 proxy-maintenance.mjs stop 停止后再指定 --browser。`
     );
   }
-  if (result.inaccessible?.length) {
-    throw new Error(`无法读取浏览器调试端口文件（${result.inaccessible.map(b => `${b.label}: ${b.code}`).join('、')}）。` +
-      '请允许文件访问，或在 config.env 明确配置 WEB_ACCESS_BROWSER 与已核对的 WEB_ACCESS_CDP_PORT。');
-  }
-  // 已 pin 过浏览器（如首次连上 edge 后 edge 退出）：拒绝任何 fallback
-  if (pinnedBrowserId) {
-    throw new Error(
-      `本次连接的浏览器是 ${pinnedBrowserId}，但现在没连上。Agent 处理顺序：` +
-      `(1) 先用系统命令打开 ${pinnedBrowserId}（按平台选择），稍等后重试请求；` +
-      `(2) 若仍失败，告知用户在地址栏访问 ${pinnedBrowserId}://inspect/#remote-debugging 重新勾选允许。` +
-      `若想换成其他浏览器，请等共享任务完成，通过 proxy-maintenance.mjs stop 停止后再指定 --browser。`
-    );
-  }
-  // 仅在「从未成功连接 + 无偏好/override」时允许固定端口兜底（手动 --remote-debugging-port 启动场景）
-  const fallbackPort = await findFallbackPort();
-  if (fallbackPort !== null) {
-    connectedBrowser = { id: 'unknown', label: '未知（通过手动调试端口连接）', source: 'fallback' };
-    console.log(`[CDP Proxy] 通过手动调试端口连接: ${fallbackPort}`);
-    return { port: fallbackPort, wsPath: null };
-  }
-  return null;
+  connectedBrowser = { id: result.browser.id, label: result.browser.label, source: result.source };
+  const tag = result.source === 'override' ? '[--browser 指定]' : '[config.env 偏好]';
+  console.log(`[CDP Proxy] 选用 ${result.browser.label}（${result.browser.id}，端口 ${result.browser.port}${result.browser.wsPath ? '，带 wsPath' : ''}）${tag}`);
+  return { port: result.browser.port, wsPath: result.browser.wsPath };
 }
 
 function getWebSocketUrl(port, wsPath) {
@@ -131,14 +103,11 @@ const connection = createCdpConnection({
   WebSocketImpl: WS,
   discoverUrl: async () => {
     const discovered = await discoverChromePort();
-    if (!discovered) throw new Error('未发现可用浏览器，请检查远程调试设置');
     chromePort = discovered.port;
     return getWebSocketUrl(discovered.port, discovered.wsPath);
   },
   onConnect: () => {
-    if (connectedBrowser?.id && connectedBrowser.id !== 'unknown') {
-      pinnedBrowserId = connectedBrowser.id;
-    }
+    pinnedBrowser = { id: connectedBrowser.id, label: connectedBrowser.label };
     lifecycleLog(`已连接浏览器 (端口 ${chromePort})`);
   },
   onDisconnect: (error) => {
@@ -153,6 +122,14 @@ const connection = createCdpConnection({
     if (msg.method === 'Target.attachedToTarget') {
       const { sessionId, targetInfo } = msg.params;
       sessions.set(targetInfo.targetId, sessionId);
+    }
+    // 标签页关闭、跨进程 iframe 换进程或被移除时，浏览器解除对应 session；从缓存删除，下次使用时重新 attach。
+    if (msg.method === 'Target.detachedFromTarget') {
+      const { sessionId, targetId } = msg.params;
+      for (const [id, sid] of sessions) {
+        if (sid === sessionId && (!targetId || id === targetId)) sessions.delete(id);
+      }
+      portGuardedSessions.delete(sessionId);
     }
     if (msg.method === 'Fetch.requestPaused') {
       const { requestId, sessionId: sid } = msg.params;
@@ -180,6 +157,9 @@ async function ensureSession(targetId) {
   }
   throw new Error('attach 失败: ' + JSON.stringify(resp.error));
 }
+
+// 页面中的 iframe（列举、执行、坐标点击路由）；跨进程 iframe 的子 session 同样经 ensureSession 进入缓存
+const pageFrames = createPageFrames({ send: (...args) => sendCDP(...args), ensureSession });
 
 // 拦截页面对 Chrome 调试端口的探测（反风控）
 // 只拦截 127.0.0.1:{chromePort} 的请求，不影响其他任何本地服务
@@ -420,16 +400,32 @@ const server = http.createServer(async (req, res) => {
       res.end(JSON.stringify({ ok: true }));
     }
 
-    // POST /eval?target=xxx - 执行 JS
+    // GET /frames?target=xxx - 列出页面主文档中的 iframe（frameId、网址、是否跨进程与定位线索）
+    else if (pathname === '/frames') {
+      if (!q.target) {
+        res.statusCode = 400;
+        res.end(JSON.stringify({ error: '需要 target' }));
+        return;
+      }
+      res.end(JSON.stringify(await pageFrames.listFrames(q.target), null, 2));
+    }
+
+    // POST /eval?target=xxx[&frame=frameId] - 执行 JS；带 frame 时在该 iframe 中执行（frameId 取自 /frames）
     else if (pathname === '/eval') {
-      const sid = await ensureSession(q.target);
+      let sid;
+      let contextId;
+      if (q.frame !== undefined) ({ sessionId: sid, contextId } = await pageFrames.frameContext(q.target, q.frame));
+      else sid = await ensureSession(q.target);
       const body = await readBody(req);
       const expr = body || q.expr || 'document.title';
       const resp = await sendCDP('Runtime.evaluate', {
         expression: expr,
         returnByValue: true,
         awaitPromise: true,
+        ...(contextId ? { contextId } : {}),
       }, sid);
+      // 不带 frame 时保持原有返回方式不变；带 frame 时如实报告 CDP 错误
+      if (contextId && resp.error) throw new Error('Runtime.evaluate: ' + resp.error.message);
       if (resp.result?.result?.value !== undefined) {
         res.end(JSON.stringify({ value: resp.result.result.value }));
       } else if (resp.result?.exceptionDetails) {
@@ -438,6 +434,32 @@ const server = http.createServer(async (req, res) => {
       } else {
         res.end(JSON.stringify(resp.result));
       }
+    }
+
+    // GET /clickXY?target=xxx&x=120&y=90 - 按视口坐标真实鼠标点击；逐层进入命中的 iframe（跨进程的换算坐标后发给其子 session），不激活标签页
+    // clicked 只表示鼠标事件已发出；坐标不在视口内时 400，不发事件
+    else if (pathname === '/clickXY') {
+      const x = Number(q.x);
+      const y = Number(q.y);
+      if (!q.target || !q.x?.trim() || !q.y?.trim() || !Number.isFinite(x) || !Number.isFinite(y) || x < 0 || y < 0) {
+        res.statusCode = 400;
+        res.end(JSON.stringify({ error: '需要 target，以及有限的非负 x、y 视口坐标' }));
+        return;
+      }
+      const route = await pageFrames.routePoint(q.target, x, y);
+      for (const type of ['mouseMoved', 'mousePressed', 'mouseReleased']) {
+        const resp = await sendCDP('Input.dispatchMouseEvent', {
+          type, x: route.x, y: route.y,
+          button: type === 'mouseMoved' ? 'none' : 'left',
+          buttons: type === 'mousePressed' ? 1 : 0,
+          clickCount: type === 'mouseMoved' ? 0 : 1,
+        }, route.sessionId);
+        if (resp.error) throw new Error('Input.dispatchMouseEvent: ' + resp.error.message);
+      }
+      res.end(JSON.stringify({
+        clicked: true, x, y,
+        ...(route.frameId ? { frameId: route.frameId, crossProcess: route.crossProcess, depth: route.depth } : {}),
+      }));
     }
 
     // POST /click?target=xxx - 点击（body 为 CSS 选择器）
@@ -606,15 +628,19 @@ const server = http.createServer(async (req, res) => {
           '/navigate?target=': 'POST body=URL - 导航（自动等待加载）',
           '/back?target=': 'GET - 后退',
           '/info?target=': 'GET - 页面标题/URL/状态',
-          '/eval?target=': 'POST body=JS表达式 - 执行 JS',
+          '/frames?target=': 'GET - 列出页面中的 iframe（frameId、网址、是否跨进程）',
+          '/eval?target=&frame=': 'POST body=JS表达式 - 执行 JS（frame 可选，取自 /frames）',
           '/click?target=': 'POST body=CSS选择器 - 点击元素',
+          '/clickAt?target=': 'POST body=CSS选择器 - 真实鼠标点击',
+          '/clickXY?target=&x=&y=': 'GET - 按视口坐标真实鼠标点击（可点中跨进程 iframe）',
+          '/setFiles?target=': 'POST body=JSON - 设置文件输入',
           '/scroll?target=&y=&direction=': 'GET - 滚动页面',
           '/screenshot?target=&file=': 'GET - 截图',
         },
       }));
     }
   } catch (e) {
-    res.statusCode = 500;
+    res.statusCode = e instanceof FrameError ? 400 : 500;
     res.end(JSON.stringify({ error: e.message }));
   } finally {
     // 客户端断开不会取消浏览器动作；以 handler 完成结算，避免维护误停后台操作。

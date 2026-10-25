@@ -1,6 +1,6 @@
 # 贡献指南 | Contributing
 
-当前版本是 2.5.1。欢迎提交具体的改写问题、误改案例和文档修正。
+当前版本是 2.6.0。欢迎提交具体的改写问题、误改案例和文档修正。
 
 ## 运行文件
 
@@ -14,7 +14,7 @@
 
 ## 提交具体问题
 
-优先用 [bad case 模板](.github/ISSUE_TEMPLATE/bad-case.md)，附上：
+优先用 [bad case 模板](https://github.com/MrGeDiao/shuorenhua/blob/e33d5eb6420ba3468043791a57d71c153b0a8691/.github/ISSUE_TEMPLATE/bad-case.md)，附上：
 
 - 原文、用户实际提出的编辑要求、模型交付的全文。
 - 使用的模型、规则版本，以及 mini / lite / full 加载方式。
