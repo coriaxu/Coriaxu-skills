@@ -14,7 +14,7 @@
 
 ## 提交具体问题
 
-优先用 [bad case 模板](https://github.com/MrGeDiao/shuorenhua/blob/e33d5eb6420ba3468043791a57d71c153b0a8691/.github/ISSUE_TEMPLATE/bad-case.md)，附上：
+优先用 [bad case 模板](https://github.com/MrGeDiao/shuorenhua/blob/0a001940bf1fc70f29f29a46c3587749d5badb45/.github/ISSUE_TEMPLATE/bad-case.md)，附上：
 
 - 原文、用户实际提出的编辑要求、模型交付的全文。
 - 使用的模型、规则版本，以及 mini / lite / full 加载方式。

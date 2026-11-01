@@ -125,7 +125,7 @@ v2.6.0 的结果：没问题的 58 条一条都没被改坏；7 条里 5 条改�
 
 ## 反馈
 
-改坏了或者改得不够，请用 [Bad Case 模板](https://github.com/MrGeDiao/shuorenhua/blob/e33d5eb6420ba3468043791a57d71c153b0a8691/.github/ISSUE_TEMPLATE/bad-case.md)贴出原文、你的请求和实际输出。不要贴未授权的聊天记录、密钥或个人信息。想参与改规则，先看[贡献说明](CONTRIBUTING.md)。
+改坏了或者改得不够，请用 [Bad Case 模板](https://github.com/MrGeDiao/shuorenhua/blob/0a001940bf1fc70f29f29a46c3587749d5badb45/.github/ISSUE_TEMPLATE/bad-case.md)贴出原文、你的请求和实际输出。不要贴未授权的聊天记录、密钥或个人信息。想参与改规则，先看[贡献说明](CONTRIBUTING.md)。
 
 历次改动见 [CHANGELOG](CHANGELOG.md)。
 
