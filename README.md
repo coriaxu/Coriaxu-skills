@@ -111,7 +111,7 @@ Coriaxu-skills/
 
 本仓库自身的代码与文档采用 [MIT 协议](LICENSE)。第三方 skill 的协议并不统一，**不要默认它们都是 MIT**：
 
-- `dbs`、`dbs-content`、`dbs-diagnosis`、`dbskill-knowledge` 来自 dontbesilent 的 dbskill，采用 **CC BY-NC 4.0**，带商用限制。商业场景下使用或再分发前，先读这四个目录内的 LICENSE。
+- `dbs`、`dbs-content`、`dbs-diagnosis`、`dbskill-knowledge` 收录的是 dontbesilent 在 2026-11-02 前以 **CC BY-NC 4.0** 发布的版本。上游此后改为保留所有权利，禁止未经书面许可转载或打包；本仓库没有同步受新条款约束的版本。使用或再分发前，请读各目录内的 LICENSE。
 - 其余第三方 skill 为 MIT 或按 MIT 处理，少数目录内没有 LICENSE 文件，协议以原作者仓库为准。
 
 逐个 skill 的作者、来源与协议见 [CREDITS.md](CREDITS.md)，以各自目录内的 LICENSE 为准。

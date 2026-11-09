@@ -2,7 +2,7 @@
 
 This file records the latest verified upstream snapshot used to refresh third-party skills in this repository.
 
-Last checked: 2026-11-02
+Last checked: 2026-11-09
 
 > Baseline note: the `Updated from` refs below describe the working-tree content each sync replaced, not the
 > previously committed content. Several 2026-08 syncs ran but were never committed, so a single commit can
@@ -10,18 +10,18 @@ Last checked: 2026-11-02
 
 | Local skill | Upstream | Ref used | Status / notes |
 |---|---|---|---|
-| `aihot` | https://aihot.virxact.com/aihot-skill/ | fetched 2026-11-02, sha256 `1fe3b86d` | Checked; public SKILL.md still matches repository and installed v2.0.0; no installation |
+| `aihot` | https://aihot.virxact.com/aihot-skill/ | fetched 2026-11-09, sha256 `dfa82adb` | Updated public SKILL.md contact address and installed; service/data terms remain separate from the MIT Skill file |
 | `darwin-skill` | https://github.com/alchaincyf/darwin-skill | `8a8b6625` | Checked; first-party HEAD unchanged; no installation |
-| `dbs` | https://github.com/dontbesilent2025/dbskill | `bab93c03` | Updated from `707725c8` to v3.1.0 and installed; version-check instruction refreshed; CC BY-NC 4.0 README/LICENSE retained |
-| `dbs-content` | https://github.com/dontbesilent2025/dbskill | `bab93c03` | Checked; upstream advanced from `707725c8`, but this managed directory is unchanged; no installation |
-| `dbs-diagnosis` | https://github.com/dontbesilent2025/dbskill | `bab93c03` | Updated from `707725c8` and installed; practical pricing examples in SKILL.md and dissolution-funnel reference expanded; CC BY-NC 4.0 README/LICENSE retained |
-| `dbskill-knowledge` | https://github.com/dontbesilent2025/dbskill | `bab93c03` | Checked; upstream advanced from `707725c8`, but managed knowledge content is unchanged; no installation; CC BY-NC 4.0 wrappers retained |
+| `dbs` | https://github.com/dontbesilent2025/dbskill | `bab93c03` | First-party HEAD `69e6fab2` has v3.3.0 content, but not synced: the new 2026-11-02 license bars redistribution/packaging without written permission; repository and installed pre-change CC BY-NC 4.0 snapshot retained |
+| `dbs-content` | https://github.com/dontbesilent2025/dbskill | `bab93c03` | Checked; first-party HEAD `69e6fab2` has no managed content change; pre-change CC BY-NC 4.0 snapshot retained; no installation |
+| `dbs-diagnosis` | https://github.com/dontbesilent2025/dbskill | `bab93c03` | Checked; first-party HEAD `69e6fab2` has no managed content change; pre-change CC BY-NC 4.0 snapshot retained; no installation |
+| `dbskill-knowledge` | https://github.com/dontbesilent2025/dbskill | `bab93c03` | Checked; first-party HEAD `69e6fab2` has no managed content change; pre-change CC BY-NC 4.0 knowledge wrappers retained; no installation |
 | `luban-skill` | https://github.com/LearnPrompt/luban-skill | `cea2da33` | Checked; first-party HEAD unchanged; no installation |
-| `nuwa-skill` | https://github.com/alchaincyf/nuwa-skill | `fe037468` | First-party HEAD remains `7c7edfeb` with newer content; not synced because installed SKILL.md and example files contain local rewrites. Existing repository snapshot and local customizations protected |
+| `nuwa-skill` | https://github.com/alchaincyf/nuwa-skill | `fe037468` | First-party HEAD `5bb9b659` has newer content; not synced because installed SKILL.md and examples contain local rewrites. Repository snapshot and local customizations protected |
 | `obsidian-bases` | https://github.com/kepano/obsidian-skills | `3ccff533` | Checked; first-party HEAD unchanged; no installation |
 | `obsidian-markdown` | https://github.com/kepano/obsidian-skills | `3ccff533` | Checked; first-party HEAD unchanged; no installation |
 | `qiaomu-epub-book-generator` | https://github.com/joeseesun/qiaomu-epub-book-generator | `c558598b` | Checked; first-party HEAD unchanged; no installation |
-| `shuorenhua` | https://github.com/MrGeDiao/shuorenhua | `0a001940` | Updated from `e33d5eb6` and installed; evaluation checks, test coverage, run records and install docs refreshed; SKILL.md unchanged. Excluded issue-template links pinned to this first-party ref |
+| `shuorenhua` | https://github.com/MrGeDiao/shuorenhua | `9b91ed94` | Updated and installed from first-party runtime directory `skills/shuorenhua/`: three runtime files plus unchanged root MIT LICENSE; prior development files remain available in the first-party repo and the run backup |
 | `web-access` | https://github.com/eze-is/web-access | `d173a759` | Updated from `2c8bf0e1` to v2.6.0 and installed; browser data-path support and frame handling added; local-only config.env preserved, first-use data migration not run |
 | `yao-meta-skill` | https://github.com/yaojingang/yao-meta-skill | `f5d8f681` | Checked; first-party HEAD unchanged; no installation |
 
@@ -85,3 +85,11 @@ Historical source leads outside this weekly automation: `guizang-html-ppt`, `gui
 - `nuwa-skill` remains unsynced at repository ref `fe037468`: first-party HEAD `7c7edfeb` is newer, but installed local rewrites still conflict. No automatic replacement or installation was attempted.
 - `git diff --check`, three updated-Skill frontmatter checks, targeted `install.sh --dry-run`, actual installation, repository-to-hub tree equality, and all three shared entry readbacks passed. shuorenhua structure check passed (123 cases, 60 links), and 78 relevant unit tests passed; dbs Python helpers compiled. Two excluded issue-template links were pinned to the new upstream ref, and two upstream trailing-space instances were removed mechanically.
 - Existing source/license attributions remain current; dontbesilent CC BY-NC 4.0 README/LICENSE wrappers were retained.
+
+## 2026-11-09 verification
+
+- All 14 confirmed managed Skill entries and the existing pending-source entry exist. All 10 first-party sources were reachable. The run began on `main`, aligned with `origin/main`, with no historical unpushed commit.
+- Found first-party updates in aihot (SHA-256 `1fe3b86d` -> `dfa82adb`), dbskill (`bab93c03` -> `69e6fab2`), nuwa-skill (`7c7edfeb` -> `5bb9b659` since the prior check), and shuorenhua (`0a001940` -> `9b91ed94`). dbskill managed content changed only in `dbs`; its new license forbids redistribution and packaging without written permission, so the repository and installed pre-change CC BY-NC 4.0 snapshot remain. nuwa-skill remains unsynced because installed local rewrites conflict.
+- Synced and installed `aihot` and `shuorenhua` only. shuorenhua now uses the author's three-file runtime directory plus its unchanged root MIT LICENSE; prior development files remain in first-party Git, local Git history and the verified run backup at `/tmp/coriaxu-upstreams-20261109/backup`. Existing out-of-scope working-tree changes were preserved.
+- `git diff --check`, two frontmatter checks, targeted `install.sh --dry-run`, actual targeted installation, first-party content equality, repository-to-hub equality, and readback through all three shared entries passed. The author's full-source `automation/check_repo.py` passed 123 cases and 65 links before packaging; no model evaluation was run.
+- Updated README, CREDITS and origin-audit to distinguish the retained CC BY-NC 4.0 snapshot from the newly restricted dbskill upstream license.

@@ -16,7 +16,7 @@
 ### dontbesilent — `dbs`, `dbs-content`, `dbs-diagnosis`, `dbskill-knowledge`
 
 - 目录：`skills/dbs/`、`skills/dbs-content/`、`skills/dbs-diagnosis/`、`skills/dbskill-knowledge/`
-- 协议：CC BY-NC 4.0（见目录内 LICENSE；`dbskill-knowledge` 为本仓库整理的知识包）
+- 协议：本仓库收录的 2026-11-02 前版本为 CC BY-NC 4.0（见目录内 LICENSE；`dbskill-knowledge` 为本仓库整理的知识包）。上游自 2026-11-02 起改为保留所有权利，新版本未经作者书面许可不得转载或打包；本仓库未同步这些新版本。
 - 功能：商业工具箱系列 skill — 商业模式诊断、内容创作诊断、商业问诊入口，附共享知识包
 - 原仓：https://github.com/dontbesilent2025/dbskill
 
@@ -94,7 +94,7 @@
 
 - 本仓库整体采用 **MIT 协议**（见 [LICENSE](LICENSE)）覆盖我自己编写的代码（`install.sh`、文档、工具脚本等）
 - `skills/` 下每个第三方 skill 目录**保留原作者的 LICENSE 文件**，按其原始协议分发
-- 已知第三方协议包含 MIT、CC BY-NC 4.0 或未声明；未发现 GPL / AGPL 等强传染性协议
+- 本仓库已收录的第三方内容包含 MIT、CC BY-NC 4.0 或未声明许可；dontbesilent 后续版本另有禁止转载、打包的新条款，未收录。未发现 GPL / AGPL 等强传染性协议
 
 ## 📬 联系方式
 
@@ -102,4 +102,4 @@ GitHub: [@coriaxu](https://github.com/coriaxu)
 
 ---
 
-_最后更新：2026-06-11_
+_最后更新：2026-11-09_

@@ -3,7 +3,7 @@
 **扫描时间**：2026-04-18
 **扫描范围**：`/Users/surfin/.claude/skills/` 下候选开源的 ~40 个 skill
 **扫描方式**：SKILL.md frontmatter + LICENSE 文件 + README.md 归属关键词
-**更新记录**：2026-05-27 依据已确认上游仓库补全来源链接与许可信息；2026-06-11 新增 LearnPrompt 的 `luban-skill`；2026-09-01 将 `coriaxu-pending-zone` 标为退役，不再列入可安装目录。
+**更新记录**：2026-05-27 依据已确认上游仓库补全来源链接与许可信息；2026-06-11 新增 LearnPrompt 的 `luban-skill`；2026-09-01 将 `coriaxu-pending-zone` 标为退役，不再列入可安装目录；2026-11-09 核对 dbskill 上游许可证变更，本仓库保留旧版授权快照。
 
 ## 溯源结果总览
 
@@ -69,7 +69,7 @@
 | web-access | 一泽 Eze | MIT | `SKILL.md` frontmatter: `license: MIT`, `github: https://github.com/eze-is/web-access` | https://github.com/eze-is/web-access |
 | claude-to-im | op7418 | MIT | `LICENSE:3 Copyright (c) 2024-2025 op7418` | 独立 GitHub 仓（有 `.git` 目录） |
 | aihot | 卡兹克 | MIT | 原始 skill 页面 https://aihot.virxact.com/aihot-skill/ | https://aihot.virxact.com/aihot-skill/ |
-| dbs / dbs-content / dbs-diagnosis / dbskill-knowledge | dontbesilent | CC BY-NC 4.0 | 上游 `LICENSE` 标注 Attribution-NonCommercial 4.0 International | https://github.com/dontbesilent2025/dbskill |
+| dbs / dbs-content / dbs-diagnosis / dbskill-knowledge | dontbesilent | 本仓库收录的 2026-11-02 前快照为 CC BY-NC 4.0；上游新版本保留所有权利，禁止未经书面许可转载或打包 | 本仓库各目录 `LICENSE` 保留旧版授权；上游 2026-11-02 起的新 `LICENSE` 第 4、8 条 | https://github.com/dontbesilent2025/dbskill |
 | obsidian-markdown / obsidian-bases | kepano / Obsidian community | MIT | 上游 `LICENSE` | https://github.com/kepano/obsidian-skills |
 | qiaomu-epub-book-generator | 乔木 / joeseesun | 待确认（上游仓内无 LICENSE） | 上游仓库公开发布 | https://github.com/joeseesun/qiaomu-epub-book-generator |
 
